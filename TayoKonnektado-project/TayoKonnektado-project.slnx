@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="../tayoKonnektado.frontEnd/tayokonnektado.frontend.esproj">
+    <Build />
+    <Deploy />
+  </Project>
+  <Project Path="TayoKonnektado-project.csproj" />
+</Solution>
