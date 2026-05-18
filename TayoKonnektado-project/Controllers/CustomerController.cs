@@ -557,82 +557,114 @@ namespace TayoKonnektado_project.Controllers
         public async Task<IActionResult> CompletePrepaidTopUp(int id)
         {
             var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            var prepaid = await _context.PrepaidLoads
+            var prepaid = await GetPrepaidLoadAsync(id, userId);
+            if (prepaid == null)
+                return NotFound(new { message = "Prepaid service not found" });
+
+            var pendingPayment = await GetLatestPendingPaymentAsync(id, userId);
+            if (pendingPayment == null)
+                return await BuildNoPendingTopupResponseAsync(id, userId, prepaid);
+
+            return await HandlePendingTopupAsync(pendingPayment, prepaid);
+        }
+
+        private Task<PrepaidLoad?> GetPrepaidLoadAsync(int id, string? userId)
+        {
+            return _context.PrepaidLoads
                 .Include(p => p.ServiceAccount)
                     .ThenInclude(sa => sa.Device)
                 .FirstOrDefaultAsync(p => p.PrepaidLoadID == id && p.ServiceAccount.Device.UserID == userId);
-            
-            if (prepaid == null) return NotFound(new { message = "Prepaid service not found" });
+        }
 
-            var pendingPayment = await _context.Payments
+        private Task<Payment?> GetLatestPendingPaymentAsync(int id, string? userId)
+        {
+            return _context.Payments
                 .Include(p => p.Invoice)
                 .Where(p => p.UserID == userId && p.Status == "Pending" && p.Invoice != null && p.Invoice.PrepaidLoadID == id)
                 .OrderByDescending(p => p.PaymentDate)
                 .FirstOrDefaultAsync();
+        }
 
-            if (pendingPayment == null)
+        private async Task<IActionResult> BuildNoPendingTopupResponseAsync(int id, string? userId, PrepaidLoad prepaid)
+        {
+            var alreadyCompleted = await _context.Payments
+                .Include(p => p.Invoice)
+                .Where(p => p.UserID == userId && p.Status == "Completed" && p.Invoice != null && p.Invoice.PrepaidLoadID == id)
+                .OrderByDescending(p => p.PaymentDate)
+                .FirstOrDefaultAsync();
+
+            if (alreadyCompleted != null)
             {
-                var alreadyCompleted = await _context.Payments
-                    .Include(p => p.Invoice)
-                    .Where(p => p.UserID == userId && p.Status == "Completed" && p.Invoice != null && p.Invoice.PrepaidLoadID == id)
-                    .OrderByDescending(p => p.PaymentDate)
-                    .FirstOrDefaultAsync();
-
-                if (alreadyCompleted != null)
-                    return Ok(new { status = "Completed", message = "Top-up already applied.", amountAdded = alreadyCompleted.AmountPaid, loadAmount = prepaid.LoadAmount, remainingBalance = prepaid.RemainingBalance, lastReload = prepaid.LastReloadBalance });
-
-                return Ok(new { status = "Pending", message = "No pending top-up payment found" });
+                return Ok(new
+                {
+                    status = "Completed",
+                    message = "Top-up already applied.",
+                    amountAdded = alreadyCompleted.AmountPaid,
+                    loadAmount = prepaid.LoadAmount,
+                    remainingBalance = prepaid.RemainingBalance,
+                    lastReload = prepaid.LastReloadBalance
+                });
             }
 
+            return Ok(new { status = "Pending", message = "No pending top-up payment found" });
+        }
+
+        private async Task<IActionResult> HandlePendingTopupAsync(Payment pendingPayment, PrepaidLoad prepaid)
+        {
             try
             {
                 var sourceStatus = await _payMongoService.GetSourceStatus(pendingPayment.ReferenceNum!);
                 Console.WriteLine($"Prepaid topup source status for {pendingPayment.ReferenceNum}: {sourceStatus}");
 
                 if (sourceStatus == "chargeable" || sourceStatus == "paid")
-                {
-                    pendingPayment.Status = "Completed";
-                    pendingPayment.PaymentDate = DateTime.UtcNow;
+                    return await CompleteTopupAsync(pendingPayment, prepaid);
 
-                    if (pendingPayment.Invoice != null)
-                    {
-                        pendingPayment.Invoice.Status = "Paid";
-                    }
-                    var amountAdded = pendingPayment.AmountPaid;
-                    prepaid.LoadAmount += amountAdded;
-                    prepaid.RemainingBalance = (prepaid.RemainingBalance ?? 0) + amountAdded;
-                    prepaid.LastReloadBalance = DateTime.UtcNow;
+                if (sourceStatus == "cancelled" || sourceStatus == "expired")
+                    return await FailTopupAsync(pendingPayment);
 
-                    await _context.SaveChangesAsync();
-
-                    return Ok(new
-                    {
-                        status = "Completed",
-                        message = "Top-up completed successfully!",
-                        amountAdded,
-                        loadAmount = prepaid.LoadAmount,
-                        remainingBalance = prepaid.RemainingBalance,
-                        lastReload = prepaid.LastReloadBalance
-                    });
-                }
-                else if (sourceStatus == "cancelled" || sourceStatus == "expired")
-                {
-                    pendingPayment.Status = "Failed";
-                    if (pendingPayment.Invoice != null)
-                        pendingPayment.Invoice.Status = "Failed";
-                    await _context.SaveChangesAsync();
-                    return Ok(new { status = "Failed", message = "Payment was cancelled or expired." });
-                }
-                else
-                {
-                    return Ok(new { status = "Pending", message = "Payment is still processing. Please wait a moment." });
-                }
+                return Ok(new { status = "Pending", message = "Payment is still processing. Please wait a moment." });
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error checking prepaid topup source status: {ex.Message}");
                 return Ok(new { status = "Pending", message = "Could not verify payment status. Please try again." });
             }
+        }
+
+        private async Task<IActionResult> CompleteTopupAsync(Payment pendingPayment, PrepaidLoad prepaid)
+        {
+            pendingPayment.Status = "Completed";
+            pendingPayment.PaymentDate = DateTime.UtcNow;
+
+            if (pendingPayment.Invoice != null)
+                pendingPayment.Invoice.Status = "Paid";
+
+            var amountAdded = pendingPayment.AmountPaid;
+            prepaid.LoadAmount += amountAdded;
+            prepaid.RemainingBalance = (prepaid.RemainingBalance ?? 0) + amountAdded;
+            prepaid.LastReloadBalance = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                status = "Completed",
+                message = "Top-up completed successfully!",
+                amountAdded,
+                loadAmount = prepaid.LoadAmount,
+                remainingBalance = prepaid.RemainingBalance,
+                lastReload = prepaid.LastReloadBalance
+            });
+        }
+
+        private async Task<IActionResult> FailTopupAsync(Payment pendingPayment)
+        {
+            pendingPayment.Status = "Failed";
+            if (pendingPayment.Invoice != null)
+                pendingPayment.Invoice.Status = "Failed";
+
+            await _context.SaveChangesAsync();
+            return Ok(new { status = "Failed", message = "Payment was cancelled or expired." });
         }
 
 

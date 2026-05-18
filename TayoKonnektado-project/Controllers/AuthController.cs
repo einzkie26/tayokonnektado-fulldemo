@@ -559,110 +559,35 @@ namespace TayoKonnektado_project.Controllers
             try
             {
                 var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                
-                var activeSubscriptionCount = await _context.Subscriptions
-                    .CountAsync(s => s.UserID == userId && s.Status == "Active");
-                var activePrepaidCount = await _context.Devices
-                    .Where(d => d.UserID == userId)
-                    .SelectMany(d => d.ServiceAccounts)
-                    .Where(sa => sa.Status == "Active" && sa.ServiceType == "Prepaid")
-                    .CountAsync();
-                var totalActiveServices = activeSubscriptionCount + activePrepaidCount;
-                
-                if (totalActiveServices >= 5)
-                    return BadRequest(new { message = "You have reached the maximum limit of 5 active services." });
-                
-                var serviceType = request.ServiceType ?? "Subscription";
-                
-                if (serviceType == "Prepaid" && string.IsNullOrWhiteSpace(request.PhoneNumber))
-                {
-                    return BadRequest(new { message = "Phone number is required for Prepaid WiFi service" });
-                }
-                var macAddress = request.MacAddress;
-                if (serviceType == "Prepaid" && string.IsNullOrWhiteSpace(macAddress))
-                {
-                    macAddress = $"PP:{DateTime.UtcNow:HHmmss}:{new Random().Next(0x00, 0xFF):X2}:{new Random().Next(0x00, 0xFF):X2}:{new Random().Next(0x00, 0xFF):X2}:{new Random().Next(0x00, 0xFF):X2}";
-                }
 
-                var device = new Device
-                {
-                    UserID = userId!,
-                    MACAddress = macAddress,
-                    Status = "Active",
-                    DeviceType = "WiFi"
-                };
-                _context.Devices.Add(device);
-                await _context.SaveChangesAsync();
+                var limitResult = await EnforceServiceLimitAsync(userId);
+                if (limitResult != null)
+                    return limitResult;
 
-                var serviceAccount = new ServiceAccount
-                {
-                    DeviceID = device.DeviceID,
-                    ServiceType = serviceType,
-                    Status = "Active"
-                };
-                _context.ServiceAccounts.Add(serviceAccount);
-                await _context.SaveChangesAsync();
+                var serviceType = ResolveServiceType(request.ServiceType);
+                var validationResult = ValidatePrepaidRequest(serviceType, request.PhoneNumber);
+                if (validationResult != null)
+                    return validationResult;
+
+                var macAddress = ResolveMacAddress(serviceType, request.MacAddress);
+
+                var device = await CreateDeviceAsync(userId!, macAddress);
+                var serviceAccount = await CreateServiceAccountAsync(device.DeviceID, serviceType);
 
                 if (serviceType == "Prepaid")
                 {
-                    var prepaidLoad = new PrepaidLoad
-                    {
-                        ServiceAccountID = serviceAccount.ServiceAccountID,
-                        PhoneNumber = request.PhoneNumber,
-                        LoadAmount = 0,
-                        RemainingBalance = 0
-                    };
-                    _context.PrepaidLoads.Add(prepaidLoad);
-                    await _context.SaveChangesAsync();
+                    await CreatePrepaidLoadAsync(serviceAccount.ServiceAccountID, request.PhoneNumber);
                 }
                 else
                 {
-                    int planId;
-                    if (request.PlanID.HasValue)
-                    {
-                        planId = request.PlanID.Value;
-                    }
-                    else
-                    {
-                        var macSuffix = request.MacAddress.Replace(":", "").ToUpper().Substring(request.MacAddress.Replace(":", "").Length - 2);
-                        int speedMbps = macSuffix switch
-                        {
-                            "FA" => 50,
-                            "EA" => 100,
-                            "GA" => 200,
-                            "HA" => 500,
-                            _ => 0
-                        };
+                    var planResult = await ResolvePlanIdAsync(request.PlanID, request.MacAddress);
+                    if (planResult.Error != null)
+                        return planResult.Error;
 
-                        if (speedMbps == 0)
-                            return BadRequest(new { message = "Invalid MAC ID. Must end with FA (50Mbps), EA (100Mbps), GA (200Mbps), or HA (500Mbps)" });
-
-                        var plan = await _context.SubscriptionPlans
-                            .AsNoTracking()
-                            .Where(p => p.SpeedMbps == speedMbps)
-                            .Select(p => new { p.PlanID })
-                            .FirstOrDefaultAsync();
-                        if (plan == null)
-                            return BadRequest(new { message = $"Plan not found. Please contact administrator to set up subscription plans." });
-                        planId = plan.PlanID;
-                    }
-
-                    var subscription = new Subscription
-                    {
-                        ServiceAccountID = serviceAccount.ServiceAccountID,
-                        PlanID = planId,
-                        UserID = userId!,
-                        StartDate = DateTime.UtcNow,
-                        Status = "Active"
-                    };
-                    _context.Subscriptions.Add(subscription);
+                    await CreateSubscriptionAsync(serviceAccount.ServiceAccountID, userId!, planResult.PlanId!.Value);
                 }
 
-                var onboarding = await _context.OnboardingStatuses.FirstOrDefaultAsync(o => o.UserID == userId);
-                if (onboarding != null)
-                    onboarding.HasRegisteredDevice = true;
-
-                await _context.SaveChangesAsync();
+                await UpdateOnboardingAsync(userId);
 
                 return Ok(new { message = "Device registered successfully", deviceId = device.DeviceID, serviceType });
             }
@@ -670,6 +595,139 @@ namespace TayoKonnektado_project.Controllers
             {
                 return BadRequest(new { message = $"Failed to register device: {ex.Message}" });
             }
+        }
+
+        private async Task<IActionResult?> EnforceServiceLimitAsync(string? userId)
+        {
+            var activeSubscriptionCount = await _context.Subscriptions
+                .CountAsync(s => s.UserID == userId && s.Status == "Active");
+            var activePrepaidCount = await _context.Devices
+                .Where(d => d.UserID == userId)
+                .SelectMany(d => d.ServiceAccounts)
+                .Where(sa => sa.Status == "Active" && sa.ServiceType == "Prepaid")
+                .CountAsync();
+
+            if (activeSubscriptionCount + activePrepaidCount >= 5)
+                return BadRequest(new { message = "You have reached the maximum limit of 5 active services." });
+
+            return null;
+        }
+
+        private static string ResolveServiceType(string? serviceType)
+        {
+            return string.IsNullOrWhiteSpace(serviceType) ? "Subscription" : serviceType;
+        }
+
+        private IActionResult? ValidatePrepaidRequest(string serviceType, string? phoneNumber)
+        {
+            if (serviceType == "Prepaid" && string.IsNullOrWhiteSpace(phoneNumber))
+                return BadRequest(new { message = "Phone number is required for Prepaid WiFi service" });
+
+            return null;
+        }
+
+        private static string? ResolveMacAddress(string serviceType, string? macAddress)
+        {
+            if (serviceType != "Prepaid" || !string.IsNullOrWhiteSpace(macAddress))
+                return macAddress;
+
+            return $"PP:{DateTime.UtcNow:HHmmss}:{new Random().Next(0x00, 0xFF):X2}:{new Random().Next(0x00, 0xFF):X2}:{new Random().Next(0x00, 0xFF):X2}:{new Random().Next(0x00, 0xFF):X2}";
+        }
+
+        private async Task<Device> CreateDeviceAsync(string userId, string? macAddress)
+        {
+            var device = new Device
+            {
+                UserID = userId,
+                MACAddress = macAddress,
+                Status = "Active",
+                DeviceType = "WiFi"
+            };
+            _context.Devices.Add(device);
+            await _context.SaveChangesAsync();
+            return device;
+        }
+
+        private async Task<ServiceAccount> CreateServiceAccountAsync(int deviceId, string serviceType)
+        {
+            var serviceAccount = new ServiceAccount
+            {
+                DeviceID = deviceId,
+                ServiceType = serviceType,
+                Status = "Active"
+            };
+            _context.ServiceAccounts.Add(serviceAccount);
+            await _context.SaveChangesAsync();
+            return serviceAccount;
+        }
+
+        private async Task CreatePrepaidLoadAsync(int serviceAccountId, string? phoneNumber)
+        {
+            var prepaidLoad = new PrepaidLoad
+            {
+                ServiceAccountID = serviceAccountId,
+                PhoneNumber = phoneNumber,
+                LoadAmount = 0,
+                RemainingBalance = 0
+            };
+            _context.PrepaidLoads.Add(prepaidLoad);
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task<(int? PlanId, IActionResult? Error)> ResolvePlanIdAsync(int? planId, string? macAddress)
+        {
+            if (planId.HasValue)
+                return (planId.Value, null);
+
+            if (string.IsNullOrWhiteSpace(macAddress))
+                return (null, BadRequest(new { message = "MAC address is required for subscription service" }));
+
+            var normalized = macAddress.Replace(":", "").ToUpperInvariant();
+            var macSuffix = normalized.Substring(normalized.Length - 2);
+            var speedMbps = macSuffix switch
+            {
+                "FA" => 50,
+                "EA" => 100,
+                "GA" => 200,
+                "HA" => 500,
+                _ => 0
+            };
+
+            if (speedMbps == 0)
+                return (null, BadRequest(new { message = "Invalid MAC ID. Must end with FA (50Mbps), EA (100Mbps), GA (200Mbps), or HA (500Mbps)" }));
+
+            var plan = await _context.SubscriptionPlans
+                .AsNoTracking()
+                .Where(p => p.SpeedMbps == speedMbps)
+                .Select(p => new { p.PlanID })
+                .FirstOrDefaultAsync();
+            if (plan == null)
+                return (null, BadRequest(new { message = "Plan not found. Please contact administrator to set up subscription plans." }));
+
+            return (plan.PlanID, null);
+        }
+
+        private async Task CreateSubscriptionAsync(int serviceAccountId, string userId, int planId)
+        {
+            var subscription = new Subscription
+            {
+                ServiceAccountID = serviceAccountId,
+                PlanID = planId,
+                UserID = userId,
+                StartDate = DateTime.UtcNow,
+                Status = "Active"
+            };
+            _context.Subscriptions.Add(subscription);
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task UpdateOnboardingAsync(string? userId)
+        {
+            var onboarding = await _context.OnboardingStatuses.FirstOrDefaultAsync(o => o.UserID == userId);
+            if (onboarding != null)
+                onboarding.HasRegisteredDevice = true;
+
+            await _context.SaveChangesAsync();
         }
 
         [Authorize]

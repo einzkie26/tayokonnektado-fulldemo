@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TayoKonnektado_project.Data;
+using TayoKonnektado_project.Models;
 
 namespace TayoKonnektado_project.Services
 {
@@ -41,66 +42,8 @@ namespace TayoKonnektado_project.Services
                     using var scope = _serviceProvider.CreateScope();
                     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-                    // 1. Expire any promos past their ExpiresAt date
-                    var expiredPromos = await context.PrepaidPromos
-                        .Where(p => p.Status == "Active" && p.ExpiresAt <= DateTime.UtcNow)
-                        .ToListAsync(stoppingToken);
-
-                    foreach (var ep in expiredPromos)
-                    {
-                        ep.Status = "Expired";
-                        _logger.LogInformation($"Promo '{ep.PromoTitle}' (#{ep.PrepaidPromoID}) expired.");
-                    }
-
-                    // 2. Get all active promos that still have data remaining
-                    var activePromos = await context.PrepaidPromos
-                        .Include(p => p.PrepaidLoad)
-                            .ThenInclude(pl => pl.ServiceAccount)
-                        .Where(p => p.Status == "Active"
-                                 && p.RemainingDataMB > 0
-                                 && p.PrepaidLoad.ServiceAccount.Status == "Active"
-                                 && p.PrepaidLoad.ServiceAccount.ServiceType == "Prepaid")
-                        .ToListAsync(stoppingToken);
-
-                    if (activePromos.Any())
-                    {
-                        // Group by PrepaidLoadID so we deduct once per account
-                        var grouped = activePromos.GroupBy(p => p.PrepaidLoadID);
-
-                        foreach (var group in grouped)
-                        {
-                            // Random MB between 5.0 and 15.0 (visible in UI, 20 GB promo lasts ~1-3 days)
-                            var deductionMB = (decimal)(MinMBPerCycle + (_random.NextDouble() * (MaxMBPerCycle - MinMBPerCycle)));
-
-                            var remaining = deductionMB;
-
-                            // Deduct from each promo in order (oldest first) until cycle is satisfied
-                            foreach (var promo in group.OrderBy(p => p.ActivatedAt))
-                            {
-                                if (remaining <= 0) break;
-
-                                var deduction = Math.Min(remaining, promo.RemainingDataMB);
-                                promo.RemainingDataMB -= deduction;
-                                remaining -= deduction;
-
-                                if (promo.RemainingDataMB <= 0)
-                                {
-                                    promo.RemainingDataMB = 0;
-                                    promo.Status = "Depleted";
-                                    _logger.LogInformation(
-                                        $"Promo '{promo.PromoTitle}' (#{promo.PrepaidPromoID}) data depleted.");
-                                }
-                            }
-                        }
-
-                        await context.SaveChangesAsync(stoppingToken);
-                        _logger.LogInformation(
-                            $"Deducted random MB from {activePromos.Count} active promo(s).");
-                    }
-
-                    // 3. Note: We do NOT deactivate service accounts with zero promos.
-                    // Users can have active prepaid accounts with zero balance - they just need to top up.
-                    // The service account stays "Active" but has no data until they purchase a promo.
+                    await ExpirePromosAsync(context, stoppingToken);
+                    await ApplyUsageAsync(context, stoppingToken);
                 }
                 catch (Exception ex)
                 {
@@ -108,6 +51,67 @@ namespace TayoKonnektado_project.Services
                 }
 
                 await Task.Delay(Interval, stoppingToken);
+            }
+        }
+
+        private async Task ExpirePromosAsync(ApplicationDbContext context, CancellationToken stoppingToken)
+        {
+            var expiredPromos = await context.PrepaidPromos
+                .Where(p => p.Status == "Active" && p.ExpiresAt <= DateTime.UtcNow)
+                .ToListAsync(stoppingToken);
+
+            foreach (var ep in expiredPromos)
+            {
+                ep.Status = "Expired";
+                _logger.LogInformation($"Promo '{ep.PromoTitle}' (#{ep.PrepaidPromoID}) expired.");
+            }
+
+            if (expiredPromos.Count > 0)
+                await context.SaveChangesAsync(stoppingToken);
+        }
+
+        private async Task ApplyUsageAsync(ApplicationDbContext context, CancellationToken stoppingToken)
+        {
+            var activePromos = await context.PrepaidPromos
+                .Include(p => p.PrepaidLoad)
+                    .ThenInclude(pl => pl.ServiceAccount)
+                .Where(p => p.Status == "Active"
+                         && p.RemainingDataMB > 0
+                         && p.PrepaidLoad.ServiceAccount.Status == "Active"
+                         && p.PrepaidLoad.ServiceAccount.ServiceType == "Prepaid")
+                .ToListAsync(stoppingToken);
+
+            if (activePromos.Count == 0)
+                return;
+
+            foreach (var group in activePromos.GroupBy(p => p.PrepaidLoadID))
+            {
+                DeductFromGroup(group);
+            }
+
+            await context.SaveChangesAsync(stoppingToken);
+            _logger.LogInformation($"Deducted random MB from {activePromos.Count} active promo(s).");
+        }
+
+        private void DeductFromGroup(IEnumerable<PrepaidPromo> group)
+        {
+            var deductionMB = (decimal)(MinMBPerCycle + (_random.NextDouble() * (MaxMBPerCycle - MinMBPerCycle)));
+            var remaining = deductionMB;
+
+            foreach (var promo in group.OrderBy(p => p.ActivatedAt))
+            {
+                if (remaining <= 0) break;
+
+                var deduction = Math.Min(remaining, promo.RemainingDataMB);
+                promo.RemainingDataMB -= deduction;
+                remaining -= deduction;
+
+                if (promo.RemainingDataMB <= 0)
+                {
+                    promo.RemainingDataMB = 0;
+                    promo.Status = "Depleted";
+                    _logger.LogInformation($"Promo '{promo.PromoTitle}' (#{promo.PrepaidPromoID}) data depleted.");
+                }
             }
         }
     }

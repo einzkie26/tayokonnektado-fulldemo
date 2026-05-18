@@ -10,11 +10,8 @@ namespace TayoKonnektado_project.Controllers
     [Route("api/[controller]")]
     public class PaymentController : ControllerBase
     {
-        private readonly PayMongoService _payMongoService;
-
-        public PaymentController(PayMongoService payMongoService)
+        public PaymentController()
         {
-            _payMongoService = payMongoService;
         }
 
         [HttpPost("create")]

@@ -921,27 +921,6 @@
           }
         },
         {
-          "ruleId": "CS8602",
-          "level": "warning",
-          "message": "Dereference of a possibly null reference.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 627,
-                  "startColumn": 41,
-                  "endLine": 627,
-                  "endColumn": 59
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
           "ruleId": "CS8629",
           "level": "warning",
           "message": "Nullable value type may be null.",
@@ -2214,6 +2193,27 @@
           }
         },
         {
+          "ruleId": "S101",
+          "level": "warning",
+          "message": "Rename class 'FAQ' to match pascal case naming rules, consider using 'Faq'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Models/Entities.cs",
+                "region": {
+                  "startLine": 255,
+                  "startColumn": 18,
+                  "endLine": 255,
+                  "endColumn": 21
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
           "ruleId": "S1118",
           "level": "warning",
           "message": "Add a 'protected' constructor or the 'static' keyword to the class declaration.",
@@ -2332,27 +2332,6 @@
           }
         },
         {
-          "ruleId": "S4487",
-          "level": "warning",
-          "message": "Remove this unread private field '_payMongoService' or refactor the code to use its value.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/PaymentController.cs",
-                "region": {
-                  "startLine": 13,
-                  "startColumn": 42,
-                  "endLine": 13,
-                  "endColumn": 58
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
           "ruleId": "S1192",
           "level": "warning",
           "message": "Define a constant instead of using this literal 'Email:Username' 4 times.",
@@ -2414,24 +2393,167 @@
           }
         },
         {
-          "ruleId": "S3459",
+          "ruleId": "S101",
           "level": "warning",
-          "message": "Remove unassigned auto-property 'Success', or set its value.",
+          "message": "Rename class 'FAQManagementService' to match pascal case naming rules, consider using 'FaqManagementService'.",
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/Admin/FAQManagementService.cs",
                 "region": {
-                  "startLine": 327,
-                  "startColumn": 25,
-                  "endLine": 327,
-                  "endColumn": 32
+                  "startLine": 7,
+                  "startColumn": 18,
+                  "endLine": 7,
+                  "endColumn": 38
                 }
               }
             }
           ],
           "properties": {
             "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1118",
+          "level": "warning",
+          "message": "Add a 'protected' constructor or the 'static' keyword to the class declaration.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PlanSeeder.cs",
+                "region": {
+                  "startLine": 6,
+                  "startColumn": 18,
+                  "endLine": 6,
+                  "endColumn": 28
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1192",
+          "level": "warning",
+          "message": "Define a constant instead of using this literal 'Pending' 4 times.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/Admin/PaymentManagementService.cs",
+                "region": {
+                  "startLine": 56,
+                  "startColumn": 35,
+                  "endLine": 56,
+                  "endColumn": 44
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/Admin/PaymentManagementService.cs",
+                "region": {
+                  "startLine": 114,
+                  "startColumn": 54,
+                  "endLine": 114,
+                  "endColumn": 63
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/Admin/PaymentManagementService.cs",
+                "region": {
+                  "startLine": 162,
+                  "startColumn": 97,
+                  "endLine": 162,
+                  "endColumn": 106
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/Admin/PaymentManagementService.cs",
+                "region": {
+                  "startLine": 181,
+                  "startColumn": 30,
+                  "endLine": 181,
+                  "endColumn": 39
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null,
+              "1": null,
+              "2": null
+            }
+          }
+        },
+        {
+          "ruleId": "S1192",
+          "level": "warning",
+          "message": "Define a constant instead of using this literal 'Completed' 4 times.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/Admin/PaymentManagementService.cs",
+                "region": {
+                  "startLine": 61,
+                  "startColumn": 34,
+                  "endLine": 61,
+                  "endColumn": 45
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/Admin/PaymentManagementService.cs",
+                "region": {
+                  "startLine": 62,
+                  "startColumn": 71,
+                  "endLine": 62,
+                  "endColumn": 82
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/Admin/PaymentManagementService.cs",
+                "region": {
+                  "startLine": 99,
+                  "startColumn": 30,
+                  "endLine": 99,
+                  "endColumn": 41
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/Admin/PaymentManagementService.cs",
+                "region": {
+                  "startLine": 100,
+                  "startColumn": 67,
+                  "endLine": 100,
+                  "endColumn": 78
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null,
+              "1": null,
+              "2": null
+            }
           }
         },
         {
@@ -2505,384 +2627,6 @@
               "2": null,
               "3": null
             }
-          }
-        },
-        {
-          "ruleId": "S1144",
-          "level": "warning",
-          "message": "Remove the unused private set accessor in property 'Success'.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 327,
-                  "startColumn": 40,
-                  "endLine": 327,
-                  "endColumn": 43
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S1192",
-          "level": "warning",
-          "message": "Define a constant instead of using this literal 'User-Agent' 4 times.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 58,
-                  "startColumn": 49,
-                  "endLine": 58,
-                  "endColumn": 61
-                }
-              }
-            }
-          ],
-          "relatedLocations": [
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 169,
-                  "startColumn": 45,
-                  "endLine": 169,
-                  "endColumn": 57
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 336,
-                  "startColumn": 45,
-                  "endLine": 336,
-                  "endColumn": 57
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 725,
-                  "startColumn": 45,
-                  "endLine": 725,
-                  "endColumn": 57
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1,
-            "customProperties": {
-              "0": null,
-              "1": null,
-              "2": null
-            }
-          }
-        },
-        {
-          "ruleId": "S1192",
-          "level": "warning",
-          "message": "Define a constant instead of using this literal 'Active' 13 times.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 136,
-                  "startColumn": 27,
-                  "endLine": 136,
-                  "endColumn": 35
-                }
-              }
-            }
-          ],
-          "relatedLocations": [
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 424,
-                  "startColumn": 30,
-                  "endLine": 424,
-                  "endColumn": 38
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 492,
-                  "startColumn": 68,
-                  "endLine": 492,
-                  "endColumn": 76
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 496,
-                  "startColumn": 43,
-                  "endLine": 496,
-                  "endColumn": 51
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 521,
-                  "startColumn": 66,
-                  "endLine": 521,
-                  "endColumn": 74
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 526,
-                  "startColumn": 43,
-                  "endLine": 526,
-                  "endColumn": 51
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 564,
-                  "startColumn": 72,
-                  "endLine": 564,
-                  "endColumn": 80
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 568,
-                  "startColumn": 47,
-                  "endLine": 568,
-                  "endColumn": 55
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 591,
-                  "startColumn": 30,
-                  "endLine": 591,
-                  "endColumn": 38
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 601,
-                  "startColumn": 30,
-                  "endLine": 601,
-                  "endColumn": 38
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 656,
-                  "startColumn": 34,
-                  "endLine": 656,
-                  "endColumn": 42
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 682,
-                  "startColumn": 68,
-                  "endLine": 682,
-                  "endColumn": 76
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 686,
-                  "startColumn": 43,
-                  "endLine": 686,
-                  "endColumn": 51
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1,
-            "customProperties": {
-              "0": null,
-              "1": null,
-              "10": null,
-              "11": null,
-              "2": null,
-              "3": null,
-              "4": null,
-              "5": null,
-              "6": null,
-              "7": null,
-              "8": null,
-              "9": null
-            }
-          }
-        },
-        {
-          "ruleId": "S1192",
-          "level": "warning",
-          "message": "Define a constant instead of using this literal 'Prepaid' 6 times.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 496,
-                  "startColumn": 73,
-                  "endLine": 496,
-                  "endColumn": 82
-                }
-              }
-            }
-          ],
-          "relatedLocations": [
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 568,
-                  "startColumn": 77,
-                  "endLine": 568,
-                  "endColumn": 86
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 577,
-                  "startColumn": 36,
-                  "endLine": 577,
-                  "endColumn": 45
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 582,
-                  "startColumn": 36,
-                  "endLine": 582,
-                  "endColumn": 45
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 606,
-                  "startColumn": 36,
-                  "endLine": 606,
-                  "endColumn": 45
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 686,
-                  "startColumn": 73,
-                  "endLine": 686,
-                  "endColumn": 82
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1,
-            "customProperties": {
-              "0": null,
-              "1": null,
-              "2": null,
-              "3": null,
-              "4": null
-            }
-          }
-        },
-        {
-          "ruleId": "S1118",
-          "level": "warning",
-          "message": "Add a 'protected' constructor or the 'static' keyword to the class declaration.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PlanSeeder.cs",
-                "region": {
-                  "startLine": 6,
-                  "startColumn": 18,
-                  "endLine": 6,
-                  "endColumn": 28
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S101",
-          "level": "warning",
-          "message": "Rename class 'FAQManagementService' to match pascal case naming rules, consider using 'FaqManagementService'.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/Admin/FAQManagementService.cs",
-                "region": {
-                  "startLine": 7,
-                  "startColumn": 18,
-                  "endLine": 7,
-                  "endColumn": 38
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
           }
         },
         {
@@ -3150,18 +2894,60 @@
           }
         },
         {
-          "ruleId": "S1192",
+          "ruleId": "S3459",
           "level": "warning",
-          "message": "Define a constant instead of using this literal 'Pending' 4 times.",
+          "message": "Remove unassigned auto-property 'Success', or set its value.",
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/Admin/PaymentManagementService.cs",
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
                 "region": {
-                  "startLine": 56,
-                  "startColumn": 35,
-                  "endLine": 56,
-                  "endColumn": 44
+                  "startLine": 327,
+                  "startColumn": 25,
+                  "endLine": 327,
+                  "endColumn": 32
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1144",
+          "level": "warning",
+          "message": "Remove the unused private set accessor in property 'Success'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 327,
+                  "startColumn": 40,
+                  "endLine": 327,
+                  "endColumn": 43
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1192",
+          "level": "warning",
+          "message": "Define a constant instead of using this literal 'User-Agent' 4 times.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 58,
+                  "startColumn": 49,
+                  "endLine": 58,
+                  "endColumn": 61
                 }
               }
             }
@@ -3169,34 +2955,34 @@
           "relatedLocations": [
             {
               "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/Admin/PaymentManagementService.cs",
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
                 "region": {
-                  "startLine": 114,
-                  "startColumn": 54,
-                  "endLine": 114,
-                  "endColumn": 63
+                  "startLine": 169,
+                  "startColumn": 45,
+                  "endLine": 169,
+                  "endColumn": 57
                 }
               }
             },
             {
               "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/Admin/PaymentManagementService.cs",
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
                 "region": {
-                  "startLine": 162,
-                  "startColumn": 97,
-                  "endLine": 162,
-                  "endColumn": 106
+                  "startLine": 336,
+                  "startColumn": 45,
+                  "endLine": 336,
+                  "endColumn": 57
                 }
               }
             },
             {
               "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/Admin/PaymentManagementService.cs",
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
                 "region": {
-                  "startLine": 181,
-                  "startColumn": 30,
-                  "endLine": 181,
-                  "endColumn": 39
+                  "startLine": 783,
+                  "startColumn": 45,
+                  "endLine": 783,
+                  "endColumn": 57
                 }
               }
             }
@@ -3213,16 +2999,16 @@
         {
           "ruleId": "S1192",
           "level": "warning",
-          "message": "Define a constant instead of using this literal 'Completed' 4 times.",
+          "message": "Define a constant instead of using this literal 'Active' 13 times.",
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/Admin/PaymentManagementService.cs",
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
                 "region": {
-                  "startLine": 61,
-                  "startColumn": 34,
-                  "endLine": 61,
-                  "endColumn": 45
+                  "startLine": 136,
+                  "startColumn": 27,
+                  "endLine": 136,
+                  "endColumn": 35
                 }
               }
             }
@@ -3230,34 +3016,133 @@
           "relatedLocations": [
             {
               "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/Admin/PaymentManagementService.cs",
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
                 "region": {
-                  "startLine": 62,
-                  "startColumn": 71,
-                  "endLine": 62,
-                  "endColumn": 82
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/Admin/PaymentManagementService.cs",
-                "region": {
-                  "startLine": 99,
+                  "startLine": 424,
                   "startColumn": 30,
-                  "endLine": 99,
-                  "endColumn": 41
+                  "endLine": 424,
+                  "endColumn": 38
                 }
               }
             },
             {
               "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/Admin/PaymentManagementService.cs",
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
                 "region": {
-                  "startLine": 100,
-                  "startColumn": 67,
-                  "endLine": 100,
-                  "endColumn": 78
+                  "startLine": 492,
+                  "startColumn": 68,
+                  "endLine": 492,
+                  "endColumn": 76
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 496,
+                  "startColumn": 43,
+                  "endLine": 496,
+                  "endColumn": 51
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 521,
+                  "startColumn": 66,
+                  "endLine": 521,
+                  "endColumn": 74
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 526,
+                  "startColumn": 43,
+                  "endLine": 526,
+                  "endColumn": 51
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 603,
+                  "startColumn": 68,
+                  "endLine": 603,
+                  "endColumn": 76
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 607,
+                  "startColumn": 43,
+                  "endLine": 607,
+                  "endColumn": 51
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 643,
+                  "startColumn": 26,
+                  "endLine": 643,
+                  "endColumn": 34
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 657,
+                  "startColumn": 26,
+                  "endLine": 657,
+                  "endColumn": 34
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 718,
+                  "startColumn": 26,
+                  "endLine": 718,
+                  "endColumn": 34
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 740,
+                  "startColumn": 68,
+                  "endLine": 740,
+                  "endColumn": 76
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 744,
+                  "startColumn": 43,
+                  "endLine": 744,
+                  "endColumn": 51
                 }
               }
             }
@@ -3267,7 +3152,174 @@
             "customProperties": {
               "0": null,
               "1": null,
-              "2": null
+              "10": null,
+              "11": null,
+              "2": null,
+              "3": null,
+              "4": null,
+              "5": null,
+              "6": null,
+              "7": null,
+              "8": null,
+              "9": null
+            }
+          }
+        },
+        {
+          "ruleId": "S1192",
+          "level": "warning",
+          "message": "Define a constant instead of using this literal 'Prepaid' 6 times.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 496,
+                  "startColumn": 73,
+                  "endLine": 496,
+                  "endColumn": 82
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 577,
+                  "startColumn": 36,
+                  "endLine": 577,
+                  "endColumn": 45
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 607,
+                  "startColumn": 73,
+                  "endLine": 607,
+                  "endColumn": 82
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 623,
+                  "startColumn": 32,
+                  "endLine": 623,
+                  "endColumn": 41
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 631,
+                  "startColumn": 32,
+                  "endLine": 631,
+                  "endColumn": 41
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 744,
+                  "startColumn": 73,
+                  "endLine": 744,
+                  "endColumn": 82
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null,
+              "1": null,
+              "2": null,
+              "3": null,
+              "4": null
+            }
+          }
+        },
+        {
+          "ruleId": "S1192",
+          "level": "warning",
+          "message": "Define a constant instead of using this literal 'SuperAdmin' 5 times.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AdminController.cs",
+                "region": {
+                  "startLine": 309,
+                  "startColumn": 30,
+                  "endLine": 309,
+                  "endColumn": 42
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AdminController.cs",
+                "region": {
+                  "startLine": 311,
+                  "startColumn": 86,
+                  "endLine": 311,
+                  "endColumn": 98
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AdminController.cs",
+                "region": {
+                  "startLine": 709,
+                  "startColumn": 39,
+                  "endLine": 709,
+                  "endColumn": 51
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AdminController.cs",
+                "region": {
+                  "startLine": 784,
+                  "startColumn": 24,
+                  "endLine": 784,
+                  "endColumn": 36
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AdminController.cs",
+                "region": {
+                  "startLine": 796,
+                  "startColumn": 55,
+                  "endLine": 796,
+                  "endColumn": 67
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null,
+              "1": null,
+              "2": null,
+              "3": null
             }
           }
         },
@@ -3315,9 +3367,9 @@
               "physicalLocation": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 569,
+                  "startLine": 583,
                   "startColumn": 63,
-                  "endLine": 569,
+                  "endLine": 583,
                   "endColumn": 72
                 }
               }
@@ -3326,9 +3378,20 @@
               "physicalLocation": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 584,
+                  "startLine": 609,
+                  "startColumn": 38,
+                  "endLine": 609,
+                  "endColumn": 47
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
+                "region": {
+                  "startLine": 625,
                   "startColumn": 42,
-                  "endLine": 584,
+                  "endLine": 625,
                   "endColumn": 51
                 }
               }
@@ -3337,20 +3400,9 @@
               "physicalLocation": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 628,
-                  "startColumn": 46,
-                  "endLine": 628,
-                  "endColumn": 55
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
-                "region": {
-                  "startLine": 634,
+                  "startLine": 630,
                   "startColumn": 42,
-                  "endLine": 634,
+                  "endLine": 630,
                   "endColumn": 51
                 }
               }
@@ -3359,9 +3411,9 @@
               "physicalLocation": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 861,
+                  "startLine": 893,
                   "startColumn": 35,
-                  "endLine": 861,
+                  "endLine": 893,
                   "endColumn": 44
                 }
               }
@@ -3370,9 +3422,9 @@
               "physicalLocation": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 868,
+                  "startLine": 900,
                   "startColumn": 129,
-                  "endLine": 868,
+                  "endLine": 900,
                   "endColumn": 138
                 }
               }
@@ -3381,9 +3433,9 @@
               "physicalLocation": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 883,
+                  "startLine": 915,
                   "startColumn": 26,
-                  "endLine": 883,
+                  "endLine": 915,
                   "endColumn": 35
                 }
               }
@@ -3392,9 +3444,9 @@
               "physicalLocation": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 895,
+                  "startLine": 927,
                   "startColumn": 138,
-                  "endLine": 895,
+                  "endLine": 927,
                   "endColumn": 147
                 }
               }
@@ -3403,9 +3455,9 @@
               "physicalLocation": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 1033,
+                  "startLine": 1065,
                   "startColumn": 114,
-                  "endLine": 1033,
+                  "endLine": 1065,
                   "endColumn": 123
                 }
               }
@@ -3414,9 +3466,9 @@
               "physicalLocation": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 1050,
+                  "startLine": 1082,
                   "startColumn": 34,
-                  "endLine": 1050,
+                  "endLine": 1082,
                   "endColumn": 43
                 }
               }
@@ -3506,10 +3558,10 @@
               "physicalLocation": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 565,
-                  "startColumn": 66,
-                  "endLine": 565,
-                  "endColumn": 93
+                  "startLine": 562,
+                  "startColumn": 49,
+                  "endLine": 562,
+                  "endColumn": 76
                 }
               }
             }
@@ -3569,9 +3621,9 @@
               "physicalLocation": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 990,
+                  "startLine": 1022,
                   "startColumn": 149,
-                  "endLine": 990,
+                  "endLine": 1022,
                   "endColumn": 157
                 }
               }
@@ -3580,9 +3632,9 @@
               "physicalLocation": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 1024,
+                  "startLine": 1056,
                   "startColumn": 67,
-                  "endLine": 1024,
+                  "endLine": 1056,
                   "endColumn": 75
                 }
               }
@@ -3620,10 +3672,10 @@
               "physicalLocation": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 577,
-                  "startColumn": 67,
-                  "endLine": 577,
-                  "endColumn": 78
+                  "startLine": 592,
+                  "startColumn": 63,
+                  "endLine": 592,
+                  "endColumn": 74
                 }
               }
             },
@@ -3631,10 +3683,10 @@
               "physicalLocation": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 582,
-                  "startColumn": 46,
-                  "endLine": 582,
-                  "endColumn": 57
+                  "startLine": 600,
+                  "startColumn": 30,
+                  "endLine": 600,
+                  "endColumn": 41
                 }
               }
             },
@@ -3642,10 +3694,10 @@
               "physicalLocation": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 594,
-                  "startColumn": 45,
-                  "endLine": 594,
-                  "endColumn": 56
+                  "startLine": 636,
+                  "startColumn": 37,
+                  "endLine": 636,
+                  "endColumn": 48
                 }
               }
             },
@@ -3653,10 +3705,10 @@
               "physicalLocation": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 610,
-                  "startColumn": 34,
-                  "endLine": 610,
-                  "endColumn": 45
+                  "startLine": 651,
+                  "startColumn": 26,
+                  "endLine": 651,
+                  "endColumn": 37
                 }
               }
             },
@@ -3664,9 +3716,9 @@
               "physicalLocation": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 864,
+                  "startLine": 896,
                   "startColumn": 133,
-                  "endLine": 864,
+                  "endLine": 896,
                   "endColumn": 144
                 }
               }
@@ -3675,9 +3727,9 @@
               "physicalLocation": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 941,
+                  "startLine": 973,
                   "startColumn": 35,
-                  "endLine": 941,
+                  "endLine": 973,
                   "endColumn": 46
                 }
               }
@@ -3686,9 +3738,9 @@
               "physicalLocation": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 942,
+                  "startLine": 974,
                   "startColumn": 83,
-                  "endLine": 942,
+                  "endLine": 974,
                   "endColumn": 94
                 }
               }
@@ -3716,9 +3768,9 @@
               "resultFile": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 1104,
+                  "startLine": 1136,
                   "startColumn": 63,
-                  "endLine": 1104,
+                  "endLine": 1136,
                   "endColumn": 79
                 }
               }
@@ -3729,9 +3781,9 @@
               "physicalLocation": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 1157,
+                  "startLine": 1189,
                   "startColumn": 63,
-                  "endLine": 1157,
+                  "endLine": 1189,
                   "endColumn": 79
                 }
               }
@@ -3740,9 +3792,9 @@
               "physicalLocation": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 1177,
+                  "startLine": 1209,
                   "startColumn": 63,
-                  "endLine": 1177,
+                  "endLine": 1209,
                   "endColumn": 79
                 }
               }
@@ -3751,9 +3803,9 @@
               "physicalLocation": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 1196,
+                  "startLine": 1228,
                   "startColumn": 63,
-                  "endLine": 1196,
+                  "endLine": 1228,
                   "endColumn": 79
                 }
               }
@@ -3762,9 +3814,9 @@
               "physicalLocation": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 1216,
+                  "startLine": 1248,
                   "startColumn": 63,
-                  "endLine": 1216,
+                  "endLine": 1248,
                   "endColumn": 79
                 }
               }
@@ -3773,9 +3825,9 @@
               "physicalLocation": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 1236,
+                  "startLine": 1268,
                   "startColumn": 63,
-                  "endLine": 1236,
+                  "endLine": 1268,
                   "endColumn": 79
                 }
               }
@@ -3784,9 +3836,9 @@
               "physicalLocation": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 1246,
+                  "startLine": 1278,
                   "startColumn": 63,
-                  "endLine": 1246,
+                  "endLine": 1278,
                   "endColumn": 79
                 }
               }
@@ -3795,9 +3847,9 @@
               "physicalLocation": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 1259,
+                  "startLine": 1291,
                   "startColumn": 63,
-                  "endLine": 1259,
+                  "endLine": 1291,
                   "endColumn": 79
                 }
               }
@@ -3806,9 +3858,9 @@
               "physicalLocation": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 1272,
+                  "startLine": 1304,
                   "startColumn": 63,
-                  "endLine": 1272,
+                  "endLine": 1304,
                   "endColumn": 79
                 }
               }
@@ -3817,9 +3869,9 @@
               "physicalLocation": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 1303,
+                  "startLine": 1335,
                   "startColumn": 63,
-                  "endLine": 1303,
+                  "endLine": 1335,
                   "endColumn": 79
                 }
               }
@@ -3828,9 +3880,9 @@
               "physicalLocation": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 1322,
+                  "startLine": 1354,
                   "startColumn": 63,
-                  "endLine": 1322,
+                  "endLine": 1354,
                   "endColumn": 79
                 }
               }
@@ -3849,100 +3901,6 @@
               "7": null,
               "8": null,
               "9": null
-            }
-          }
-        },
-        {
-          "ruleId": "S101",
-          "level": "warning",
-          "message": "Rename class 'FAQ' to match pascal case naming rules, consider using 'Faq'.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Models/Entities.cs",
-                "region": {
-                  "startLine": 255,
-                  "startColumn": 18,
-                  "endLine": 255,
-                  "endColumn": 21
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S1192",
-          "level": "warning",
-          "message": "Define a constant instead of using this literal 'SuperAdmin' 5 times.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AdminController.cs",
-                "region": {
-                  "startLine": 309,
-                  "startColumn": 30,
-                  "endLine": 309,
-                  "endColumn": 42
-                }
-              }
-            }
-          ],
-          "relatedLocations": [
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AdminController.cs",
-                "region": {
-                  "startLine": 311,
-                  "startColumn": 86,
-                  "endLine": 311,
-                  "endColumn": 98
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AdminController.cs",
-                "region": {
-                  "startLine": 709,
-                  "startColumn": 39,
-                  "endLine": 709,
-                  "endColumn": 51
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AdminController.cs",
-                "region": {
-                  "startLine": 784,
-                  "startColumn": 24,
-                  "endLine": 784,
-                  "endColumn": 36
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AdminController.cs",
-                "region": {
-                  "startLine": 796,
-                  "startColumn": 55,
-                  "endLine": 796,
-                  "endColumn": 67
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1,
-            "customProperties": {
-              "0": null,
-              "1": null,
-              "2": null,
-              "3": null
             }
           }
         },
@@ -4005,48 +3963,6 @@
           }
         },
         {
-          "ruleId": "S107",
-          "level": "warning",
-          "message": "Constructor has 9 parameters, which is greater than the 7 authorized.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 31,
-                  "startColumn": 30,
-                  "endLine": 40,
-                  "endColumn": 57
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S2245",
-          "level": "warning",
-          "message": "Make sure that using this pseudorandom number generator is safe here.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 94,
-                  "startColumn": 28,
-                  "endLine": 94,
-                  "endColumn": 40
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
           "ruleId": "S3626",
           "level": "warning",
           "message": "Remove this redundant jump.",
@@ -4059,94 +3975,6 @@
                   "startColumn": 25,
                   "endLine": 31,
                   "endColumn": 32
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S927",
-          "level": "warning",
-          "message": "Rename parameter 'modelBuilder' to 'builder' to match the base class declaration.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Data/ApplicationDbContext.cs",
-                "region": {
-                  "startLine": 36,
-                  "startColumn": 62,
-                  "endLine": 36,
-                  "endColumn": 74
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "ASP0015",
-          "level": "note",
-          "message": "The header 'User-Agent' can be accessed using the UserAgent property",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 58,
-                  "startColumn": 33,
-                  "endLine": 58,
-                  "endColumn": 62
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1,
-            "customProperties": {
-              "HeaderName": "User-Agent",
-              "ResolvedPropertyName": "UserAgent"
-            }
-          }
-        },
-        {
-          "ruleId": "S2245",
-          "level": "warning",
-          "message": "Make sure that using this pseudorandom number generator is safe here.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 153,
-                  "startColumn": 24,
-                  "endLine": 153,
-                  "endColumn": 36
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S6580",
-          "level": "warning",
-          "message": "Use a format provider when parsing date and time.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
-                "region": {
-                  "startLine": 67,
-                  "startColumn": 33,
-                  "endLine": 67,
-                  "endColumn": 65
                 }
               }
             }
@@ -4198,265 +4026,18 @@
           }
         },
         {
-          "ruleId": "S3776",
+          "ruleId": "S6580",
           "level": "warning",
-          "message": "Refactor this method to reduce its Cognitive Complexity from 16 to the 15 allowed.",
+          "message": "Use a format provider when parsing date and time.",
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 167,
-                  "startColumn": 42,
-                  "endLine": 167,
-                  "endColumn": 47
-                }
-              }
-            }
-          ],
-          "relatedLocations": [
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 171,
-                  "startColumn": 13,
-                  "endLine": 171,
-                  "endColumn": 15
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 174,
-                  "startColumn": 13,
-                  "endLine": 174,
-                  "endColumn": 15
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 178,
-                  "startColumn": 13,
-                  "endLine": 178,
-                  "endColumn": 15
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 186,
-                  "startColumn": 13,
-                  "endLine": 186,
-                  "endColumn": 15
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 189,
-                  "startColumn": 13,
-                  "endLine": 189,
-                  "endColumn": 15
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 197,
-                  "startColumn": 13,
-                  "endLine": 197,
-                  "endColumn": 15
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 217,
-                  "startColumn": 13,
-                  "endLine": 217,
-                  "endColumn": 15
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 223,
-                  "startColumn": 13,
-                  "endLine": 223,
-                  "endColumn": 15
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 223,
-                  "startColumn": 78,
-                  "endLine": 223,
-                  "endColumn": 80
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 223,
-                  "startColumn": 34,
-                  "endLine": 223,
-                  "endColumn": 36
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 228,
-                  "startColumn": 13,
-                  "endLine": 228,
-                  "endColumn": 15
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 257,
-                  "startColumn": 54,
-                  "endLine": 257,
-                  "endColumn": 56
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 259,
-                  "startColumn": 13,
-                  "endLine": 259,
-                  "endColumn": 15
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 262,
-                  "startColumn": 69,
-                  "endLine": 262,
-                  "endColumn": 71
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 263,
-                  "startColumn": 17,
-                  "endLine": 263,
-                  "endColumn": 19
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1,
-            "customProperties": {
-              "0": "+1",
-              "1": "+1",
-              "10": "+1",
-              "11": "+1",
-              "12": "+1",
-              "13": "+1",
-              "14": "+2 (incl 1 for nesting)",
-              "2": "+1",
-              "3": "+1",
-              "4": "+1",
-              "5": "+1",
-              "6": "+1",
-              "7": "+1",
-              "8": "+1",
-              "9": "+1"
-            }
-          }
-        },
-        {
-          "ruleId": "S2245",
-          "level": "warning",
-          "message": "Make sure that using this pseudorandom number generator is safe here.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 200,
-                  "startColumn": 28,
-                  "endLine": 200,
-                  "endColumn": 40
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S2245",
-          "level": "warning",
-          "message": "Make sure that using this pseudorandom number generator is safe here.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 230,
-                  "startColumn": 28,
-                  "endLine": 230,
-                  "endColumn": 40
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S6667",
-          "level": "warning",
-          "message": "Logging in a catch clause should pass the caught exception as a parameter.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/SubscriptionEndDateService.cs",
-                "region": {
-                  "startLine": 45,
-                  "startColumn": 21,
-                  "endLine": 45,
-                  "endColumn": 91
+                  "startLine": 67,
+                  "startColumn": 33,
+                  "endLine": 67,
+                  "endColumn": 65
                 }
               }
             }
@@ -4532,6 +4113,48 @@
           }
         },
         {
+          "ruleId": "S6667",
+          "level": "warning",
+          "message": "Logging in a catch clause should pass the caught exception as a parameter.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/SubscriptionEndDateService.cs",
+                "region": {
+                  "startLine": 45,
+                  "startColumn": 21,
+                  "endLine": 45,
+                  "endColumn": 91
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S4790",
+          "level": "warning",
+          "message": "Make sure this weak hash algorithm is not used in a sensitive context here.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/Security/PasswordBreachService.cs",
+                "region": {
+                  "startLine": 48,
+                  "startColumn": 30,
+                  "endLine": 48,
+                  "endColumn": 43
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
           "ruleId": "S2629",
           "level": "warning",
           "message": "Don't use string interpolation in logging message templates.",
@@ -4571,6 +4194,46 @@
           ],
           "properties": {
             "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "CA1850",
+          "level": "note",
+          "message": "Prefer static 'System.Security.Cryptography.SHA1.HashData' method over 'ComputeHash'",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/Security/PasswordBreachService.cs",
+                "region": {
+                  "startLine": 49,
+                  "startColumn": 25,
+                  "endLine": 49,
+                  "endColumn": 72
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/Security/PasswordBreachService.cs",
+                "region": {
+                  "startLine": 48,
+                  "startColumn": 23,
+                  "endLine": 48,
+                  "endColumn": 43
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "ComputeTypePropertyKey": "ComputeHash",
+              "DeleteHashCreationPropertyKey": "DeleteHashCreationPropertyKey",
+              "HashCreationIndexPropertyKey": "0",
+              "TargetHashTypeDiagnosticPropertyKey": "SHA1"
+            }
           }
         },
         {
@@ -4640,122 +4303,39 @@
           }
         },
         {
-          "ruleId": "ASP0015",
-          "level": "note",
-          "message": "The header 'User-Agent' can be accessed using the UserAgent property",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 169,
-                  "startColumn": 29,
-                  "endLine": 169,
-                  "endColumn": 58
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1,
-            "customProperties": {
-              "HeaderName": "User-Agent",
-              "ResolvedPropertyName": "UserAgent"
-            }
-          }
-        },
-        {
-          "ruleId": "S2068",
+          "ruleId": "S6667",
           "level": "warning",
-          "message": "\"password\" detected here, make sure this is not a hard-coded credential.",
+          "message": "Logging in a catch clause should pass the caught exception as a parameter.",
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/AdminSeeder.cs",
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PrepaidUsageService.cs",
                 "region": {
-                  "startLine": 28,
-                  "startColumn": 17,
-                  "endLine": 28,
-                  "endColumn": 49
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S1075",
-          "level": "warning",
-          "message": "Refactor your code not to use hardcoded absolute paths or URIs.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 299,
-                  "startColumn": 70,
-                  "endLine": 299,
-                  "endColumn": 119
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S3267",
-          "level": "warning",
-          "message": "Loops should be simplified using the \"Where\" LINQ method",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 401,
-                  "startColumn": 34,
-                  "endLine": 401,
-                  "endColumn": 39
-                }
-              }
-            }
-          ],
-          "relatedLocations": [
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 403,
+                  "startLine": 50,
                   "startColumn": 21,
-                  "endLine": 403,
-                  "endColumn": 113
+                  "endLine": 50,
+                  "endColumn": 84
                 }
               }
             }
           ],
           "properties": {
-            "warningLevel": 1,
-            "customProperties": {
-              "0": null
-            }
+            "warningLevel": 1
           }
         },
         {
-          "ruleId": "S2325",
+          "ruleId": "S2629",
           "level": "warning",
-          "message": "Make 'GetDeviceFromUserAgent' a static method.",
+          "message": "Don't use string interpolation in logging message templates.",
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PrepaidUsageService.cs",
                 "region": {
-                  "startLine": 385,
-                  "startColumn": 24,
-                  "endLine": 385,
-                  "endColumn": 46
+                  "startLine": 50,
+                  "startColumn": 38,
+                  "endLine": 50,
+                  "endColumn": 83
                 }
               }
             }
@@ -4765,18 +4345,18 @@
           }
         },
         {
-          "ruleId": "CA1869",
+          "ruleId": "CA2254",
           "level": "note",
-          "message": "Avoid creating a new 'JsonSerializerOptions' instance for every serialization operation. Cache and reuse instances instead.",
+          "message": "The logging message template should not vary between calls to 'LoggerExtensions.LogError(ILogger, string?, params object?[])'",
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PrepaidUsageService.cs",
                 "region": {
-                  "startLine": 317,
-                  "startColumn": 98,
-                  "endLine": 320,
-                  "endColumn": 14
+                  "startLine": 50,
+                  "startColumn": 38,
+                  "endLine": 50,
+                  "endColumn": 83
                 }
               }
             }
@@ -4786,89 +4366,24 @@
           }
         },
         {
-          "ruleId": "S4790",
+          "ruleId": "S2629",
           "level": "warning",
-          "message": "Make sure this weak hash algorithm is not used in a sensitive context here.",
+          "message": "Don't use string interpolation in logging message templates.",
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/Security/PasswordBreachService.cs",
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PrepaidUsageService.cs",
                 "region": {
-                  "startLine": 48,
-                  "startColumn": 30,
-                  "endLine": 48,
-                  "endColumn": 43
+                  "startLine": 66,
+                  "startColumn": 40,
+                  "endLine": 66,
+                  "endColumn": 98
                 }
               }
             }
           ],
           "properties": {
             "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "ASP0015",
-          "level": "note",
-          "message": "The header 'User-Agent' can be accessed using the UserAgent property",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 336,
-                  "startColumn": 29,
-                  "endLine": 336,
-                  "endColumn": 58
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1,
-            "customProperties": {
-              "HeaderName": "User-Agent",
-              "ResolvedPropertyName": "UserAgent"
-            }
-          }
-        },
-        {
-          "ruleId": "CA1850",
-          "level": "note",
-          "message": "Prefer static 'System.Security.Cryptography.SHA1.HashData' method over 'ComputeHash'",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/Security/PasswordBreachService.cs",
-                "region": {
-                  "startLine": 49,
-                  "startColumn": 25,
-                  "endLine": 49,
-                  "endColumn": 72
-                }
-              }
-            }
-          ],
-          "relatedLocations": [
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/Security/PasswordBreachService.cs",
-                "region": {
-                  "startLine": 48,
-                  "startColumn": 23,
-                  "endLine": 48,
-                  "endColumn": 43
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1,
-            "customProperties": {
-              "ComputeTypePropertyKey": "ComputeHash",
-              "DeleteHashCreationPropertyKey": "DeleteHashCreationPropertyKey",
-              "HashCreationIndexPropertyKey": "0",
-              "TargetHashTypeDiagnosticPropertyKey": "SHA1"
-            }
           }
         },
         {
@@ -4893,361 +4408,18 @@
           }
         },
         {
-          "ruleId": "S6964",
-          "level": "warning",
-          "message": "Value type property used as input in a controller action should be nullable, required or annotated with the JsonRequiredAttribute to avoid under-posting.",
+          "ruleId": "CA2254",
+          "level": "note",
+          "message": "The logging message template should not vary between calls to 'LoggerExtensions.LogInformation(ILogger, string?, params object?[])'",
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AdminController.cs",
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PrepaidUsageService.cs",
                 "region": {
-                  "startLine": 907,
-                  "startColumn": 24,
-                  "endLine": 907,
-                  "endColumn": 29
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S6964",
-          "level": "warning",
-          "message": "Value type property used as input in a controller action should be nullable, required or annotated with the JsonRequiredAttribute to avoid under-posting.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AdminController.cs",
-                "region": {
-                  "startLine": 872,
-                  "startColumn": 24,
-                  "endLine": 872,
-                  "endColumn": 30
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S3776",
-          "level": "warning",
-          "message": "Refactor this method to reduce its Cognitive Complexity from 23 to the 15 allowed.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 557,
-                  "startColumn": 42,
-                  "endLine": 557,
-                  "endColumn": 56
-                }
-              }
-            }
-          ],
-          "relatedLocations": [
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 564,
-                  "startColumn": 57,
-                  "endLine": 564,
-                  "endColumn": 59
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 568,
-                  "startColumn": 56,
-                  "endLine": 568,
-                  "endColumn": 58
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 572,
-                  "startColumn": 17,
-                  "endLine": 572,
-                  "endColumn": 19
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 577,
-                  "startColumn": 17,
-                  "endLine": 577,
-                  "endColumn": 19
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 577,
-                  "startColumn": 46,
-                  "endLine": 577,
-                  "endColumn": 48
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 582,
-                  "startColumn": 17,
-                  "endLine": 582,
-                  "endColumn": 19
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 582,
-                  "startColumn": 46,
-                  "endLine": 582,
-                  "endColumn": 48
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 606,
-                  "startColumn": 17,
-                  "endLine": 606,
-                  "endColumn": 19
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 618,
-                  "startColumn": 17,
-                  "endLine": 618,
-                  "endColumn": 21
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 621,
-                  "startColumn": 21,
-                  "endLine": 621,
-                  "endColumn": 23
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 625,
-                  "startColumn": 21,
-                  "endLine": 625,
-                  "endColumn": 25
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 628,
-                  "startColumn": 51,
-                  "endLine": 628,
-                  "endColumn": 57
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 637,
-                  "startColumn": 25,
-                  "endLine": 637,
-                  "endColumn": 27
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 645,
-                  "startColumn": 25,
-                  "endLine": 645,
-                  "endColumn": 27
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 662,
-                  "startColumn": 17,
-                  "endLine": 662,
-                  "endColumn": 19
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 669,
-                  "startColumn": 13,
-                  "endLine": 669,
-                  "endColumn": 18
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1,
-            "customProperties": {
-              "0": "+1",
-              "1": "+1",
-              "10": "+1",
-              "11": "+3 (incl 2 for nesting)",
-              "12": "+3 (incl 2 for nesting)",
-              "13": "+3 (incl 2 for nesting)",
-              "14": "+1",
-              "15": "+1",
-              "2": "+1",
-              "3": "+1",
-              "4": "+1",
-              "5": "+1",
-              "6": "+1",
-              "7": "+1",
-              "8": "+1",
-              "9": "+2 (incl 1 for nesting)"
-            }
-          }
-        },
-        {
-          "ruleId": "S2245",
-          "level": "warning",
-          "message": "Make sure that using this pseudorandom number generator is safe here.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 584,
-                  "startColumn": 65,
-                  "endLine": 584,
-                  "endColumn": 77
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S2245",
-          "level": "warning",
-          "message": "Make sure that using this pseudorandom number generator is safe here.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 584,
-                  "startColumn": 100,
-                  "endLine": 584,
-                  "endColumn": 112
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S2245",
-          "level": "warning",
-          "message": "Make sure that using this pseudorandom number generator is safe here.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 584,
-                  "startColumn": 135,
-                  "endLine": 584,
-                  "endColumn": 147
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S2245",
-          "level": "warning",
-          "message": "Make sure that using this pseudorandom number generator is safe here.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 584,
-                  "startColumn": 170,
-                  "endLine": 584,
-                  "endColumn": 182
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S2245",
-          "level": "warning",
-          "message": "Make sure that using this pseudorandom number generator is safe here.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 709,
-                  "startColumn": 24,
-                  "endLine": 709,
-                  "endColumn": 36
+                  "startLine": 66,
+                  "startColumn": 40,
+                  "endLine": 66,
+                  "endColumn": 98
                 }
               }
             }
@@ -5654,6 +4826,27 @@
           }
         },
         {
+          "ruleId": "S6964",
+          "level": "warning",
+          "message": "Value type property used as input in a controller action should be nullable, required or annotated with the JsonRequiredAttribute to avoid under-posting.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AdminController.cs",
+                "region": {
+                  "startLine": 907,
+                  "startColumn": 24,
+                  "endLine": 907,
+                  "endColumn": 29
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
           "ruleId": "S3358",
           "level": "warning",
           "message": "Extract this nested ternary operation into an independent statement.",
@@ -5675,163 +4868,60 @@
           }
         },
         {
-          "ruleId": "S3776",
+          "ruleId": "S2629",
           "level": "warning",
-          "message": "Refactor this method to reduce its Cognitive Complexity from 26 to the 15 allowed.",
+          "message": "Don't use string interpolation in logging message templates.",
           "locations": [
             {
               "resultFile": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PrepaidUsageService.cs",
                 "region": {
-                  "startLine": 32,
-                  "startColumn": 39,
-                  "endLine": 32,
-                  "endColumn": 51
+                  "startLine": 93,
+                  "startColumn": 36,
+                  "endLine": 93,
+                  "endColumn": 100
                 }
               }
             }
           ],
-          "relatedLocations": [
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "CA2254",
+          "level": "note",
+          "message": "The logging message template should not vary between calls to 'LoggerExtensions.LogInformation(ILogger, string?, params object?[])'",
+          "locations": [
             {
-              "physicalLocation": {
+              "resultFile": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PrepaidUsageService.cs",
                 "region": {
-                  "startLine": 37,
-                  "startColumn": 13,
-                  "endLine": 37,
-                  "endColumn": 18
+                  "startLine": 93,
+                  "startColumn": 36,
+                  "endLine": 93,
+                  "endColumn": 100
                 }
               }
-            },
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2068",
+          "level": "warning",
+          "message": "\"password\" detected here, make sure this is not a hard-coded credential.",
+          "locations": [
             {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PrepaidUsageService.cs",
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/AdminSeeder.cs",
                 "region": {
-                  "startLine": 46,
-                  "startColumn": 58,
-                  "endLine": 46,
-                  "endColumn": 60
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PrepaidUsageService.cs",
-                "region": {
-                  "startLine": 49,
-                  "startColumn": 21,
-                  "endLine": 49,
-                  "endColumn": 28
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PrepaidUsageService.cs",
-                "region": {
-                  "startLine": 60,
-                  "startColumn": 34,
-                  "endLine": 60,
-                  "endColumn": 36
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PrepaidUsageService.cs",
-                "region": {
-                  "startLine": 65,
-                  "startColumn": 21,
-                  "endLine": 65,
-                  "endColumn": 23
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PrepaidUsageService.cs",
-                "region": {
-                  "startLine": 70,
-                  "startColumn": 25,
-                  "endLine": 70,
-                  "endColumn": 32
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PrepaidUsageService.cs",
-                "region": {
-                  "startLine": 78,
-                  "startColumn": 29,
-                  "endLine": 78,
-                  "endColumn": 36
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PrepaidUsageService.cs",
-                "region": {
-                  "startLine": 80,
-                  "startColumn": 33,
-                  "endLine": 80,
-                  "endColumn": 35
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PrepaidUsageService.cs",
-                "region": {
-                  "startLine": 86,
-                  "startColumn": 33,
-                  "endLine": 86,
-                  "endColumn": 35
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PrepaidUsageService.cs",
-                "region": {
-                  "startLine": 105,
+                  "startLine": 28,
                   "startColumn": 17,
-                  "endLine": 105,
-                  "endColumn": 22
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1,
-            "customProperties": {
-              "0": "+1",
-              "1": "+1",
-              "2": "+2 (incl 1 for nesting)",
-              "3": "+1",
-              "4": "+2 (incl 1 for nesting)",
-              "5": "+3 (incl 2 for nesting)",
-              "6": "+4 (incl 3 for nesting)",
-              "7": "+5 (incl 4 for nesting)",
-              "8": "+5 (incl 4 for nesting)",
-              "9": "+2 (incl 1 for nesting)"
-            }
-          }
-        },
-        {
-          "ruleId": "S6667",
-          "level": "warning",
-          "message": "Logging in a catch clause should pass the caught exception as a parameter.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PrepaidUsageService.cs",
-                "region": {
-                  "startLine": 107,
-                  "startColumn": 21,
-                  "endLine": 107,
-                  "endColumn": 84
+                  "endLine": 28,
+                  "endColumn": 49
                 }
               }
             }
@@ -5849,311 +4939,10 @@
               "resultFile": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PrepaidUsageService.cs",
                 "region": {
-                  "startLine": 52,
-                  "startColumn": 48,
-                  "endLine": 52,
-                  "endColumn": 106
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S2629",
-          "level": "warning",
-          "message": "Don't use string interpolation in logging message templates.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PrepaidUsageService.cs",
-                "region": {
-                  "startLine": 91,
-                  "startColumn": 41,
-                  "endLine": 91,
-                  "endColumn": 111
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S2629",
-          "level": "warning",
-          "message": "Don't use string interpolation in logging message templates.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PrepaidUsageService.cs",
-                "region": {
-                  "startLine": 98,
-                  "startColumn": 29,
-                  "endLine": 98,
-                  "endColumn": 93
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S2629",
-          "level": "warning",
-          "message": "Don't use string interpolation in logging message templates.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PrepaidUsageService.cs",
-                "region": {
-                  "startLine": 107,
-                  "startColumn": 38,
-                  "endLine": 107,
-                  "endColumn": 83
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "ASP0015",
-          "level": "note",
-          "message": "The header 'User-Agent' can be accessed using the UserAgent property",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 725,
-                  "startColumn": 29,
-                  "endLine": 725,
-                  "endColumn": 58
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1,
-            "customProperties": {
-              "HeaderName": "User-Agent",
-              "ResolvedPropertyName": "UserAgent"
-            }
-          }
-        },
-        {
-          "ruleId": "CA1860",
-          "level": "note",
-          "message": "Prefer comparing 'Count' to 0 rather than using 'Any()', both for clarity and for performance",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PrepaidUsageService.cs",
-                "region": {
-                  "startLine": 65,
-                  "startColumn": 25,
-                  "endLine": 65,
-                  "endColumn": 43
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1,
-            "customProperties": {
-              "DiagnosticPropertyKey": "Count"
-            }
-          }
-        },
-        {
-          "ruleId": "CA2254",
-          "level": "note",
-          "message": "The logging message template should not vary between calls to 'LoggerExtensions.LogInformation(ILogger, string?, params object?[])'",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PrepaidUsageService.cs",
-                "region": {
-                  "startLine": 52,
-                  "startColumn": 48,
-                  "endLine": 52,
-                  "endColumn": 106
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "CA2254",
-          "level": "note",
-          "message": "The logging message template should not vary between calls to 'LoggerExtensions.LogInformation(ILogger, string?, params object?[])'",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PrepaidUsageService.cs",
-                "region": {
-                  "startLine": 91,
-                  "startColumn": 41,
-                  "endLine": 91,
-                  "endColumn": 111
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "CA2254",
-          "level": "note",
-          "message": "The logging message template should not vary between calls to 'LoggerExtensions.LogInformation(ILogger, string?, params object?[])'",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PrepaidUsageService.cs",
-                "region": {
-                  "startLine": 98,
-                  "startColumn": 29,
-                  "endLine": 98,
-                  "endColumn": 93
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "CA2254",
-          "level": "note",
-          "message": "The logging message template should not vary between calls to 'LoggerExtensions.LogError(ILogger, string?, params object?[])'",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PrepaidUsageService.cs",
-                "region": {
-                  "startLine": 107,
-                  "startColumn": 38,
-                  "endLine": 107,
-                  "endColumn": 83
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S6932",
-          "level": "warning",
-          "message": "Use model binding instead of accessing the raw request data",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 725,
-                  "startColumn": 29,
-                  "endLine": 725,
-                  "endColumn": 44
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S6932",
-          "level": "warning",
-          "message": "Use model binding instead of accessing the raw request data",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 336,
-                  "startColumn": 29,
-                  "endLine": 336,
-                  "endColumn": 44
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S6932",
-          "level": "warning",
-          "message": "Use model binding instead of accessing the raw request data",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 169,
-                  "startColumn": 29,
-                  "endLine": 169,
-                  "endColumn": 44
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S6932",
-          "level": "warning",
-          "message": "Use model binding instead of accessing the raw request data",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 58,
-                  "startColumn": 33,
-                  "endLine": 58,
-                  "endColumn": 48
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "CA1822",
-          "level": "note",
-          "message": "Member 'GetDeviceFromUserAgent' does not access instance data and can be marked as static",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
-                "region": {
-                  "startLine": 385,
-                  "startColumn": 24,
-                  "endLine": 385,
-                  "endColumn": 46
+                  "startLine": 113,
+                  "startColumn": 44,
+                  "endLine": 113,
+                  "endColumn": 114
                 }
               }
             }
@@ -6169,11 +4958,11 @@
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AdminController.cs",
                 "region": {
-                  "startLine": 1479,
+                  "startLine": 872,
                   "startColumn": 24,
-                  "endLine": 1479,
+                  "endLine": 872,
                   "endColumn": 30
                 }
               }
@@ -6184,43 +4973,39 @@
           }
         },
         {
-          "ruleId": "CA1862",
+          "ruleId": "CA2254",
           "level": "note",
-          "message": "Prefer the string comparison method overload of 'string.Contains(string)' that takes a 'StringComparison' enum value to perform a case-insensitive comparison, but keep in mind that this might cause subtle changes in behavior, so make sure to conduct thorough testing after applying the suggestion, or if culturally sensitive comparison is not required, consider using 'StringComparison.OrdinalIgnoreCase'",
+          "message": "The logging message template should not vary between calls to 'LoggerExtensions.LogInformation(ILogger, string?, params object?[])'",
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PrepaidUsageService.cs",
                 "region": {
-                  "startLine": 397,
-                  "startColumn": 21,
-                  "endLine": 397,
-                  "endColumn": 70
+                  "startLine": 113,
+                  "startColumn": 44,
+                  "endLine": 113,
+                  "endColumn": 114
                 }
               }
             }
           ],
           "properties": {
-            "warningLevel": 1,
-            "customProperties": {
-              "LeftOffendingMethod": "ToLower",
-              "RightOffendingMethod": null
-            }
+            "warningLevel": 1
           }
         },
         {
-          "ruleId": "S1075",
+          "ruleId": "S112",
           "level": "warning",
-          "message": "Refactor your code not to use hardcoded absolute paths or URIs.",
+          "message": "'System.Exception' should not be thrown by user code.",
           "locations": [
             {
               "resultFile": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PayMongoService.cs",
                 "region": {
-                  "startLine": 16,
-                  "startColumn": 58,
-                  "endLine": 16,
-                  "endColumn": 81
+                  "startLine": 84,
+                  "startColumn": 23,
+                  "endLine": 84,
+                  "endColumn": 69
                 }
               }
             }
@@ -6241,72 +5026,6 @@
                   "startLine": 46,
                   "startColumn": 23,
                   "endLine": 46,
-                  "endColumn": 69
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S1075",
-          "level": "warning",
-          "message": "Refactor your code not to use hardcoded absolute paths or URIs.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PayMongoService.cs",
-                "region": {
-                  "startLine": 39,
-                  "startColumn": 56,
-                  "endLine": 39,
-                  "endColumn": 101
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "CA1860",
-          "level": "note",
-          "message": "Prefer comparing 'Count' to 0 rather than using 'Any()', both for clarity and for performance",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/Admin/TicketManagementService.cs",
-                "region": {
-                  "startLine": 114,
-                  "startColumn": 43,
-                  "endLine": 114,
-                  "endColumn": 63
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1,
-            "customProperties": {
-              "DiagnosticPropertyKey": "Count"
-            }
-          }
-        },
-        {
-          "ruleId": "S112",
-          "level": "warning",
-          "message": "'System.Exception' should not be thrown by user code.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PayMongoService.cs",
-                "region": {
-                  "startLine": 84,
-                  "startColumn": 23,
-                  "endLine": 84,
                   "endColumn": 69
                 }
               }
@@ -6346,9 +5065,51 @@
               "resultFile": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PayMongoService.cs",
                 "region": {
+                  "startLine": 16,
+                  "startColumn": 58,
+                  "endLine": 16,
+                  "endColumn": 81
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1075",
+          "level": "warning",
+          "message": "Refactor your code not to use hardcoded absolute paths or URIs.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PayMongoService.cs",
+                "region": {
                   "startLine": 79,
                   "startColumn": 56,
                   "endLine": 79,
+                  "endColumn": 101
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1075",
+          "level": "warning",
+          "message": "Refactor your code not to use hardcoded absolute paths or URIs.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PayMongoService.cs",
+                "region": {
+                  "startLine": 39,
+                  "startColumn": 56,
+                  "endLine": 39,
                   "endColumn": 101
                 }
               }
@@ -6413,6 +5174,190 @@
                   "startColumn": 23,
                   "endLine": 141,
                   "endColumn": 69
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S112",
+          "level": "warning",
+          "message": "'System.Exception' should not be thrown by user code.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PayMongoService.cs",
+                "region": {
+                  "startLine": 307,
+                  "startColumn": 23,
+                  "endLine": 307,
+                  "endColumn": 69
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1066",
+          "level": "warning",
+          "message": "Merge this if statement with the enclosing one.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PayMongoService.cs",
+                "region": {
+                  "startLine": 249,
+                  "startColumn": 17,
+                  "endLine": 249,
+                  "endColumn": 19
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PayMongoService.cs",
+                "region": {
+                  "startLine": 247,
+                  "startColumn": 13,
+                  "endLine": 247,
+                  "endColumn": 15
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": "Merge this if statement with its nested one."
+            }
+          }
+        },
+        {
+          "ruleId": "S112",
+          "level": "warning",
+          "message": "'System.Exception' should not be thrown by user code.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PayMongoService.cs",
+                "region": {
+                  "startLine": 292,
+                  "startColumn": 23,
+                  "endLine": 292,
+                  "endColumn": 69
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1075",
+          "level": "warning",
+          "message": "Refactor your code not to use hardcoded absolute paths or URIs.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PayMongoService.cs",
+                "region": {
+                  "startLine": 285,
+                  "startColumn": 56,
+                  "endLine": 285,
+                  "endColumn": 94
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S112",
+          "level": "warning",
+          "message": "'System.Exception' should not be thrown by user code.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PayMongoService.cs",
+                "region": {
+                  "startLine": 345,
+                  "startColumn": 31,
+                  "endLine": 345,
+                  "endColumn": 72
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S112",
+          "level": "warning",
+          "message": "'System.Exception' should not be thrown by user code.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PayMongoService.cs",
+                "region": {
+                  "startLine": 237,
+                  "startColumn": 23,
+                  "endLine": 237,
+                  "endColumn": 69
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S112",
+          "level": "warning",
+          "message": "'System.Exception' should not be thrown by user code.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PayMongoService.cs",
+                "region": {
+                  "startLine": 258,
+                  "startColumn": 23,
+                  "endLine": 258,
+                  "endColumn": 99
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1075",
+          "level": "warning",
+          "message": "Refactor your code not to use hardcoded absolute paths or URIs.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PayMongoService.cs",
+                "region": {
+                  "startLine": 230,
+                  "startColumn": 56,
+                  "endLine": 230,
+                  "endColumn": 93
                 }
               }
             }
@@ -7167,202 +6112,18 @@
           }
         },
         {
-          "ruleId": "S1066",
+          "ruleId": "S6964",
           "level": "warning",
-          "message": "Merge this if statement with the enclosing one.",
+          "message": "Value type property used as input in a controller action should be nullable, required or annotated with the JsonRequiredAttribute to avoid under-posting.",
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PayMongoService.cs",
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 249,
-                  "startColumn": 17,
-                  "endLine": 249,
-                  "endColumn": 19
-                }
-              }
-            }
-          ],
-          "relatedLocations": [
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PayMongoService.cs",
-                "region": {
-                  "startLine": 247,
-                  "startColumn": 13,
-                  "endLine": 247,
-                  "endColumn": 15
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1,
-            "customProperties": {
-              "0": "Merge this if statement with its nested one."
-            }
-          }
-        },
-        {
-          "ruleId": "S112",
-          "level": "warning",
-          "message": "'System.Exception' should not be thrown by user code.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PayMongoService.cs",
-                "region": {
-                  "startLine": 292,
-                  "startColumn": 23,
-                  "endLine": 292,
-                  "endColumn": 69
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S1075",
-          "level": "warning",
-          "message": "Refactor your code not to use hardcoded absolute paths or URIs.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PayMongoService.cs",
-                "region": {
-                  "startLine": 285,
-                  "startColumn": 56,
-                  "endLine": 285,
-                  "endColumn": 94
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S112",
-          "level": "warning",
-          "message": "'System.Exception' should not be thrown by user code.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PayMongoService.cs",
-                "region": {
-                  "startLine": 237,
-                  "startColumn": 23,
-                  "endLine": 237,
-                  "endColumn": 69
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S112",
-          "level": "warning",
-          "message": "'System.Exception' should not be thrown by user code.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PayMongoService.cs",
-                "region": {
-                  "startLine": 258,
-                  "startColumn": 23,
-                  "endLine": 258,
-                  "endColumn": 99
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S1075",
-          "level": "warning",
-          "message": "Refactor your code not to use hardcoded absolute paths or URIs.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PayMongoService.cs",
-                "region": {
-                  "startLine": 230,
-                  "startColumn": 56,
-                  "endLine": 230,
-                  "endColumn": 93
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S6580",
-          "level": "warning",
-          "message": "Use a format provider when parsing date and time.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/Admin/SubscriptionManagementService.cs",
-                "region": {
-                  "startLine": 60,
-                  "startColumn": 44,
-                  "endLine": 60,
-                  "endColumn": 67
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S112",
-          "level": "warning",
-          "message": "'System.Exception' should not be thrown by user code.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PayMongoService.cs",
-                "region": {
-                  "startLine": 307,
-                  "startColumn": 23,
-                  "endLine": 307,
-                  "endColumn": 69
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S112",
-          "level": "warning",
-          "message": "'System.Exception' should not be thrown by user code.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/PayMongoService.cs",
-                "region": {
-                  "startLine": 345,
-                  "startColumn": 31,
-                  "endLine": 345,
-                  "endColumn": 72
+                  "startLine": 1511,
+                  "startColumn": 24,
+                  "endLine": 1511,
+                  "endColumn": 30
                 }
               }
             }
@@ -7380,9 +6141,9 @@
               "resultFile": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 1474,
+                  "startLine": 1506,
                   "startColumn": 24,
-                  "endLine": 1474,
+                  "endLine": 1506,
                   "endColumn": 30
                 }
               }
@@ -7393,195 +6154,18 @@
           }
         },
         {
-          "ruleId": "S1481",
-          "level": "warning",
-          "message": "Remove the unused local variable 'wasNotActive'.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/Admin/SubscriptionManagementService.cs",
-                "region": {
-                  "startLine": 47,
-                  "startColumn": 17,
-                  "endLine": 47,
-                  "endColumn": 29
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S3776",
-          "level": "warning",
-          "message": "Refactor this method to reduce its Cognitive Complexity from 17 to the 15 allowed.",
+          "ruleId": "CA1862",
+          "level": "note",
+          "message": "Prefer the string comparison method overload of 'string.Contains(string)' that takes a 'StringComparison' enum value to perform a case-insensitive comparison, but keep in mind that this might cause subtle changes in behavior, so make sure to conduct thorough testing after applying the suggestion, or if culturally sensitive comparison is not required, consider using 'StringComparison.OrdinalIgnoreCase'",
           "locations": [
             {
               "resultFile": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 557,
-                  "startColumn": 42,
-                  "endLine": 557,
-                  "endColumn": 62
-                }
-              }
-            }
-          ],
-          "relatedLocations": [
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
-                "region": {
-                  "startLine": 563,
-                  "startColumn": 65,
-                  "endLine": 563,
-                  "endColumn": 67
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
-                "region": {
-                  "startLine": 565,
-                  "startColumn": 13,
-                  "endLine": 565,
-                  "endColumn": 15
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
-                "region": {
-                  "startLine": 569,
-                  "startColumn": 48,
-                  "endLine": 569,
-                  "endColumn": 50
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
-                "region": {
-                  "startLine": 573,
-                  "startColumn": 13,
-                  "endLine": 573,
-                  "endColumn": 15
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
-                "region": {
-                  "startLine": 577,
-                  "startColumn": 52,
-                  "endLine": 577,
-                  "endColumn": 54
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
-                "region": {
-                  "startLine": 581,
-                  "startColumn": 17,
-                  "endLine": 581,
-                  "endColumn": 19
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
-                "region": {
-                  "startLine": 592,
-                  "startColumn": 17,
-                  "endLine": 592,
-                  "endColumn": 19
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
-                "region": {
-                  "startLine": 592,
-                  "startColumn": 50,
-                  "endLine": 592,
-                  "endColumn": 52
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
-                "region": {
-                  "startLine": 597,
+                  "startLine": 397,
                   "startColumn": 21,
-                  "endLine": 597,
-                  "endColumn": 23
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
-                "region": {
-                  "startLine": 618,
-                  "startColumn": 17,
-                  "endLine": 618,
-                  "endColumn": 21
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
-                "region": {
-                  "startLine": 618,
-                  "startColumn": 54,
-                  "endLine": 618,
-                  "endColumn": 56
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
-                "region": {
-                  "startLine": 621,
-                  "startColumn": 21,
-                  "endLine": 621,
-                  "endColumn": 23
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
-                "region": {
-                  "startLine": 626,
-                  "startColumn": 17,
-                  "endLine": 626,
-                  "endColumn": 21
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
-                "region": {
-                  "startLine": 631,
-                  "startColumn": 13,
-                  "endLine": 631,
-                  "endColumn": 18
+                  "endLine": 397,
+                  "endColumn": 70
                 }
               }
             }
@@ -7589,20 +6173,8 @@
           "properties": {
             "warningLevel": 1,
             "customProperties": {
-              "0": "+1",
-              "1": "+1",
-              "10": "+1",
-              "11": "+2 (incl 1 for nesting)",
-              "12": "+1",
-              "13": "+1",
-              "2": "+1",
-              "3": "+1",
-              "4": "+1",
-              "5": "+2 (incl 1 for nesting)",
-              "6": "+1",
-              "7": "+1",
-              "8": "+2 (incl 1 for nesting)",
-              "9": "+1"
+              "LeftOffendingMethod": "ToLower",
+              "RightOffendingMethod": null
             }
           }
         },
@@ -7631,150 +6203,27 @@
           }
         },
         {
-          "ruleId": "S6964",
-          "level": "warning",
-          "message": "Value type property used as input in a controller action should be nullable, required or annotated with the JsonRequiredAttribute to avoid under-posting.",
+          "ruleId": "CA1860",
+          "level": "note",
+          "message": "Prefer comparing 'Count' to 0 rather than using 'Any()', both for clarity and for performance",
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/Admin/TicketManagementService.cs",
                 "region": {
-                  "startLine": 1406,
-                  "startColumn": 20,
-                  "endLine": 1406,
-                  "endColumn": 29
+                  "startLine": 114,
+                  "startColumn": 43,
+                  "endLine": 114,
+                  "endColumn": 63
                 }
               }
             }
           ],
           "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S6964",
-          "level": "warning",
-          "message": "Value type property used as input in a controller action should be nullable, required or annotated with the JsonRequiredAttribute to avoid under-posting.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
-                "region": {
-                  "startLine": 1400,
-                  "startColumn": 20,
-                  "endLine": 1400,
-                  "endColumn": 34
-                }
-              }
+            "warningLevel": 1,
+            "customProperties": {
+              "DiagnosticPropertyKey": "Count"
             }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S6964",
-          "level": "warning",
-          "message": "Value type property used as input in a controller action should be nullable, required or annotated with the JsonRequiredAttribute to avoid under-posting.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
-                "region": {
-                  "startLine": 1401,
-                  "startColumn": 20,
-                  "endLine": 1401,
-                  "endColumn": 29
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S6964",
-          "level": "warning",
-          "message": "Value type property used as input in a controller action should be nullable, required or annotated with the JsonRequiredAttribute to avoid under-posting.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
-                "region": {
-                  "startLine": 1432,
-                  "startColumn": 21,
-                  "endLine": 1432,
-                  "endColumn": 30
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S6964",
-          "level": "warning",
-          "message": "Value type property used as input in a controller action should be nullable, required or annotated with the JsonRequiredAttribute to avoid under-posting.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
-                "region": {
-                  "startLine": 1423,
-                  "startColumn": 20,
-                  "endLine": 1423,
-                  "endColumn": 28
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S6964",
-          "level": "warning",
-          "message": "Value type property used as input in a controller action should be nullable, required or annotated with the JsonRequiredAttribute to avoid under-posting.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
-                "region": {
-                  "startLine": 1424,
-                  "startColumn": 20,
-                  "endLine": 1424,
-                  "endColumn": 27
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
-          }
-        },
-        {
-          "ruleId": "S6964",
-          "level": "warning",
-          "message": "Value type property used as input in a controller action should be nullable, required or annotated with the JsonRequiredAttribute to avoid under-posting.",
-          "locations": [
-            {
-              "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
-                "region": {
-                  "startLine": 1426,
-                  "startColumn": 21,
-                  "endLine": 1426,
-                  "endColumn": 30
-                }
-              }
-            }
-          ],
-          "properties": {
-            "warningLevel": 1
           }
         },
         {
@@ -7968,18 +6417,147 @@
           }
         },
         {
-          "ruleId": "S6964",
+          "ruleId": "S1186",
           "level": "warning",
-          "message": "Value type property used as input in a controller action should be nullable, required or annotated with the JsonRequiredAttribute to avoid under-posting.",
+          "message": "Add a nested comment explaining why this method is empty, throw a 'NotSupportedException' or complete the implementation.",
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Migrations/20260310055858_UpdateCascadeDeleteRulesOnly.cs",
                 "region": {
-                  "startLine": 1411,
-                  "startColumn": 20,
-                  "endLine": 1411,
+                  "startLine": 17,
+                  "startColumn": 33,
+                  "endLine": 17,
+                  "endColumn": 37
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S6580",
+          "level": "warning",
+          "message": "Use a format provider when parsing date and time.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/Admin/SubscriptionManagementService.cs",
+                "region": {
+                  "startLine": 60,
+                  "startColumn": 44,
+                  "endLine": 60,
+                  "endColumn": 67
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S1481",
+          "level": "warning",
+          "message": "Remove the unused local variable 'wasNotActive'.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Services/Admin/SubscriptionManagementService.cs",
+                "region": {
+                  "startLine": 47,
+                  "startColumn": 17,
+                  "endLine": 47,
                   "endColumn": 29
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "CA1861",
+          "level": "note",
+          "message": "Prefer 'static readonly' fields over constant array arguments if the called method is called repeatedly and is not mutating the passed array",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Migrations/20260428092534_AddRolePermissions.cs",
+                "region": {
+                  "startLine": 33,
+                  "startColumn": 26,
+                  "endLine": 33,
+                  "endColumn": 64
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "paramName": "columns"
+            }
+          }
+        },
+        {
+          "ruleId": "S107",
+          "level": "warning",
+          "message": "Constructor has 9 parameters, which is greater than the 7 authorized.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 31,
+                  "startColumn": 30,
+                  "endLine": 40,
+                  "endColumn": 57
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2245",
+          "level": "warning",
+          "message": "Make sure that using this pseudorandom number generator is safe here.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 153,
+                  "startColumn": 24,
+                  "endLine": 153,
+                  "endColumn": 36
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2245",
+          "level": "warning",
+          "message": "Make sure that using this pseudorandom number generator is safe here.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 94,
+                  "startColumn": 28,
+                  "endLine": 94,
+                  "endColumn": 40
                 }
               }
             }
@@ -7997,9 +6575,277 @@
               "resultFile": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 1415,
+                  "startLine": 1438,
                   "startColumn": 20,
-                  "endLine": 1415,
+                  "endLine": 1438,
+                  "endColumn": 29
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S3776",
+          "level": "warning",
+          "message": "Refactor this method to reduce its Cognitive Complexity from 16 to the 15 allowed.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 167,
+                  "startColumn": 42,
+                  "endLine": 167,
+                  "endColumn": 47
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 171,
+                  "startColumn": 13,
+                  "endLine": 171,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 174,
+                  "startColumn": 13,
+                  "endLine": 174,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 178,
+                  "startColumn": 13,
+                  "endLine": 178,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 186,
+                  "startColumn": 13,
+                  "endLine": 186,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 189,
+                  "startColumn": 13,
+                  "endLine": 189,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 197,
+                  "startColumn": 13,
+                  "endLine": 197,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 217,
+                  "startColumn": 13,
+                  "endLine": 217,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 223,
+                  "startColumn": 13,
+                  "endLine": 223,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 223,
+                  "startColumn": 78,
+                  "endLine": 223,
+                  "endColumn": 80
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 223,
+                  "startColumn": 34,
+                  "endLine": 223,
+                  "endColumn": 36
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 228,
+                  "startColumn": 13,
+                  "endLine": 228,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 257,
+                  "startColumn": 54,
+                  "endLine": 257,
+                  "endColumn": 56
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 259,
+                  "startColumn": 13,
+                  "endLine": 259,
+                  "endColumn": 15
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 262,
+                  "startColumn": 69,
+                  "endLine": 262,
+                  "endColumn": 71
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 263,
+                  "startColumn": 17,
+                  "endLine": 263,
+                  "endColumn": 19
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": "+1",
+              "1": "+1",
+              "10": "+1",
+              "11": "+1",
+              "12": "+1",
+              "13": "+1",
+              "14": "+2 (incl 1 for nesting)",
+              "2": "+1",
+              "3": "+1",
+              "4": "+1",
+              "5": "+1",
+              "6": "+1",
+              "7": "+1",
+              "8": "+1",
+              "9": "+1"
+            }
+          }
+        },
+        {
+          "ruleId": "S2245",
+          "level": "warning",
+          "message": "Make sure that using this pseudorandom number generator is safe here.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 200,
+                  "startColumn": 28,
+                  "endLine": 200,
+                  "endColumn": 40
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2245",
+          "level": "warning",
+          "message": "Make sure that using this pseudorandom number generator is safe here.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 230,
+                  "startColumn": 28,
+                  "endLine": 230,
+                  "endColumn": 40
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S6964",
+          "level": "warning",
+          "message": "Value type property used as input in a controller action should be nullable, required or annotated with the JsonRequiredAttribute to avoid under-posting.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
+                "region": {
+                  "startLine": 1455,
+                  "startColumn": 20,
+                  "endLine": 1455,
                   "endColumn": 28
                 }
               }
@@ -8018,9 +6864,30 @@
               "resultFile": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 1416,
+                  "startLine": 1464,
+                  "startColumn": 21,
+                  "endLine": 1464,
+                  "endColumn": 30
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S6964",
+          "level": "warning",
+          "message": "Value type property used as input in a controller action should be nullable, required or annotated with the JsonRequiredAttribute to avoid under-posting.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
+                "region": {
+                  "startLine": 1456,
                   "startColumn": 20,
-                  "endLine": 1416,
+                  "endLine": 1456,
                   "endColumn": 27
                 }
               }
@@ -8031,18 +6898,319 @@
           }
         },
         {
-          "ruleId": "S1186",
+          "ruleId": "S6964",
           "level": "warning",
-          "message": "Add a nested comment explaining why this method is empty, throw a 'NotSupportedException' or complete the implementation.",
+          "message": "Value type property used as input in a controller action should be nullable, required or annotated with the JsonRequiredAttribute to avoid under-posting.",
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Migrations/20260310055858_UpdateCascadeDeleteRulesOnly.cs",
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 17,
+                  "startLine": 1458,
+                  "startColumn": 21,
+                  "endLine": 1458,
+                  "endColumn": 30
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S6964",
+          "level": "warning",
+          "message": "Value type property used as input in a controller action should be nullable, required or annotated with the JsonRequiredAttribute to avoid under-posting.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
+                "region": {
+                  "startLine": 1432,
+                  "startColumn": 20,
+                  "endLine": 1432,
+                  "endColumn": 34
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S6964",
+          "level": "warning",
+          "message": "Value type property used as input in a controller action should be nullable, required or annotated with the JsonRequiredAttribute to avoid under-posting.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
+                "region": {
+                  "startLine": 1433,
+                  "startColumn": 20,
+                  "endLine": 1433,
+                  "endColumn": 29
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "ASP0015",
+          "level": "note",
+          "message": "The header 'User-Agent' can be accessed using the UserAgent property",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 58,
                   "startColumn": 33,
-                  "endLine": 17,
-                  "endColumn": 37
+                  "endLine": 58,
+                  "endColumn": 62
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "HeaderName": "User-Agent",
+              "ResolvedPropertyName": "UserAgent"
+            }
+          }
+        },
+        {
+          "ruleId": "S1075",
+          "level": "warning",
+          "message": "Refactor your code not to use hardcoded absolute paths or URIs.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 299,
+                  "startColumn": 70,
+                  "endLine": 299,
+                  "endColumn": 119
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "CA1869",
+          "level": "note",
+          "message": "Avoid creating a new 'JsonSerializerOptions' instance for every serialization operation. Cache and reuse instances instead.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 317,
+                  "startColumn": 98,
+                  "endLine": 320,
+                  "endColumn": 14
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S6964",
+          "level": "warning",
+          "message": "Value type property used as input in a controller action should be nullable, required or annotated with the JsonRequiredAttribute to avoid under-posting.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
+                "region": {
+                  "startLine": 1443,
+                  "startColumn": 20,
+                  "endLine": 1443,
+                  "endColumn": 29
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S6964",
+          "level": "warning",
+          "message": "Value type property used as input in a controller action should be nullable, required or annotated with the JsonRequiredAttribute to avoid under-posting.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
+                "region": {
+                  "startLine": 1447,
+                  "startColumn": 20,
+                  "endLine": 1447,
+                  "endColumn": 28
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S6964",
+          "level": "warning",
+          "message": "Value type property used as input in a controller action should be nullable, required or annotated with the JsonRequiredAttribute to avoid under-posting.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
+                "region": {
+                  "startLine": 1448,
+                  "startColumn": 20,
+                  "endLine": 1448,
+                  "endColumn": 27
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "ASP0015",
+          "level": "note",
+          "message": "The header 'User-Agent' can be accessed using the UserAgent property",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 336,
+                  "startColumn": 29,
+                  "endLine": 336,
+                  "endColumn": 58
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "HeaderName": "User-Agent",
+              "ResolvedPropertyName": "UserAgent"
+            }
+          }
+        },
+        {
+          "ruleId": "ASP0015",
+          "level": "note",
+          "message": "The header 'User-Agent' can be accessed using the UserAgent property",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 169,
+                  "startColumn": 29,
+                  "endLine": 169,
+                  "endColumn": 58
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "HeaderName": "User-Agent",
+              "ResolvedPropertyName": "UserAgent"
+            }
+          }
+        },
+        {
+          "ruleId": "S3267",
+          "level": "warning",
+          "message": "Loops should be simplified using the \"Where\" LINQ method",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 401,
+                  "startColumn": 34,
+                  "endLine": 401,
+                  "endColumn": 39
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 403,
+                  "startColumn": 21,
+                  "endLine": 403,
+                  "endColumn": 113
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "0": null
+            }
+          }
+        },
+        {
+          "ruleId": "S2325",
+          "level": "warning",
+          "message": "Make 'GetDeviceFromUserAgent' a static method.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 385,
+                  "startColumn": 24,
+                  "endLine": 385,
+                  "endColumn": 46
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S6964",
+          "level": "warning",
+          "message": "Value type property used as input in a controller action should be nullable, required or annotated with the JsonRequiredAttribute to avoid under-posting.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
+                "region": {
+                  "startLine": 1475,
+                  "startColumn": 20,
+                  "endLine": 1475,
+                  "endColumn": 27
                 }
               }
             }
@@ -8383,18 +7551,18 @@
           }
         },
         {
-          "ruleId": "S6964",
+          "ruleId": "S2245",
           "level": "warning",
-          "message": "Value type property used as input in a controller action should be nullable, required or annotated with the JsonRequiredAttribute to avoid under-posting.",
+          "message": "Make sure that using this pseudorandom number generator is safe here.",
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
                 "region": {
-                  "startLine": 1443,
-                  "startColumn": 20,
-                  "endLine": 1443,
-                  "endColumn": 27
+                  "startLine": 634,
+                  "startColumn": 51,
+                  "endLine": 634,
+                  "endColumn": 63
                 }
               }
             }
@@ -8404,27 +7572,66 @@
           }
         },
         {
-          "ruleId": "CA1861",
-          "level": "note",
-          "message": "Prefer 'static readonly' fields over constant array arguments if the called method is called repeatedly and is not mutating the passed array",
+          "ruleId": "S2245",
+          "level": "warning",
+          "message": "Make sure that using this pseudorandom number generator is safe here.",
           "locations": [
             {
               "resultFile": {
-                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Migrations/20260428092534_AddRolePermissions.cs",
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
                 "region": {
-                  "startLine": 33,
-                  "startColumn": 26,
-                  "endLine": 33,
-                  "endColumn": 64
+                  "startLine": 634,
+                  "startColumn": 86,
+                  "endLine": 634,
+                  "endColumn": 98
                 }
               }
             }
           ],
           "properties": {
-            "warningLevel": 1,
-            "customProperties": {
-              "paramName": "columns"
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2245",
+          "level": "warning",
+          "message": "Make sure that using this pseudorandom number generator is safe here.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 634,
+                  "startColumn": 121,
+                  "endLine": 634,
+                  "endColumn": 133
+                }
+              }
             }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2245",
+          "level": "warning",
+          "message": "Make sure that using this pseudorandom number generator is safe here.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 634,
+                  "startColumn": 156,
+                  "endLine": 634,
+                  "endColumn": 168
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
           }
         },
         {
@@ -8514,9 +7721,30 @@
               "resultFile": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 1159,
+                  "startLine": 1191,
                   "startColumn": 24,
-                  "endLine": 1159,
+                  "endLine": 1191,
+                  "endColumn": 36
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S2245",
+          "level": "warning",
+          "message": "Make sure that using this pseudorandom number generator is safe here.",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 767,
+                  "startColumn": 24,
+                  "endLine": 767,
                   "endColumn": 36
                 }
               }
@@ -8535,9 +7763,9 @@
               "resultFile": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 1198,
+                  "startLine": 1230,
                   "startColumn": 24,
-                  "endLine": 1198,
+                  "endLine": 1230,
                   "endColumn": 36
                 }
               }
@@ -8556,10 +7784,161 @@
               "resultFile": {
                 "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/CustomerController.cs",
                 "region": {
-                  "startLine": 1277,
+                  "startLine": 1309,
                   "startColumn": 28,
-                  "endLine": 1277,
+                  "endLine": 1309,
                   "endColumn": 40
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "ASP0015",
+          "level": "note",
+          "message": "The header 'User-Agent' can be accessed using the UserAgent property",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 783,
+                  "startColumn": 29,
+                  "endLine": 783,
+                  "endColumn": 58
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1,
+            "customProperties": {
+              "HeaderName": "User-Agent",
+              "ResolvedPropertyName": "UserAgent"
+            }
+          }
+        },
+        {
+          "ruleId": "S6932",
+          "level": "warning",
+          "message": "Use model binding instead of accessing the raw request data",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 783,
+                  "startColumn": 29,
+                  "endLine": 783,
+                  "endColumn": 44
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S6932",
+          "level": "warning",
+          "message": "Use model binding instead of accessing the raw request data",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 169,
+                  "startColumn": 29,
+                  "endLine": 169,
+                  "endColumn": 44
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S6932",
+          "level": "warning",
+          "message": "Use model binding instead of accessing the raw request data",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 336,
+                  "startColumn": 29,
+                  "endLine": 336,
+                  "endColumn": 44
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "S6932",
+          "level": "warning",
+          "message": "Use model binding instead of accessing the raw request data",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 58,
+                  "startColumn": 33,
+                  "endLine": 58,
+                  "endColumn": 48
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "CA1822",
+          "level": "note",
+          "message": "Member 'GetDeviceFromUserAgent' does not access instance data and can be marked as static",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 385,
+                  "startColumn": 24,
+                  "endLine": 385,
+                  "endColumn": 46
+                }
+              }
+            }
+          ],
+          "properties": {
+            "warningLevel": 1
+          }
+        },
+        {
+          "ruleId": "CA1859",
+          "level": "note",
+          "message": "Change return type of method 'ValidatePrepaidRequest' from 'Microsoft.AspNetCore.Mvc.IActionResult?' to 'Microsoft.AspNetCore.Mvc.BadRequestObjectResult?' for improved performance",
+          "locations": [
+            {
+              "resultFile": {
+                "uri": "file:///E:/projects/sharp_tayokonnektado/TayoKonnektado-project/Controllers/AuthController.cs",
+                "region": {
+                  "startLine": 621,
+                  "startColumn": 32,
+                  "endLine": 621,
+                  "endColumn": 54
                 }
               }
             }
@@ -8677,6 +8056,21 @@
             ]
           }
         },
+        "CA1859": {
+          "id": "CA1859",
+          "shortDescription": "Use concrete types when possible for improved performance",
+          "fullDescription": "Using concrete types avoids virtual or interface call overhead and enables inlining.",
+          "defaultLevel": "note",
+          "helpUri": "https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca1859",
+          "properties": {
+            "category": "Performance",
+            "isEnabledByDefault": true,
+            "tags": [
+              "Telemetry",
+              "EnabledRuleInAggressiveMode"
+            ]
+          }
+        },
         "CA1860": {
           "id": "CA1860",
           "shortDescription": "Avoid using 'Enumerable.Any()' extension method",
@@ -8772,20 +8166,6 @@
           "shortDescription": "Member hides inherited member; missing override keyword",
           "defaultLevel": "warning",
           "helpUri": "https://msdn.microsoft.com/query/roslyn.query?appId=roslyn&k=k(CS0114)",
-          "properties": {
-            "category": "Compiler",
-            "isEnabledByDefault": true,
-            "tags": [
-              "Compiler",
-              "Telemetry"
-            ]
-          }
-        },
-        "CS8602": {
-          "id": "CS8602",
-          "shortDescription": "Dereference of a possibly null reference.",
-          "defaultLevel": "warning",
-          "helpUri": "https://msdn.microsoft.com/query/roslyn.query?appId=roslyn&k=k(CS8602)",
           "properties": {
             "category": "Compiler",
             "isEnabledByDefault": true,
@@ -9167,22 +8547,6 @@
             ]
           }
         },
-        "S4487": {
-          "id": "S4487",
-          "shortDescription": "Unread \"private\" fields should be removed",
-          "fullDescription": "Private fields which are written but never read are a case of \"dead store\". Changing the value of such a field is useless and most probably indicates an error in the code.",
-          "defaultLevel": "warning",
-          "properties": {
-            "category": "Critical Code Smell",
-            "isEnabledByDefault": true,
-            "tags": [
-              "C#",
-              "MainSourceScope",
-              "TestSourceScope",
-              "SonarWay"
-            ]
-          }
-        },
         "S4790": {
           "id": "S4790",
           "shortDescription": "Using weak hashing algorithms is security-sensitive",
@@ -9347,22 +8711,6 @@
             "tags": [
               "C#",
               "MainSourceScope",
-              "SonarWay"
-            ]
-          }
-        },
-        "S927": {
-          "id": "S927",
-          "shortDescription": "Parameter names should match base declaration and other partial definitions",
-          "fullDescription": "Parameters are part of the method signature and its identity.",
-          "defaultLevel": "warning",
-          "properties": {
-            "category": "Critical Code Smell",
-            "isEnabledByDefault": true,
-            "tags": [
-              "C#",
-              "MainSourceScope",
-              "TestSourceScope",
               "SonarWay"
             ]
           }

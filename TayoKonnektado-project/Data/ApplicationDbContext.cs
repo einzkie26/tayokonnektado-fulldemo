@@ -33,64 +33,64 @@ namespace TayoKonnektado_project.Data
         public DbSet<SystemSettings> SystemSettings { get; set; }
         public DbSet<LoginAttempt> LoginAttempts { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(modelBuilder);
+            base.OnModelCreating(builder);
 
-            modelBuilder.Entity<Device>()
+            builder.Entity<Device>()
                 .Property(d => d.UserID)
                 .HasColumnName("UserID");
 
-            modelBuilder.Entity<Subscription>()
+            builder.Entity<Subscription>()
                 .Property(s => s.UserID)
                 .HasColumnName("UserID");
 
-            modelBuilder.Entity<Subscription>()
+            builder.Entity<Subscription>()
                 .HasOne(s => s.ServiceAccount)
                 .WithMany(sa => sa.Subscriptions)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<Subscription>()
+            builder.Entity<Subscription>()
                 .HasOne(s => s.Plan)
                 .WithMany(p => p.Subscriptions)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<Invoice>()
+            builder.Entity<Invoice>()
                 .HasOne(i => i.Subscription)
                 .WithMany(s => s.Invoices)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Invoice>()
+            builder.Entity<Invoice>()
                 .HasOne(i => i.PrepaidLoad)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<Payment>()
+            builder.Entity<Payment>()
                 .HasOne(p => p.Invoice)
                 .WithMany(i => i.Payments)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<TicketReply>()
+            builder.Entity<TicketReply>()
                 .HasOne(r => r.Ticket)
                 .WithMany(t => t.Replies)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<PrepaidPromo>()
+            builder.Entity<PrepaidPromo>()
                 .HasOne(pp => pp.PrepaidLoad)
                 .WithMany()
                 .HasForeignKey(pp => pp.PrepaidLoadID)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<PrepaidPromo>()
+            builder.Entity<PrepaidPromo>()
                 .HasOne(pp => pp.User)
                 .WithMany()
                 .HasForeignKey(pp => pp.UserID)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<RolePermission>()
+            builder.Entity<RolePermission>()
                 .HasKey(rp => rp.RolePermissionID);
 
-            modelBuilder.Entity<RolePermission>()
+            builder.Entity<RolePermission>()
                 .HasIndex(rp => new { rp.RoleName, rp.PermissionName })
                 .IsUnique();
         }

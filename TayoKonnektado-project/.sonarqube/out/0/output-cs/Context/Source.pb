@@ -1040,8 +1040,8 @@ namespace TayoKonnektado_project.Controllers
         public string Password { get; set; } = string.Empty;
     }
 }
-ParseOptions.0.jsonìˆ
-UE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Controllers\AuthController.csü‡using Microsoft.AspNetCore.Authorization;
+ParseOptions.0.jsonˆ–
+UE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Controllers\AuthController.cs˜•using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -1602,110 +1602,35 @@ namespace TayoKonnektado_project.Controllers
             try
             {
                 var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                
-                var activeSubscriptionCount = await _context.Subscriptions
-                    .CountAsync(s => s.UserID == userId && s.Status == "Active");
-                var activePrepaidCount = await _context.Devices
-                    .Where(d => d.UserID == userId)
-                    .SelectMany(d => d.ServiceAccounts)
-                    .Where(sa => sa.Status == "Active" && sa.ServiceType == "Prepaid")
-                    .CountAsync();
-                var totalActiveServices = activeSubscriptionCount + activePrepaidCount;
-                
-                if (totalActiveServices >= 5)
-                    return BadRequest(new { message = "You have reached the maximum limit of 5 active services." });
-                
-                var serviceType = request.ServiceType ?? "Subscription";
-                
-                if (serviceType == "Prepaid" && string.IsNullOrWhiteSpace(request.PhoneNumber))
-                {
-                    return BadRequest(new { message = "Phone number is required for Prepaid WiFi service" });
-                }
-                var macAddress = request.MacAddress;
-                if (serviceType == "Prepaid" && string.IsNullOrWhiteSpace(macAddress))
-                {
-                    macAddress = $"PP:{DateTime.UtcNow:HHmmss}:{new Random().Next(0x00, 0xFF):X2}:{new Random().Next(0x00, 0xFF):X2}:{new Random().Next(0x00, 0xFF):X2}:{new Random().Next(0x00, 0xFF):X2}";
-                }
 
-                var device = new Device
-                {
-                    UserID = userId!,
-                    MACAddress = macAddress,
-                    Status = "Active",
-                    DeviceType = "WiFi"
-                };
-                _context.Devices.Add(device);
-                await _context.SaveChangesAsync();
+                var limitResult = await EnforceServiceLimitAsync(userId);
+                if (limitResult != null)
+                    return limitResult;
 
-                var serviceAccount = new ServiceAccount
-                {
-                    DeviceID = device.DeviceID,
-                    ServiceType = serviceType,
-                    Status = "Active"
-                };
-                _context.ServiceAccounts.Add(serviceAccount);
-                await _context.SaveChangesAsync();
+                var serviceType = ResolveServiceType(request.ServiceType);
+                var validationResult = ValidatePrepaidRequest(serviceType, request.PhoneNumber);
+                if (validationResult != null)
+                    return validationResult;
+
+                var macAddress = ResolveMacAddress(serviceType, request.MacAddress);
+
+                var device = await CreateDeviceAsync(userId!, macAddress);
+                var serviceAccount = await CreateServiceAccountAsync(device.DeviceID, serviceType);
 
                 if (serviceType == "Prepaid")
                 {
-                    var prepaidLoad = new PrepaidLoad
-                    {
-                        ServiceAccountID = serviceAccount.ServiceAccountID,
-                        PhoneNumber = request.PhoneNumber,
-                        LoadAmount = 0,
-                        RemainingBalance = 0
-                    };
-                    _context.PrepaidLoads.Add(prepaidLoad);
-                    await _context.SaveChangesAsync();
+                    await CreatePrepaidLoadAsync(serviceAccount.ServiceAccountID, request.PhoneNumber);
                 }
                 else
                 {
-                    int planId;
-                    if (request.PlanID.HasValue)
-                    {
-                        planId = request.PlanID.Value;
-                    }
-                    else
-                    {
-                        var macSuffix = request.MacAddress.Replace(":", "").ToUpper().Substring(request.MacAddress.Replace(":", "").Length - 2);
-                        int speedMbps = macSuffix switch
-                        {
-                            "FA" => 50,
-                            "EA" => 100,
-                            "GA" => 200,
-                            "HA" => 500,
-                            _ => 0
-                        };
+                    var planResult = await ResolvePlanIdAsync(request.PlanID, request.MacAddress);
+                    if (planResult.Error != null)
+                        return planResult.Error;
 
-                        if (speedMbps == 0)
-                            return BadRequest(new { message = "Invalid MAC ID. Must end with FA (50Mbps), EA (100Mbps), GA (200Mbps), or HA (500Mbps)" });
-
-                        var plan = await _context.SubscriptionPlans
-                            .AsNoTracking()
-                            .Where(p => p.SpeedMbps == speedMbps)
-                            .Select(p => new { p.PlanID })
-                            .FirstOrDefaultAsync();
-                        if (plan == null)
-                            return BadRequest(new { message = $"Plan not found. Please contact administrator to set up subscription plans." });
-                        planId = plan.PlanID;
-                    }
-
-                    var subscription = new Subscription
-                    {
-                        ServiceAccountID = serviceAccount.ServiceAccountID,
-                        PlanID = planId,
-                        UserID = userId!,
-                        StartDate = DateTime.UtcNow,
-                        Status = "Active"
-                    };
-                    _context.Subscriptions.Add(subscription);
+                    await CreateSubscriptionAsync(serviceAccount.ServiceAccountID, userId!, planResult.PlanId!.Value);
                 }
 
-                var onboarding = await _context.OnboardingStatuses.FirstOrDefaultAsync(o => o.UserID == userId);
-                if (onboarding != null)
-                    onboarding.HasRegisteredDevice = true;
-
-                await _context.SaveChangesAsync();
+                await UpdateOnboardingAsync(userId);
 
                 return Ok(new { message = "Device registered successfully", deviceId = device.DeviceID, serviceType });
             }
@@ -1713,6 +1638,139 @@ namespace TayoKonnektado_project.Controllers
             {
                 return BadRequest(new { message = $"Failed to register device: {ex.Message}" });
             }
+        }
+
+        private async Task<IActionResult?> EnforceServiceLimitAsync(string? userId)
+        {
+            var activeSubscriptionCount = await _context.Subscriptions
+                .CountAsync(s => s.UserID == userId && s.Status == "Active");
+            var activePrepaidCount = await _context.Devices
+                .Where(d => d.UserID == userId)
+                .SelectMany(d => d.ServiceAccounts)
+                .Where(sa => sa.Status == "Active" && sa.ServiceType == "Prepaid")
+                .CountAsync();
+
+            if (activeSubscriptionCount + activePrepaidCount >= 5)
+                return BadRequest(new { message = "You have reached the maximum limit of 5 active services." });
+
+            return null;
+        }
+
+        private static string ResolveServiceType(string? serviceType)
+        {
+            return string.IsNullOrWhiteSpace(serviceType) ? "Subscription" : serviceType;
+        }
+
+        private IActionResult? ValidatePrepaidRequest(string serviceType, string? phoneNumber)
+        {
+            if (serviceType == "Prepaid" && string.IsNullOrWhiteSpace(phoneNumber))
+                return BadRequest(new { message = "Phone number is required for Prepaid WiFi service" });
+
+            return null;
+        }
+
+        private static string? ResolveMacAddress(string serviceType, string? macAddress)
+        {
+            if (serviceType != "Prepaid" || !string.IsNullOrWhiteSpace(macAddress))
+                return macAddress;
+
+            return $"PP:{DateTime.UtcNow:HHmmss}:{new Random().Next(0x00, 0xFF):X2}:{new Random().Next(0x00, 0xFF):X2}:{new Random().Next(0x00, 0xFF):X2}:{new Random().Next(0x00, 0xFF):X2}";
+        }
+
+        private async Task<Device> CreateDeviceAsync(string userId, string? macAddress)
+        {
+            var device = new Device
+            {
+                UserID = userId,
+                MACAddress = macAddress,
+                Status = "Active",
+                DeviceType = "WiFi"
+            };
+            _context.Devices.Add(device);
+            await _context.SaveChangesAsync();
+            return device;
+        }
+
+        private async Task<ServiceAccount> CreateServiceAccountAsync(int deviceId, string serviceType)
+        {
+            var serviceAccount = new ServiceAccount
+            {
+                DeviceID = deviceId,
+                ServiceType = serviceType,
+                Status = "Active"
+            };
+            _context.ServiceAccounts.Add(serviceAccount);
+            await _context.SaveChangesAsync();
+            return serviceAccount;
+        }
+
+        private async Task CreatePrepaidLoadAsync(int serviceAccountId, string? phoneNumber)
+        {
+            var prepaidLoad = new PrepaidLoad
+            {
+                ServiceAccountID = serviceAccountId,
+                PhoneNumber = phoneNumber,
+                LoadAmount = 0,
+                RemainingBalance = 0
+            };
+            _context.PrepaidLoads.Add(prepaidLoad);
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task<(int? PlanId, IActionResult? Error)> ResolvePlanIdAsync(int? planId, string? macAddress)
+        {
+            if (planId.HasValue)
+                return (planId.Value, null);
+
+            if (string.IsNullOrWhiteSpace(macAddress))
+                return (null, BadRequest(new { message = "MAC address is required for subscription service" }));
+
+            var normalized = macAddress.Replace(":", "").ToUpperInvariant();
+            var macSuffix = normalized.Substring(normalized.Length - 2);
+            var speedMbps = macSuffix switch
+            {
+                "FA" => 50,
+                "EA" => 100,
+                "GA" => 200,
+                "HA" => 500,
+                _ => 0
+            };
+
+            if (speedMbps == 0)
+                return (null, BadRequest(new { message = "Invalid MAC ID. Must end with FA (50Mbps), EA (100Mbps), GA (200Mbps), or HA (500Mbps)" }));
+
+            var plan = await _context.SubscriptionPlans
+                .AsNoTracking()
+                .Where(p => p.SpeedMbps == speedMbps)
+                .Select(p => new { p.PlanID })
+                .FirstOrDefaultAsync();
+            if (plan == null)
+                return (null, BadRequest(new { message = "Plan not found. Please contact administrator to set up subscription plans." }));
+
+            return (plan.PlanID, null);
+        }
+
+        private async Task CreateSubscriptionAsync(int serviceAccountId, string userId, int planId)
+        {
+            var subscription = new Subscription
+            {
+                ServiceAccountID = serviceAccountId,
+                PlanID = planId,
+                UserID = userId,
+                StartDate = DateTime.UtcNow,
+                Status = "Active"
+            };
+            _context.Subscriptions.Add(subscription);
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task UpdateOnboardingAsync(string? userId)
+        {
+            var onboarding = await _context.OnboardingStatuses.FirstOrDefaultAsync(o => o.UserID == userId);
+            if (onboarding != null)
+                onboarding.HasRegisteredDevice = true;
+
+            await _context.SaveChangesAsync();
         }
 
         [Authorize]
@@ -1821,8 +1879,8 @@ namespace TayoKonnektado_project.Controllers
         public string Code { get; set; } = string.Empty;
     }
 }
-ParseOptions.0.json–ƒ
-YE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Controllers\CustomerController.cs¢‚using Microsoft.AspNetCore.Authorization;
+ParseOptions.0.jsonˆŠ
+YE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Controllers\CustomerController.cs”‰using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -2381,82 +2439,114 @@ namespace TayoKonnektado_project.Controllers
         public async Task<IActionResult> CompletePrepaidTopUp(int id)
         {
             var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            var prepaid = await _context.PrepaidLoads
+            var prepaid = await GetPrepaidLoadAsync(id, userId);
+            if (prepaid == null)
+                return NotFound(new { message = "Prepaid service not found" });
+
+            var pendingPayment = await GetLatestPendingPaymentAsync(id, userId);
+            if (pendingPayment == null)
+                return await BuildNoPendingTopupResponseAsync(id, userId, prepaid);
+
+            return await HandlePendingTopupAsync(pendingPayment, prepaid);
+        }
+
+        private Task<PrepaidLoad?> GetPrepaidLoadAsync(int id, string? userId)
+        {
+            return _context.PrepaidLoads
                 .Include(p => p.ServiceAccount)
                     .ThenInclude(sa => sa.Device)
                 .FirstOrDefaultAsync(p => p.PrepaidLoadID == id && p.ServiceAccount.Device.UserID == userId);
-            
-            if (prepaid == null) return NotFound(new { message = "Prepaid service not found" });
+        }
 
-            var pendingPayment = await _context.Payments
+        private Task<Payment?> GetLatestPendingPaymentAsync(int id, string? userId)
+        {
+            return _context.Payments
                 .Include(p => p.Invoice)
                 .Where(p => p.UserID == userId && p.Status == "Pending" && p.Invoice != null && p.Invoice.PrepaidLoadID == id)
                 .OrderByDescending(p => p.PaymentDate)
                 .FirstOrDefaultAsync();
+        }
 
-            if (pendingPayment == null)
+        private async Task<IActionResult> BuildNoPendingTopupResponseAsync(int id, string? userId, PrepaidLoad prepaid)
+        {
+            var alreadyCompleted = await _context.Payments
+                .Include(p => p.Invoice)
+                .Where(p => p.UserID == userId && p.Status == "Completed" && p.Invoice != null && p.Invoice.PrepaidLoadID == id)
+                .OrderByDescending(p => p.PaymentDate)
+                .FirstOrDefaultAsync();
+
+            if (alreadyCompleted != null)
             {
-                var alreadyCompleted = await _context.Payments
-                    .Include(p => p.Invoice)
-                    .Where(p => p.UserID == userId && p.Status == "Completed" && p.Invoice != null && p.Invoice.PrepaidLoadID == id)
-                    .OrderByDescending(p => p.PaymentDate)
-                    .FirstOrDefaultAsync();
-
-                if (alreadyCompleted != null)
-                    return Ok(new { status = "Completed", message = "Top-up already applied.", amountAdded = alreadyCompleted.AmountPaid, loadAmount = prepaid.LoadAmount, remainingBalance = prepaid.RemainingBalance, lastReload = prepaid.LastReloadBalance });
-
-                return Ok(new { status = "Pending", message = "No pending top-up payment found" });
+                return Ok(new
+                {
+                    status = "Completed",
+                    message = "Top-up already applied.",
+                    amountAdded = alreadyCompleted.AmountPaid,
+                    loadAmount = prepaid.LoadAmount,
+                    remainingBalance = prepaid.RemainingBalance,
+                    lastReload = prepaid.LastReloadBalance
+                });
             }
 
+            return Ok(new { status = "Pending", message = "No pending top-up payment found" });
+        }
+
+        private async Task<IActionResult> HandlePendingTopupAsync(Payment pendingPayment, PrepaidLoad prepaid)
+        {
             try
             {
                 var sourceStatus = await _payMongoService.GetSourceStatus(pendingPayment.ReferenceNum!);
                 Console.WriteLine($"Prepaid topup source status for {pendingPayment.ReferenceNum}: {sourceStatus}");
 
                 if (sourceStatus == "chargeable" || sourceStatus == "paid")
-                {
-                    pendingPayment.Status = "Completed";
-                    pendingPayment.PaymentDate = DateTime.UtcNow;
+                    return await CompleteTopupAsync(pendingPayment, prepaid);
 
-                    if (pendingPayment.Invoice != null)
-                    {
-                        pendingPayment.Invoice.Status = "Paid";
-                    }
-                    var amountAdded = pendingPayment.AmountPaid;
-                    prepaid.LoadAmount += amountAdded;
-                    prepaid.RemainingBalance = (prepaid.RemainingBalance ?? 0) + amountAdded;
-                    prepaid.LastReloadBalance = DateTime.UtcNow;
+                if (sourceStatus == "cancelled" || sourceStatus == "expired")
+                    return await FailTopupAsync(pendingPayment);
 
-                    await _context.SaveChangesAsync();
-
-                    return Ok(new
-                    {
-                        status = "Completed",
-                        message = "Top-up completed successfully!",
-                        amountAdded,
-                        loadAmount = prepaid.LoadAmount,
-                        remainingBalance = prepaid.RemainingBalance,
-                        lastReload = prepaid.LastReloadBalance
-                    });
-                }
-                else if (sourceStatus == "cancelled" || sourceStatus == "expired")
-                {
-                    pendingPayment.Status = "Failed";
-                    if (pendingPayment.Invoice != null)
-                        pendingPayment.Invoice.Status = "Failed";
-                    await _context.SaveChangesAsync();
-                    return Ok(new { status = "Failed", message = "Payment was cancelled or expired." });
-                }
-                else
-                {
-                    return Ok(new { status = "Pending", message = "Payment is still processing. Please wait a moment." });
-                }
+                return Ok(new { status = "Pending", message = "Payment is still processing. Please wait a moment." });
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error checking prepaid topup source status: {ex.Message}");
                 return Ok(new { status = "Pending", message = "Could not verify payment status. Please try again." });
             }
+        }
+
+        private async Task<IActionResult> CompleteTopupAsync(Payment pendingPayment, PrepaidLoad prepaid)
+        {
+            pendingPayment.Status = "Completed";
+            pendingPayment.PaymentDate = DateTime.UtcNow;
+
+            if (pendingPayment.Invoice != null)
+                pendingPayment.Invoice.Status = "Paid";
+
+            var amountAdded = pendingPayment.AmountPaid;
+            prepaid.LoadAmount += amountAdded;
+            prepaid.RemainingBalance = (prepaid.RemainingBalance ?? 0) + amountAdded;
+            prepaid.LastReloadBalance = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                status = "Completed",
+                message = "Top-up completed successfully!",
+                amountAdded,
+                loadAmount = prepaid.LoadAmount,
+                remainingBalance = prepaid.RemainingBalance,
+                lastReload = prepaid.LastReloadBalance
+            });
+        }
+
+        private async Task<IActionResult> FailTopupAsync(Payment pendingPayment)
+        {
+            pendingPayment.Status = "Failed";
+            if (pendingPayment.Invoice != null)
+                pendingPayment.Invoice.Status = "Failed";
+
+            await _context.SaveChangesAsync();
+            return Ok(new { status = "Failed", message = "Payment was cancelled or expired." });
         }
 
 
@@ -3306,8 +3396,8 @@ namespace TayoKonnektado_project.Controllers
         public string? PromoValidity { get; set; }
     }
 }
-ParseOptions.0.jsonÔ
-XE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Controllers\PaymentController.csâusing Microsoft.AspNetCore.Authorization;
+ParseOptions.0.jsonÉ
+XE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Controllers\PaymentController.cs×using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TayoKonnektado_project.Models;
 using TayoKonnektado_project.Services;
@@ -3319,11 +3409,8 @@ namespace TayoKonnektado_project.Controllers
     [Route("api/[controller]")]
     public class PaymentController : ControllerBase
     {
-        private readonly PayMongoService _payMongoService;
-
-        public PaymentController(PayMongoService payMongoService)
+        public PaymentController()
         {
-            _payMongoService = payMongoService;
         }
 
         [HttpPost("create")]
@@ -3403,8 +3490,8 @@ namespace TayoKonnektado_project.Controllers
         }
     }
 }
-ParseOptions.0.jsonÏ 
-TE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Data\ApplicationDbContext.csáusing Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+ParseOptions.0.json‰ 
+TE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Data\ApplicationDbContext.cs›using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using TayoKonnektado_project.Models;
 
@@ -3439,64 +3526,64 @@ namespace TayoKonnektado_project.Data
         public DbSet<SystemSettings> SystemSettings { get; set; }
         public DbSet<LoginAttempt> LoginAttempts { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(modelBuilder);
+            base.OnModelCreating(builder);
 
-            modelBuilder.Entity<Device>()
+            builder.Entity<Device>()
                 .Property(d => d.UserID)
                 .HasColumnName("UserID");
 
-            modelBuilder.Entity<Subscription>()
+            builder.Entity<Subscription>()
                 .Property(s => s.UserID)
                 .HasColumnName("UserID");
 
-            modelBuilder.Entity<Subscription>()
+            builder.Entity<Subscription>()
                 .HasOne(s => s.ServiceAccount)
                 .WithMany(sa => sa.Subscriptions)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<Subscription>()
+            builder.Entity<Subscription>()
                 .HasOne(s => s.Plan)
                 .WithMany(p => p.Subscriptions)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<Invoice>()
+            builder.Entity<Invoice>()
                 .HasOne(i => i.Subscription)
                 .WithMany(s => s.Invoices)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Invoice>()
+            builder.Entity<Invoice>()
                 .HasOne(i => i.PrepaidLoad)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<Payment>()
+            builder.Entity<Payment>()
                 .HasOne(p => p.Invoice)
                 .WithMany(i => i.Payments)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<TicketReply>()
+            builder.Entity<TicketReply>()
                 .HasOne(r => r.Ticket)
                 .WithMany(t => t.Replies)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<PrepaidPromo>()
+            builder.Entity<PrepaidPromo>()
                 .HasOne(pp => pp.PrepaidLoad)
                 .WithMany()
                 .HasForeignKey(pp => pp.PrepaidLoadID)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<PrepaidPromo>()
+            builder.Entity<PrepaidPromo>()
                 .HasOne(pp => pp.User)
                 .WithMany()
                 .HasForeignKey(pp => pp.UserID)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<RolePermission>()
+            builder.Entity<RolePermission>()
                 .HasKey(rp => rp.RolePermissionID);
 
-            modelBuilder.Entity<RolePermission>()
+            builder.Entity<RolePermission>()
                 .HasIndex(rp => new { rp.RoleName, rp.PermissionName })
                 .IsUnique();
         }
@@ -39202,9 +39289,10 @@ namespace TayoKonnektado_project.Services
         }
     }
 }
-ParseOptions.0.json‘+
-WE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Services\PrepaidUsageService.cs *using Microsoft.EntityFrameworkCore;
+ParseOptions.0.json‘&
+WE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Services\PrepaidUsageService.cs %using Microsoft.EntityFrameworkCore;
 using TayoKonnektado_project.Data;
+using TayoKonnektado_project.Models;
 
 namespace TayoKonnektado_project.Services
 {
@@ -39246,66 +39334,8 @@ namespace TayoKonnektado_project.Services
                     using var scope = _serviceProvider.CreateScope();
                     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-                    // 1. Expire any promos past their ExpiresAt date
-                    var expiredPromos = await context.PrepaidPromos
-                        .Where(p => p.Status == "Active" && p.ExpiresAt <= DateTime.UtcNow)
-                        .ToListAsync(stoppingToken);
-
-                    foreach (var ep in expiredPromos)
-                    {
-                        ep.Status = "Expired";
-                        _logger.LogInformation($"Promo '{ep.PromoTitle}' (#{ep.PrepaidPromoID}) expired.");
-                    }
-
-                    // 2. Get all active promos that still have data remaining
-                    var activePromos = await context.PrepaidPromos
-                        .Include(p => p.PrepaidLoad)
-                            .ThenInclude(pl => pl.ServiceAccount)
-                        .Where(p => p.Status == "Active"
-                                 && p.RemainingDataMB > 0
-                                 && p.PrepaidLoad.ServiceAccount.Status == "Active"
-                                 && p.PrepaidLoad.ServiceAccount.ServiceType == "Prepaid")
-                        .ToListAsync(stoppingToken);
-
-                    if (activePromos.Any())
-                    {
-                        // Group by PrepaidLoadID so we deduct once per account
-                        var grouped = activePromos.GroupBy(p => p.PrepaidLoadID);
-
-                        foreach (var group in grouped)
-                        {
-                            // Random MB between 5.0 and 15.0 (visible in UI, 20 GB promo lasts ~1-3 days)
-                            var deductionMB = (decimal)(MinMBPerCycle + (_random.NextDouble() * (MaxMBPerCycle - MinMBPerCycle)));
-
-                            var remaining = deductionMB;
-
-                            // Deduct from each promo in order (oldest first) until cycle is satisfied
-                            foreach (var promo in group.OrderBy(p => p.ActivatedAt))
-                            {
-                                if (remaining <= 0) break;
-
-                                var deduction = Math.Min(remaining, promo.RemainingDataMB);
-                                promo.RemainingDataMB -= deduction;
-                                remaining -= deduction;
-
-                                if (promo.RemainingDataMB <= 0)
-                                {
-                                    promo.RemainingDataMB = 0;
-                                    promo.Status = "Depleted";
-                                    _logger.LogInformation(
-                                        $"Promo '{promo.PromoTitle}' (#{promo.PrepaidPromoID}) data depleted.");
-                                }
-                            }
-                        }
-
-                        await context.SaveChangesAsync(stoppingToken);
-                        _logger.LogInformation(
-                            $"Deducted random MB from {activePromos.Count} active promo(s).");
-                    }
-
-                    // 3. Note: We do NOT deactivate service accounts with zero promos.
-                    // Users can have active prepaid accounts with zero balance - they just need to top up.
-                    // The service account stays "Active" but has no data until they purchase a promo.
+                    await ExpirePromosAsync(context, stoppingToken);
+                    await ApplyUsageAsync(context, stoppingToken);
                 }
                 catch (Exception ex)
                 {
@@ -39313,6 +39343,67 @@ namespace TayoKonnektado_project.Services
                 }
 
                 await Task.Delay(Interval, stoppingToken);
+            }
+        }
+
+        private async Task ExpirePromosAsync(ApplicationDbContext context, CancellationToken stoppingToken)
+        {
+            var expiredPromos = await context.PrepaidPromos
+                .Where(p => p.Status == "Active" && p.ExpiresAt <= DateTime.UtcNow)
+                .ToListAsync(stoppingToken);
+
+            foreach (var ep in expiredPromos)
+            {
+                ep.Status = "Expired";
+                _logger.LogInformation($"Promo '{ep.PromoTitle}' (#{ep.PrepaidPromoID}) expired.");
+            }
+
+            if (expiredPromos.Count > 0)
+                await context.SaveChangesAsync(stoppingToken);
+        }
+
+        private async Task ApplyUsageAsync(ApplicationDbContext context, CancellationToken stoppingToken)
+        {
+            var activePromos = await context.PrepaidPromos
+                .Include(p => p.PrepaidLoad)
+                    .ThenInclude(pl => pl.ServiceAccount)
+                .Where(p => p.Status == "Active"
+                         && p.RemainingDataMB > 0
+                         && p.PrepaidLoad.ServiceAccount.Status == "Active"
+                         && p.PrepaidLoad.ServiceAccount.ServiceType == "Prepaid")
+                .ToListAsync(stoppingToken);
+
+            if (activePromos.Count == 0)
+                return;
+
+            foreach (var group in activePromos.GroupBy(p => p.PrepaidLoadID))
+            {
+                DeductFromGroup(group);
+            }
+
+            await context.SaveChangesAsync(stoppingToken);
+            _logger.LogInformation($"Deducted random MB from {activePromos.Count} active promo(s).");
+        }
+
+        private void DeductFromGroup(IEnumerable<PrepaidPromo> group)
+        {
+            var deductionMB = (decimal)(MinMBPerCycle + (_random.NextDouble() * (MaxMBPerCycle - MinMBPerCycle)));
+            var remaining = deductionMB;
+
+            foreach (var promo in group.OrderBy(p => p.ActivatedAt))
+            {
+                if (remaining <= 0) break;
+
+                var deduction = Math.Min(remaining, promo.RemainingDataMB);
+                promo.RemainingDataMB -= deduction;
+                remaining -= deduction;
+
+                if (promo.RemainingDataMB <= 0)
+                {
+                    promo.RemainingDataMB = 0;
+                    promo.Status = "Depleted";
+                    _logger.LogInformation($"Promo '{promo.PromoTitle}' (#{promo.PrepaidPromoID}) data depleted.");
+                }
             }
         }
     }
@@ -39640,7 +39731,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TayoKonnektado-project")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5f909935172de315638ac6fc5e20b443f3217a22")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3e8f9066be49f0d778e60acc338369c097a07eed")]
 [assembly: System.Reflection.AssemblyProductAttribute("TayoKonnektado-project")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TayoKonnektado-project")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
