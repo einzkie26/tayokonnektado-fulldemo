@@ -8,6 +8,7 @@ using TayoKonnektado_project.Data;
 using TayoKonnektado_project.Models;
 using TayoKonnektado_project.Services;
 using TayoKonnektado_project.Services.Security;
+using TayoKonnektado_project.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,7 +48,7 @@ builder.Services.AddSwaggerGen(c =>
                     Id = "Bearer"
                 }
             },
-            new string[] {}
+            Array.Empty<string>()
         }
     });
 });
@@ -198,23 +199,4 @@ using (var scope = app.Services.CreateScope())
     await PlanSeeder.SeedPlansAsync(context);
 }
 
-app.Run();
-
-/// <summary>
-/// Ensures DateTime values round-trip as UTC (with 'Z' suffix) in JSON responses.
-/// Without this, EF Core returns DateTime with Kind=Unspecified, causing ASP.NET to
-/// omit the 'Z', which makes JavaScript treat the time as local instead of UTC.
-/// </summary>
-public class UtcDateTimeConverter : System.Text.Json.Serialization.JsonConverter<DateTime>
-{
-    public override DateTime Read(ref System.Text.Json.Utf8JsonReader reader, Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
-    {
-        var dt = reader.GetDateTime();
-        return DateTime.SpecifyKind(dt, DateTimeKind.Utc);
-    }
-
-    public override void Write(System.Text.Json.Utf8JsonWriter writer, DateTime value, System.Text.Json.JsonSerializerOptions options)
-    {
-        writer.WriteStringValue(DateTime.SpecifyKind(value, DateTimeKind.Utc));
-    }
-}
+await app.RunAsync();

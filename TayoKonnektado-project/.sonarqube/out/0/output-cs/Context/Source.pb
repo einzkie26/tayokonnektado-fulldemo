@@ -90,10 +90,11 @@ namespace TayoKonnektado_project.Controllers
         public string? Details { get; set; }
     }
 }
-ParseOptions.0.jsonâ±
-VE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Controllers\AdminController.csò∞using Microsoft.AspNetCore.Authorization;
+ParseOptions.0.jsonÇ≤
+VE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Controllers\AdminController.csë±using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using TayoKonnektado_project.Data;
 using TayoKonnektado_project.Models;
 using TayoKonnektado_project.Services.Admin;
@@ -962,6 +963,7 @@ namespace TayoKonnektado_project.Controllers
 
     public class AdminTopUpRequest
     {
+        [Required]
         public decimal Amount { get; set; }
     }
 
@@ -979,6 +981,7 @@ namespace TayoKonnektado_project.Controllers
     {
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
+        [Required]
         public decimal Price { get; set; }
         public string Data { get; set; } = string.Empty;
         public string Validity { get; set; } = string.Empty;
@@ -997,11 +1000,13 @@ namespace TayoKonnektado_project.Controllers
     {
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
+        [Required]
         public decimal Price { get; set; }
         public string Data { get; set; } = string.Empty;
         public string Validity { get; set; } = string.Empty;
         public string? Badge { get; set; }
         public string? Color { get; set; }
+        [Required]
         public bool IsActive { get; set; } = true;
     }
 
@@ -1893,11 +1898,12 @@ namespace TayoKonnektado_project.Controllers
         public string Code { get; set; } = string.Empty;
     }
 }
-ParseOptions.0.jsonàä
-YE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Controllers\CustomerController.csîâusing Microsoft.AspNetCore.Authorization;
+ParseOptions.0.jsonøå
+YE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Controllers\CustomerController.csÀãusing Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using TayoKonnektado_project.Data;
 using TayoKonnektado_project.Models;
 using TayoKonnektado_project.Services;
@@ -3325,22 +3331,28 @@ namespace TayoKonnektado_project.Controllers
 
     public class UpgradePlanRequest
     {
+        [Required]
         public int SubscriptionId { get; set; }
+        [Required]
         public int NewPlanId { get; set; }
     }
 
     public class CreatePaymentIntentRequest
     {
+        [Required]
         public int InvoiceId { get; set; }
     }
 
     public class ProcessPaymentRequest
     {
+        [Required]
         public int InvoiceId { get; set; }
         public string PaymentMethod { get; set; } = string.Empty;
         public string? PaymentIntentId { get; set; }
         public string? CardNumber { get; set; }
+        [Required]
         public int ExpMonth { get; set; }
+        [Required]
         public int ExpYear { get; set; }
         public string? Cvc { get; set; }
     }
@@ -3348,26 +3360,32 @@ namespace TayoKonnektado_project.Controllers
     public class SavePaymentMethodRequest
     {
         public string CardNumber { get; set; } = string.Empty;
+        [Required]
         public int ExpMonth { get; set; }
+        [Required]
         public int ExpYear { get; set; }
         public string Cvc { get; set; } = string.Empty;
+        [Required]
         public bool IsDefault { get; set; }
     }
 
     public class SaveGCashMethodRequest
     {
         public string PhoneNumber { get; set; } = string.Empty;
+        [Required]
         public bool IsDefault { get; set; }
     }
 
     public class ConfirmGCashMethodRequest
     {
         public string PhoneNumber { get; set; } = string.Empty;
+        [Required]
         public bool IsDefault { get; set; }
     }
 
     public class AddAddonRequest
     {
+        [Required]
         public int AddonId { get; set; }
     }
 
@@ -3399,11 +3417,13 @@ namespace TayoKonnektado_project.Controllers
 
     public class TopUpRequest
     {
+        [Required]
         public decimal Amount { get; set; }
     }
 
     public class BuyPromoRequest
     {
+        [Required]
         public decimal Amount { get; set; }
         public string? PromoTitle { get; set; }
         public string? PromoData { get; set; }
@@ -36979,11 +36999,14 @@ namespace TayoKonnektado_project.Models
         public bool HasCompletedTutorial { get; set; } = false;
     }
 }
-ParseOptions.0.json˛
-PE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Models\PaymentRequest.csînamespace TayoKonnektado_project.Models
+ParseOptions.0.jsonø
+PE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Models\PaymentRequest.cs’using System.ComponentModel.DataAnnotations;
+
+namespace TayoKonnektado_project.Models
 {
     public class PaymentRequest
     {
+        [Required]
         public decimal Amount { get; set; }
         public string Description { get; set; } = string.Empty;
         public string CustomerEmail { get; set; } = string.Empty;
@@ -37034,8 +37057,8 @@ RE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Models\SecuritySettings
         public int BlockMinutes { get; set; } = 15;
     }
 }
-ParseOptions.0.jsonéE
-BE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Program.cs≤Dusing Microsoft.AspNetCore.Authentication.JwtBearer;
+ParseOptions.0.json€>
+BE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Program.csˇ=using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -37045,6 +37068,7 @@ using TayoKonnektado_project.Data;
 using TayoKonnektado_project.Models;
 using TayoKonnektado_project.Services;
 using TayoKonnektado_project.Services.Security;
+using TayoKonnektado_project.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37084,7 +37108,7 @@ builder.Services.AddSwaggerGen(c =>
                     Id = "Bearer"
                 }
             },
-            new string[] {}
+            Array.Empty<string>()
         }
     });
 });
@@ -37235,26 +37259,7 @@ using (var scope = app.Services.CreateScope())
     await PlanSeeder.SeedPlansAsync(context);
 }
 
-app.Run();
-
-/// <summary>
-/// Ensures DateTime values round-trip as UTC (with 'Z' suffix) in JSON responses.
-/// Without this, EF Core returns DateTime with Kind=Unspecified, causing ASP.NET to
-/// omit the 'Z', which makes JavaScript treat the time as local instead of UTC.
-/// </summary>
-public class UtcDateTimeConverter : System.Text.Json.Serialization.JsonConverter<DateTime>
-{
-    public override DateTime Read(ref System.Text.Json.Utf8JsonReader reader, Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
-    {
-        var dt = reader.GetDateTime();
-        return DateTime.SpecifyKind(dt, DateTimeKind.Utc);
-    }
-
-    public override void Write(System.Text.Json.Utf8JsonWriter writer, DateTime value, System.Text.Json.JsonSerializerOptions options)
-    {
-        writer.WriteStringValue(DateTime.SpecifyKind(value, DateTimeKind.Utc));
-    }
-}
+await app.RunAsync();
 ParseOptions.0.jsonÑ/
 ]E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Services\ActivityLoggingMiddleware.csç.using System.Globalization;
 using System.Security.Claims;
@@ -39709,6 +39714,32 @@ namespace TayoKonnektado_project.Services
         }
     }
 }
+ParseOptions.0.json¬
+YE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Utilities\UtcDateTimeConverter.csœusing System;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
+namespace TayoKonnektado_project.Utilities
+{
+    /// <summary>
+    /// Ensures DateTime values round-trip as UTC (with 'Z' suffix) in JSON responses.
+    /// Without this, EF Core returns DateTime with Kind=Unspecified, causing ASP.NET to
+    /// omit the 'Z', which makes JavaScript treat the time as local instead of UTC.
+    /// </summary>
+    public class UtcDateTimeConverter : JsonConverter<DateTime>
+    {
+        public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            var dt = reader.GetDateTime();
+            return DateTime.SpecifyKind(dt, DateTimeKind.Utc);
+        }
+
+        public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
+        {
+            writer.WriteStringValue(DateTime.SpecifyKind(value, DateTimeKind.Utc));
+        }
+    }
+}
 ParseOptions.0.jsonç
 qE:\projects\sharp_tayokonnektado\TayoKonnektado-project\obj\Debug\net8.0\TayoKonnektado-project.GlobalUsings.g.csÇ// <auto-generated/>
 global using Microsoft.AspNetCore.Builder;
@@ -39748,7 +39779,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TayoKonnektado-project")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2dd6a436f418ebd77301d6e873fdd0813ea76115")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ba8345a45eb9de9967897cbd68efd151f1dec48c")]
 [assembly: System.Reflection.AssemblyProductAttribute("TayoKonnektado-project")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TayoKonnektado-project")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

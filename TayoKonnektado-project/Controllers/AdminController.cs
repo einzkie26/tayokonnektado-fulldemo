@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using TayoKonnektado_project.Data;
 using TayoKonnektado_project.Models;
 using TayoKonnektado_project.Services.Admin;
@@ -869,6 +870,7 @@ namespace TayoKonnektado_project.Controllers
 
     public class AdminTopUpRequest
     {
+        [Required]
         public decimal Amount { get; set; }
     }
 
@@ -886,6 +888,7 @@ namespace TayoKonnektado_project.Controllers
     {
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
+        [Required]
         public decimal Price { get; set; }
         public string Data { get; set; } = string.Empty;
         public string Validity { get; set; } = string.Empty;
@@ -904,11 +907,13 @@ namespace TayoKonnektado_project.Controllers
     {
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
+        [Required]
         public decimal Price { get; set; }
         public string Data { get; set; } = string.Empty;
         public string Validity { get; set; } = string.Empty;
         public string? Badge { get; set; }
         public string? Color { get; set; }
+        [Required]
         public bool IsActive { get; set; } = true;
     }
 

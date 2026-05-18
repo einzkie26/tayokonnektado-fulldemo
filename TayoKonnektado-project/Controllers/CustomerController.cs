@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using TayoKonnektado_project.Data;
 using TayoKonnektado_project.Models;
 using TayoKonnektado_project.Services;
@@ -1429,22 +1430,28 @@ namespace TayoKonnektado_project.Controllers
 
     public class UpgradePlanRequest
     {
+        [Required]
         public int SubscriptionId { get; set; }
+        [Required]
         public int NewPlanId { get; set; }
     }
 
     public class CreatePaymentIntentRequest
     {
+        [Required]
         public int InvoiceId { get; set; }
     }
 
     public class ProcessPaymentRequest
     {
+        [Required]
         public int InvoiceId { get; set; }
         public string PaymentMethod { get; set; } = string.Empty;
         public string? PaymentIntentId { get; set; }
         public string? CardNumber { get; set; }
+        [Required]
         public int ExpMonth { get; set; }
+        [Required]
         public int ExpYear { get; set; }
         public string? Cvc { get; set; }
     }
@@ -1452,26 +1459,32 @@ namespace TayoKonnektado_project.Controllers
     public class SavePaymentMethodRequest
     {
         public string CardNumber { get; set; } = string.Empty;
+        [Required]
         public int ExpMonth { get; set; }
+        [Required]
         public int ExpYear { get; set; }
         public string Cvc { get; set; } = string.Empty;
+        [Required]
         public bool IsDefault { get; set; }
     }
 
     public class SaveGCashMethodRequest
     {
         public string PhoneNumber { get; set; } = string.Empty;
+        [Required]
         public bool IsDefault { get; set; }
     }
 
     public class ConfirmGCashMethodRequest
     {
         public string PhoneNumber { get; set; } = string.Empty;
+        [Required]
         public bool IsDefault { get; set; }
     }
 
     public class AddAddonRequest
     {
+        [Required]
         public int AddonId { get; set; }
     }
 
@@ -1503,11 +1516,13 @@ namespace TayoKonnektado_project.Controllers
 
     public class TopUpRequest
     {
+        [Required]
         public decimal Amount { get; set; }
     }
 
     public class BuyPromoRequest
     {
+        [Required]
         public decimal Amount { get; set; }
         public string? PromoTitle { get; set; }
         public string? PromoData { get; set; }

@@ -1,7 +1,10 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace TayoKonnektado_project.Models
 {
     public class PaymentRequest
     {
+        [Required]
         public decimal Amount { get; set; }
         public string Description { get; set; } = string.Empty;
         public string CustomerEmail { get; set; } = string.Empty;
