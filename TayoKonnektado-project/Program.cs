@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Threading.RateLimiting;
 using TayoKonnektado_project.Data;
 using TayoKonnektado_project.Models;
 using TayoKonnektado_project.Services;
+using TayoKonnektado_project.Services.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -57,17 +59,27 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 //Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
-    //Relax password requirements for easier testing
-    options.Password.RequireDigit = false;
-    options.Password.RequireLowercase = false;
-    options.Password.RequireUppercase = false;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequiredLength = 6;
+    // Strong password policy
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequiredLength = 12;
+    options.Password.RequiredUniqueChars = 4;
+
+    // Lockout policy for brute-force protection
+    options.Lockout.AllowedForNewUsers = true;
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
 })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
 //JWT Authentication
+var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
+if (string.IsNullOrWhiteSpace(jwtKey))
+    throw new InvalidOperationException("JWT secret key is not configured. Set JWT_KEY environment variable.");
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -83,7 +95,7 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
     };
 })
 .AddGoogle(options =>
@@ -104,6 +116,22 @@ builder.Services.AddCors(options =>
         });
 });
 
+// Rate limiting for auth endpoints
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddPolicy("auth", httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 20,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 5
+            }));
+});
+
 //Register Services
 builder.Services.AddScoped<TayoKonnektado_project.Services.PayMongoService>();
 builder.Services.AddScoped<TayoKonnektado_project.Services.TokenService>();
@@ -116,9 +144,13 @@ builder.Services.AddScoped<TayoKonnektado_project.Services.Admin.StaffManagement
 builder.Services.AddScoped<TayoKonnektado_project.Services.Admin.DashboardService>();
 builder.Services.AddScoped<TayoKonnektado_project.Services.Admin.PlanManagementService>();
 builder.Services.AddScoped<TayoKonnektado_project.Services.Admin.FAQManagementService>();
+builder.Services.AddScoped<TayoKonnektado_project.Services.LoginAttemptService>();
 builder.Services.AddHostedService<TayoKonnektado_project.Services.SubscriptionEndDateService>();
 builder.Services.AddHostedService<TayoKonnektado_project.Services.PrepaidUsageService>();
 builder.Services.AddHttpClient();
+builder.Services.Configure<SecuritySettings>(builder.Configuration.GetSection("Security"));
+builder.Services.AddSingleton<IpDeviceReputationService>();
+builder.Services.AddHttpClient<PasswordBreachService>();
 
 var app = builder.Build();
 
@@ -141,6 +173,8 @@ else
 }
 
 app.UseAuthentication();
+app.UseRateLimiter();
+app.UseMiddleware<ActivityLoggingMiddleware>();
 app.UseAuthorization();
 
 app.MapControllers();

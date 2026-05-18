@@ -29,6 +29,9 @@ namespace TayoKonnektado_project.Data
         public DbSet<LoginHistory> LoginHistory { get; set; }
         public DbSet<NotificationPreference> NotificationPreferences { get; set; }
         public DbSet<PromoOffer> PromoOffers { get; set; }
+        public DbSet<RolePermission> RolePermissions { get; set; }
+        public DbSet<SystemSettings> SystemSettings { get; set; }
+        public DbSet<LoginAttempt> LoginAttempts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -83,6 +86,13 @@ namespace TayoKonnektado_project.Data
                 .WithMany()
                 .HasForeignKey(pp => pp.UserID)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<RolePermission>()
+                .HasKey(rp => rp.RolePermissionID);
+
+            modelBuilder.Entity<RolePermission>()
+                .HasIndex(rp => new { rp.RoleName, rp.PermissionName })
+                .IsUnique();
         }
     }
 }

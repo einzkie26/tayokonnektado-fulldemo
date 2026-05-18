@@ -209,7 +209,54 @@ namespace TayoKonnektado_project.Controllers
 
         [Authorize(Roles = "SuperAdmin,Admin")]
         [HttpGet("activity-logs")]
-        public async Task<IActionResult> GetActivityLogs() => Ok(await _dashboardService.GetActivityLogsAsync());
+        public async Task<IActionResult> GetActivityLogs([FromQuery] DateTime? since = null)
+        {
+            Response.Headers.CacheControl = "no-store, no-cache, must-revalidate";
+            Response.Headers.Pragma = "no-cache";
+            Response.Headers.Expires = "0";
+
+            return Ok(await _dashboardService.GetActivityLogsAsync(since));
+        }
+
+        [Authorize(Roles = "SuperAdmin,Admin")]
+        [HttpDelete("activity-logs/{id}")]
+        public async Task<IActionResult> DeleteActivityLog(int id)
+        {
+            var log = await _context.ActivityLogs.FindAsync(id);
+            if (log == null) return NotFound();
+            _context.ActivityLogs.Remove(log);
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Activity log deleted" });
+        }
+
+        [HttpPost("activity-logs")]
+        public async Task<IActionResult> CreateActivityLog([FromBody] CreateActivityLogRequest request)
+        {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId))
+                return Unauthorized();
+
+            var actionText = !string.IsNullOrWhiteSpace(request.Action)
+                ? request.Action
+                : request.Description;
+
+            if (string.IsNullOrWhiteSpace(actionText))
+                return BadRequest(new { message = "Action or description is required" });
+
+            var activityLog = new ActivityLog
+            {
+                UserID = userId,
+                Action = actionText,
+                Type = string.IsNullOrWhiteSpace(request.Type) ? "Update" : request.Type,
+                IPAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
+                Timestamp = DateTime.UtcNow
+            };
+
+            _context.ActivityLogs.Add(activityLog);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Activity logged successfully" });
+        }
 
         // Plan Management
         [HttpGet("plans")]
@@ -256,13 +303,101 @@ namespace TayoKonnektado_project.Controllers
         [HttpDelete("staff/{id}")]
         public async Task<IActionResult> DeleteStaff(string id)
         {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null) return NotFound(new { message = "Staff not found" });
+
+            if (user.Role == "SuperAdmin")
+            {
+                var superAdminCount = await _context.Users.CountAsync(u => u.Role == "SuperAdmin");
+                if (superAdminCount <= 2)
+                    return BadRequest(new { message = "Cannot delete SuperAdmin. Minimum 2 SuperAdmins required." });
+            }
+
             var success = await _staffService.DeleteStaffAsync(id);
             return success ? Ok(new { message = "Staff deleted successfully" }) : NotFound();
         }
 
         [Authorize(Roles = "SuperAdmin")]
+        [HttpPut("roles/{roleName}")]
+        public async Task<IActionResult> UpdateRole(string roleName, [FromBody] UpdateRoleRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(roleName) || request?.Permissions == null)
+                return BadRequest(new { message = "Invalid role or permissions" });
+
+            try
+            {
+                var existingPermissions = await _context.RolePermissions
+                    .Where(rp => rp.RoleName == roleName)
+                    .ToListAsync();
+
+                _context.RolePermissions.RemoveRange(existingPermissions);
+
+                var newPermissions = request.Permissions.Select(p => new RolePermission
+                {
+                    RoleName = roleName,
+                    PermissionName = p,
+                    CreatedAt = DateTime.UtcNow
+                }).ToList();
+
+                _context.RolePermissions.AddRange(newPermissions);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = "Role permissions updated successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [Authorize(Roles = "SuperAdmin,Admin,Staff")]
         [HttpGet("roles")]
-        public IActionResult GetRoles() => Ok(new List<object>());
+        public async Task<IActionResult> GetRoles()
+        {
+            var adminUsers = await _context.Users
+                .Where(u => u.Role == "Admin")
+                .Select(u => new { id = u.Id, name = $"{u.FirstName} {u.LastName}", email = u.Email })
+                .ToListAsync();
+
+            var staffUsers = await _context.Users
+                .Where(u => u.Role == "Staff")
+                .Select(u => new { id = u.Id, name = $"{u.FirstName} {u.LastName}", email = u.Email })
+                .ToListAsync();
+
+            var adminPermissions = await _context.RolePermissions
+                .Where(rp => rp.RoleName == "Admin")
+                .Select(rp => rp.PermissionName)
+                .ToListAsync();
+
+            var staffPermissions = await _context.RolePermissions
+                .Where(rp => rp.RoleName == "Staff")
+                .Select(rp => rp.PermissionName)
+                .ToListAsync();
+
+            var roles = new object[]
+            {
+                new
+                {
+                    id = 1,
+                    name = "Admin",
+                    users = adminUsers.Count,
+                    members = adminUsers,
+                    permissions = adminPermissions.Count > 0 ? adminPermissions : new List<string>(),
+                    color = "red"
+                },
+                new
+                {
+                    id = 2,
+                    name = "Staff",
+                    users = staffUsers.Count,
+                    members = staffUsers,
+                    permissions = staffPermissions.Count > 0 ? staffPermissions : new List<string>(),
+                    color = "blue"
+                }
+            };
+
+            return Ok(roles);
+        }
 
         // FAQ Management
         [HttpGet("faqs")]
@@ -462,13 +597,206 @@ namespace TayoKonnektado_project.Controllers
 
         // Notifications (placeholder)
         [HttpGet("notifications")]
-        public IActionResult GetNotifications() => Ok(new List<object>());
+        public async Task<IActionResult> GetNotifications()
+        {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) return Unauthorized();
+
+            var notifications = await _context.Notifications
+                .Where(n => n.UserID == userId)
+                .OrderByDescending(n => n.SentAt)
+                .ToListAsync();
+            return Ok(notifications);
+        }
+
+        [HttpPost("notifications")]
+        public async Task<IActionResult> CreateNotification([FromBody] CreateNotificationRequest request)
+        {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) return Unauthorized();
+
+            var notification = new Notification
+            {
+                UserID = userId,
+                Message = request.Message,
+                Type = request.Type ?? "info",
+                Status = "unread",
+                SentAt = DateTime.UtcNow
+            };
+
+            _context.Notifications.Add(notification);
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Notification created", notificationID = notification.NotificationID });
+        }
 
         [HttpPost("notifications/mark-all-read")]
-        public IActionResult MarkAllNotificationsRead() => Ok(new { message = "All notifications marked as read" });
+        public async Task<IActionResult> MarkAllNotificationsRead()
+        {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) return Unauthorized();
+
+            var notifications = await _context.Notifications
+                .Where(n => n.UserID == userId && n.Status == "unread")
+                .ToListAsync();
+
+            foreach (var notification in notifications)
+            {
+                notification.Status = "read";
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "All notifications marked as read" });
+        }
 
         [HttpDelete("notifications/{id}")]
-        public IActionResult DeleteNotification(int id) => Ok(new { message = "Notification deleted" });
+        public async Task<IActionResult> DeleteNotification(int id)
+        {
+            var notification = await _context.Notifications.FindAsync(id);
+            if (notification == null) return NotFound();
+
+            _context.Notifications.Remove(notification);
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Notification deleted" });
+        }
+
+        // System Settings
+        [HttpGet("settings")]
+        public async Task<IActionResult> GetSettings()
+        {
+            var settings = await _context.SystemSettings.FirstOrDefaultAsync();
+            if (settings == null)
+            {
+                settings = new SystemSettings();
+                _context.SystemSettings.Add(settings);
+                await _context.SaveChangesAsync();
+            }
+            return Ok(settings);
+        }
+
+        [HttpPut("settings")]
+        public async Task<IActionResult> UpdateSettings([FromBody] UpdateSystemSettingsRequest request)
+        {
+            var settings = await _context.SystemSettings.FirstOrDefaultAsync();
+            if (settings == null)
+            {
+                settings = new SystemSettings();
+                _context.SystemSettings.Add(settings);
+            }
+
+            settings.SiteName = request.SiteName ?? settings.SiteName;
+            settings.SiteEmail = request.SiteEmail ?? settings.SiteEmail;
+            settings.MaintenanceMode = request.MaintenanceMode ?? settings.MaintenanceMode;
+            settings.MaxLoginAttempts = request.MaxLoginAttempts ?? settings.MaxLoginAttempts;
+            settings.SessionTimeout = request.SessionTimeout ?? settings.SessionTimeout;
+            settings.EnableTwoFactor = request.EnableTwoFactor ?? settings.EnableTwoFactor;
+            settings.EnableAuditLogs = request.EnableAuditLogs ?? settings.EnableAuditLogs;
+            settings.NotificationEmail = request.NotificationEmail ?? settings.NotificationEmail;
+            settings.EmailOnNewTickets = request.EmailOnNewTickets ?? settings.EmailOnNewTickets;
+            settings.EmailOnPaymentReceived = request.EmailOnPaymentReceived ?? settings.EmailOnPaymentReceived;
+            settings.EmailOnSystemErrors = request.EmailOnSystemErrors ?? settings.EmailOnSystemErrors;
+            settings.EmailOnSecurityAlerts = request.EmailOnSecurityAlerts ?? settings.EmailOnSecurityAlerts;
+            settings.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Settings updated successfully", settings });
+        }
+
+        [Authorize(Roles = "SuperAdmin")]
+        [HttpGet("superadmin-count")]
+        public async Task<IActionResult> GetSuperAdminCount()
+        {
+            var superAdminRoleId = await _context.Roles
+                .Where(r => r.Name == "SuperAdmin")
+                .Select(r => r.Id)
+                .FirstOrDefaultAsync();
+
+            var count = 0;
+            if (!string.IsNullOrEmpty(superAdminRoleId))
+            {
+                count = await _context.UserRoles
+                    .CountAsync(ur => ur.RoleId == superAdminRoleId);
+            }
+
+            var canCreate = Math.Max(0, 2 - count);
+            return Ok(new { count, canCreate });
+        }
+
+        [Authorize(Roles = "SuperAdmin")]
+        [HttpGet("suspended-users")]
+        public async Task<IActionResult> GetSuspendedUsers()
+        {
+            var suspendedUsers = await _context.LoginAttempts
+                .Where(la => la.LockedUntil.HasValue && la.LockedUntil > DateTime.UtcNow)
+                .Include(la => la.User)
+                .OrderByDescending(la => la.LockedUntil)
+                .Select(la => new
+                {
+                    la.LoginAttemptID,
+                    la.UserID,
+                    UserName = la.User.FirstName + " " + la.User.LastName,
+                    Email = la.User.Email,
+                    FailedAttempts = la.FailedAttempts,
+                    LockReason = la.LockReason,
+                    LockedUntil = la.LockedUntil,
+                    RemainingMinutes = (int)Math.Ceiling((la.LockedUntil.Value - DateTime.UtcNow).TotalMinutes)
+                })
+                .ToListAsync();
+
+            return Ok(suspendedUsers);
+        }
+
+        [Authorize(Roles = "SuperAdmin")]
+        [HttpPost("unlock-user/{userId}")]
+        public async Task<IActionResult> UnlockUser(string userId)
+        {
+            var attempt = await _context.LoginAttempts.FirstOrDefaultAsync(la => la.UserID == userId);
+            if (attempt == null)
+                return NotFound(new { message = "User not found" });
+
+            attempt.FailedAttempts = 0;
+            attempt.LockedUntil = null;
+            attempt.LockReason = null;
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "User unlocked successfully" });
+        }
+
+        [Authorize(Roles = "SuperAdmin")]
+        [HttpPost("create-superadmin")]
+        public async Task<IActionResult> CreateSuperAdmin([FromBody] CreateSuperAdminRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
+                return BadRequest(new { message = "Email and password are required" });
+
+            if (request.Password.Length < 6)
+                return BadRequest(new { message = "Password must be at least 6 characters" });
+
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+            if (existingUser != null)
+                return BadRequest(new { message = "Email already exists" });
+
+            var newUser = new ApplicationUser
+            {
+                UserName = request.Email,
+                Email = request.Email,
+                FirstName = request.FirstName ?? string.Empty,
+                LastName = request.LastName ?? string.Empty,
+                Role = "SuperAdmin",
+                EmailConfirmed = true,
+                Status = "Active"
+            };
+
+            var userManager = HttpContext.RequestServices.GetService(typeof(Microsoft.AspNetCore.Identity.UserManager<ApplicationUser>)) as Microsoft.AspNetCore.Identity.UserManager<ApplicationUser>;
+            if (userManager == null) return BadRequest(new { message = "User manager not available" });
+
+            var result = await userManager.CreateAsync(newUser, request.Password);
+            if (!result.Succeeded)
+                return BadRequest(new { message = string.Join(", ", result.Errors.Select(e => e.Description)) });
+
+            await userManager.AddToRoleAsync(newUser, "SuperAdmin");
+
+            return Ok(new { message = "SuperAdmin created successfully", userId = newUser.Id });
+        }
     }
 
     // Request Models
@@ -565,6 +893,13 @@ namespace TayoKonnektado_project.Controllers
         public string? Color { get; set; }
     }
 
+    public class CreateActivityLogRequest
+    {
+        public string Action { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string Type { get; set; } = string.Empty;
+    }
+
     public class UpdatePromoOfferRequest
     {
         public string Title { get; set; } = string.Empty;
@@ -575,5 +910,40 @@ namespace TayoKonnektado_project.Controllers
         public string? Badge { get; set; }
         public string? Color { get; set; }
         public bool IsActive { get; set; } = true;
+    }
+
+    public class UpdateRoleRequest
+    {
+        public string[]? Permissions { get; set; }
+    }
+
+    public class CreateNotificationRequest
+    {
+        public string Message { get; set; } = string.Empty;
+        public string? Type { get; set; } = "info";
+    }
+
+    public class UpdateSystemSettingsRequest
+    {
+        public string? SiteName { get; set; }
+        public string? SiteEmail { get; set; }
+        public bool? MaintenanceMode { get; set; }
+        public int? MaxLoginAttempts { get; set; }
+        public int? SessionTimeout { get; set; }
+        public bool? EnableTwoFactor { get; set; }
+        public bool? EnableAuditLogs { get; set; }
+        public string? NotificationEmail { get; set; }
+        public bool? EmailOnNewTickets { get; set; }
+        public bool? EmailOnPaymentReceived { get; set; }
+        public bool? EmailOnSystemErrors { get; set; }
+        public bool? EmailOnSecurityAlerts { get; set; }
+    }
+
+    public class CreateSuperAdminRequest
+    {
+        public string Email { get; set; } = string.Empty;
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
     }
 }

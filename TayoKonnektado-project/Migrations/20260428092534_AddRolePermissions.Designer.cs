@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TayoKonnektado_project.Data;
 
@@ -11,9 +12,11 @@ using TayoKonnektado_project.Data;
 namespace TayoKonnektado_project.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260428092534_AddRolePermissions")]
+    partial class AddRolePermissions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -153,6 +156,36 @@ namespace TayoKonnektado_project.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("RolePermission", b =>
+                {
+                    b.Property<int>("RolePermissionID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RolePermissionID"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PermissionName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RoleName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("RolePermissionID");
+
+                    b.HasIndex("RoleName", "PermissionName")
+                        .IsUnique();
+
+                    b.ToTable("RolePermissions");
                 });
 
             modelBuilder.Entity("TayoKonnektado_project.Models.ActivityLog", b =>
@@ -430,40 +463,6 @@ namespace TayoKonnektado_project.Migrations
                     b.HasIndex("UserID");
 
                     b.ToTable("Invoices");
-                });
-
-            modelBuilder.Entity("TayoKonnektado_project.Models.LoginAttempt", b =>
-                {
-                    b.Property<int>("LoginAttemptID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LoginAttemptID"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("FailedAttempts")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("LastAttemptAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("LockReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("LockedUntil")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserID")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("LoginAttemptID");
-
-                    b.HasIndex("UserID");
-
-                    b.ToTable("LoginAttempts");
                 });
 
             modelBuilder.Entity("TayoKonnektado_project.Models.LoginHistory", b =>
@@ -755,36 +754,6 @@ namespace TayoKonnektado_project.Migrations
                     b.ToTable("PromoOffers");
                 });
 
-            modelBuilder.Entity("TayoKonnektado_project.Models.RolePermission", b =>
-                {
-                    b.Property<int>("RolePermissionID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RolePermissionID"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("PermissionName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("RoleName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("RolePermissionID");
-
-                    b.HasIndex("RoleName", "PermissionName")
-                        .IsUnique();
-
-                    b.ToTable("RolePermissions");
-                });
-
             modelBuilder.Entity("TayoKonnektado_project.Models.SavedPaymentMethod", b =>
                 {
                     b.Property<int>("PaymentMethodID")
@@ -977,64 +946,6 @@ namespace TayoKonnektado_project.Migrations
                     b.ToTable("SupportTickets");
                 });
 
-            modelBuilder.Entity("TayoKonnektado_project.Models.SystemSettings", b =>
-                {
-                    b.Property<int>("SettingID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SettingID"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("EmailOnNewTickets")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("EmailOnPaymentReceived")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("EmailOnSecurityAlerts")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("EmailOnSystemErrors")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("EnableAuditLogs")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("EnableTwoFactor")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("MaintenanceMode")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("MaxLoginAttempts")
-                        .HasColumnType("int");
-
-                    b.Property<string>("NotificationEmail")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("SessionTimeout")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SiteEmail")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SiteName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("SettingID");
-
-                    b.ToTable("SystemSettings");
-                });
-
             modelBuilder.Entity("TayoKonnektado_project.Models.TicketReply", b =>
                 {
                     b.Property<int>("ReplyID")
@@ -1224,17 +1135,6 @@ namespace TayoKonnektado_project.Migrations
                     b.Navigation("PrepaidLoad");
 
                     b.Navigation("Subscription");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("TayoKonnektado_project.Models.LoginAttempt", b =>
-                {
-                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.Navigation("User");
                 });

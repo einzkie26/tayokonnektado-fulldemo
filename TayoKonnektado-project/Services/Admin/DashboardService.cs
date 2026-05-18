@@ -108,22 +108,126 @@ namespace TayoKonnektado_project.Services.Admin
                 .ToListAsync();
         }
 
-        public async Task<object> GetActivityLogsAsync()
+        public async Task<object> GetActivityLogsAsync(DateTime? since = null)
         {
-            return await _context.ActivityLogs
-                .Include(l => l.User)
-                .OrderByDescending(l => l.Timestamp)
-                .Take(100)
-                .Select(l => new
+            var roleByUser = await _context.UserRoles
+                .Join(
+                    _context.Roles,
+                    ur => ur.RoleId,
+                    r => r.Id,
+                    (ur, r) => new { ur.UserId, RoleName = r.Name ?? string.Empty })
+                .GroupBy(x => x.UserId)
+                .Select(g => new
                 {
-                    l.LogID,
-                    User = l.User.FirstName + " " + l.User.LastName,
-                    l.Action,
-                    l.Type,
-                    l.IPAddress,
-                    l.Timestamp
+                    UserId = g.Key,
+                    Role = g
+                        .OrderBy(x => (x.RoleName ?? string.Empty).ToLower() == "superadmin" ? 0 : (x.RoleName ?? string.Empty).ToLower() == "admin" ? 1 : (x.RoleName ?? string.Empty).ToLower() == "staff" ? 2 : 3)
+                        .Select(x => x.RoleName)
+                        .FirstOrDefault()
                 })
+                .ToDictionaryAsync(x => x.UserId, x => x.Role ?? string.Empty);
+
+            var logsQuery = _context.ActivityLogs
+                .AsNoTracking()
+                .Include(l => l.User)
+                .AsQueryable();
+
+            if (since.HasValue)
+            {
+                var sinceUtc = DateTime.SpecifyKind(since.Value, DateTimeKind.Utc);
+                logsQuery = logsQuery.Where(l => l.Timestamp > sinceUtc);
+            }
+
+            var logs = await logsQuery
+                .OrderByDescending(l => l.Timestamp)
+                .Take(1000)
                 .ToListAsync();
+
+            var loginHistoryQuery = _context.LoginHistory
+                .AsNoTracking()
+                .Include(h => h.User)
+                .AsQueryable();
+
+            if (since.HasValue)
+            {
+                var sinceUtc = DateTime.SpecifyKind(since.Value, DateTimeKind.Utc);
+                loginHistoryQuery = loginHistoryQuery.Where(h => h.LoginTime > sinceUtc);
+            }
+
+            var loginHistory = await loginHistoryQuery
+                .OrderByDescending(h => h.LoginTime)
+                .Take(500)
+                .ToListAsync();
+
+            var activityEntries = logs.Select(l => new ActivityLogView
+            {
+                LogID = l.LogID,
+                UserID = l.UserID,
+                UserEmail = l.User?.Email,
+                User = l.User == null
+                    ? "Unknown"
+                    : !string.IsNullOrWhiteSpace((l.User.FirstName + " " + l.User.LastName).Trim())
+                        ? (l.User.FirstName + " " + l.User.LastName).Trim()
+                        : (l.User.Email ?? "Unknown"),
+                UserRole = roleByUser.TryGetValue(l.UserID, out var resolvedRole)
+                    ? resolvedRole
+                    : (l.User != null && !string.IsNullOrWhiteSpace(l.User.Role) ? l.User.Role : "Customer"),
+                Action = l.Action,
+                Type = l.Type,
+                IPAddress = l.IPAddress,
+                Timestamp = l.Timestamp
+            });
+
+            var loginEntries = loginHistory.Select(h => new ActivityLogView
+            {
+                LogID = -h.LoginHistoryID,
+                UserID = h.UserID,
+                UserEmail = h.User?.Email,
+                User = h.User == null
+                    ? "Unknown"
+                    : !string.IsNullOrWhiteSpace((h.User.FirstName + " " + h.User.LastName).Trim())
+                        ? (h.User.FirstName + " " + h.User.LastName).Trim()
+                        : (h.User.Email ?? "Unknown"),
+                UserRole = roleByUser.TryGetValue(h.UserID, out var resolvedRole)
+                    ? resolvedRole
+                    : (h.User != null && !string.IsNullOrWhiteSpace(h.User.Role) ? h.User.Role : "Customer"),
+                Action = "Logged in",
+                Type = "Login",
+                IPAddress = h.IPAddress,
+                Timestamp = h.LoginTime
+            });
+
+            return activityEntries
+                .Concat(loginEntries)
+                .Where(x => !string.Equals(x.UserRole, "SuperAdmin", StringComparison.OrdinalIgnoreCase))
+                .OrderByDescending(x => x.Timestamp)
+                .Take(1000)
+                .Select(x => new
+                {
+                    x.LogID,
+                    x.UserID,
+                    x.UserEmail,
+                    x.User,
+                    x.UserRole,
+                    x.Action,
+                    x.Type,
+                    x.IPAddress,
+                    x.Timestamp
+                })
+                .ToList();
+        }
+
+        private sealed class ActivityLogView
+        {
+            public int LogID { get; set; }
+            public string UserID { get; set; } = string.Empty;
+            public string? UserEmail { get; set; }
+            public string User { get; set; } = "Unknown";
+            public string UserRole { get; set; } = "Customer";
+            public string Action { get; set; } = string.Empty;
+            public string Type { get; set; } = "View";
+            public string? IPAddress { get; set; }
+            public DateTime Timestamp { get; set; }
         }
     }
 }

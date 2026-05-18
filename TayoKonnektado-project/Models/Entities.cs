@@ -292,4 +292,49 @@ namespace TayoKonnektado_project.Models
         [ForeignKey("UserID")]
         public ApplicationUser User { get; set; } = null!;
     }
+
+    public class RolePermission
+    {
+        [Key]
+        public int RolePermissionID { get; set; }
+        public string RoleName { get; set; } = string.Empty; // "Admin" or "Staff"
+        public string PermissionName { get; set; } = string.Empty;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? UpdatedAt { get; set; }
+    }
+
+    public class SystemSettings
+    {
+        [Key]
+        public int SettingID { get; set; }
+        public string SiteName { get; set; } = "TayoKonnektado";
+        public string SiteEmail { get; set; } = string.Empty;
+        public bool MaintenanceMode { get; set; } = false;
+        public int MaxLoginAttempts { get; set; } = 5;
+        public int SessionTimeout { get; set; } = 30;
+        public bool EnableTwoFactor { get; set; } = true;
+        public bool EnableAuditLogs { get; set; } = true;
+        public string NotificationEmail { get; set; } = string.Empty;
+        public bool EmailOnNewTickets { get; set; } = true;
+        public bool EmailOnPaymentReceived { get; set; } = true;
+        public bool EmailOnSystemErrors { get; set; } = true;
+        public bool EmailOnSecurityAlerts { get; set; } = true;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    }
+
+    public class LoginAttempt
+    {
+        [Key]
+        public int LoginAttemptID { get; set; }
+        public string UserID { get; set; } = string.Empty;
+        public int FailedAttempts { get; set; } = 0;
+        public DateTime? LockedUntil { get; set; }
+        public string? LockReason { get; set; } // "30_mins", "2_hours", "30_days"
+        public DateTime LastAttemptAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        [ForeignKey("UserID")]
+        public ApplicationUser User { get; set; } = null!;
+    }
 }

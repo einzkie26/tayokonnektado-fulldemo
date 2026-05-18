@@ -1,14 +1,19 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using TayoKonnektado_project.Data;
 using TayoKonnektado_project.Models;
 using TayoKonnektado_project.Services;
+using TayoKonnektado_project.Services.Security;
 using TayoKonnektado_project.Attributes;
 
 namespace TayoKonnektado_project.Controllers
 {
+    [EnableRateLimiting("auth")]
     [ApiController]
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
@@ -17,13 +22,32 @@ namespace TayoKonnektado_project.Controllers
         private readonly TokenService _tokenService;
         private readonly EmailService _emailService;
         private readonly ApplicationDbContext _context;
+        private readonly IConfiguration _configuration;
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly LoginAttemptService _loginAttemptService;
+        private readonly IpDeviceReputationService _ipDeviceReputationService;
+        private readonly PasswordBreachService _passwordBreachService;
 
-        public AuthController(UserManager<ApplicationUser> userManager, TokenService tokenService, EmailService emailService, ApplicationDbContext context)
+        public AuthController(
+            UserManager<ApplicationUser> userManager,
+            TokenService tokenService,
+            EmailService emailService,
+            ApplicationDbContext context,
+            IConfiguration configuration,
+            IHttpClientFactory httpClientFactory,
+            LoginAttemptService loginAttemptService,
+            IpDeviceReputationService ipDeviceReputationService,
+            PasswordBreachService passwordBreachService)
         {
             _userManager = userManager;
             _tokenService = tokenService;
             _emailService = emailService;
             _context = context;
+            _configuration = configuration;
+            _httpClientFactory = httpClientFactory;
+            _loginAttemptService = loginAttemptService;
+            _ipDeviceReputationService = ipDeviceReputationService;
+            _passwordBreachService = passwordBreachService;
         }
 
         [HttpPost("register")]
@@ -31,8 +55,19 @@ namespace TayoKonnektado_project.Controllers
         {
             try
             {
+                var userAgent = Request.Headers["User-Agent"].ToString();
+                var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+                if (_ipDeviceReputationService.IsBlocked(ipAddress, userAgent, out var blockReason))
+                    return StatusCode(429, new { message = $"Access blocked: {blockReason}. Please try again later." });
+
+                if (!await VerifyReCaptchaAsync(request.CaptchaToken))
+                    return BadRequest(new { message = "Captcha verification failed" });
+
                 if (!request.Email.EndsWith("@gmail.com", StringComparison.OrdinalIgnoreCase))
                     return BadRequest(new { message = "Only Gmail addresses are allowed" });
+
+                if (await _passwordBreachService.IsBreachedAsync(request.Password))
+                    return BadRequest(new { message = "Password has been found in a breach. Please choose a different password." });
 
                 var existingUser = await _userManager.FindByEmailAsync(request.Email);
                 if (existingUser != null)
@@ -71,6 +106,10 @@ namespace TayoKonnektado_project.Controllers
 
                 await _context.SaveChangesAsync();
                 await _emailService.SendVerificationCodeAsync(request.Email, code);
+
+                await LogActivityAsync(user.Id, "Registered account", "Create");
+
+                _ipDeviceReputationService.RegisterSuccess(ipAddress, userAgent);
 
                 return Ok(new { message = "Registration successful. Please check your email for verification code." });
             }
@@ -127,12 +166,33 @@ namespace TayoKonnektado_project.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
+            var userAgent = Request.Headers["User-Agent"].ToString();
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+            if (_ipDeviceReputationService.IsBlocked(ipAddress, userAgent, out var blockReason))
+                return StatusCode(429, new { message = $"Access blocked: {blockReason}. Please try again later." });
+
+            if (!await VerifyReCaptchaAsync(request.CaptchaToken))
+                return BadRequest(new { message = "Captcha verification failed" });
+
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
+            {
+                _ipDeviceReputationService.RegisterFailure(ipAddress, userAgent);
                 return Unauthorized(new { message = "Invalid credentials" });
+            }
+
+            // Check if user is locked due to failed login attempts
+            var lockoutCheck = await _loginAttemptService.CheckLoginAttemptAsync(user.Id);
+            if (lockoutCheck.isLocked)
+                return Unauthorized(new { message = $"Account locked due to too many failed login attempts. Try again in {lockoutCheck.message}" });
 
             if (!await _userManager.CheckPasswordAsync(user, request.Password))
+            {
+                // Record failed attempt
+                await _loginAttemptService.RecordFailedAttemptAsync(user.Id);
+                _ipDeviceReputationService.RegisterFailure(ipAddress, userAgent);
                 return Unauthorized(new { message = "Invalid credentials" });
+            }
 
             if (!user.EmailConfirmed)
             {
@@ -180,8 +240,6 @@ namespace TayoKonnektado_project.Controllers
                 return Ok(new { requiresTwoFactor = true, email = user.Email, message = "Verification code sent to your email" });
             }
 
-            var userAgent = Request.Headers["User-Agent"].ToString();
-            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
             var device = GetDeviceFromUserAgent(userAgent);
             var location = "Philippines";
 
@@ -212,20 +270,74 @@ namespace TayoKonnektado_project.Controllers
                 }
             }
 
-            var token = _tokenService.GenerateToken(user.Email!, user.Id, role);
+            // Reset login attempts on successful login
+            await _loginAttemptService.ResetAttemptsAsync(user.Id);
+            _ipDeviceReputationService.RegisterSuccess(ipAddress, userAgent);
+
+            var token = await _tokenService.GenerateTokenAsync(user.Email!, user.Id, role);
+
+            var settings = await _context.SystemSettings.FirstOrDefaultAsync();
+            var sessionTimeoutMinutes = settings?.SessionTimeout ?? 30;
+
+            await LogActivityAsync(user.Id, "Logged in", "Login");
 
             return Ok(new AuthResponse
             {
                 Token = token,
                 Email = user.Email!,
                 Role = role,
-                Expiration = DateTime.UtcNow.AddHours(24)
+                Expiration = DateTime.UtcNow.AddMinutes(sessionTimeoutMinutes)
             });
+        }
+
+        private async Task<bool> VerifyReCaptchaAsync(string? captchaToken)
+        {
+            if (string.IsNullOrWhiteSpace(captchaToken))
+                return false;
+
+            var secretKey = _configuration["ReCaptcha:SecretKey"];
+            var verifyUrl = _configuration["ReCaptcha:VerifyUrl"] ?? "https://www.google.com/recaptcha/api/siteverify";
+
+            if (string.IsNullOrWhiteSpace(secretKey))
+                return false;
+
+            var httpClient = _httpClientFactory.CreateClient();
+            var content = new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                ["secret"] = secretKey,
+                ["response"] = captchaToken,
+                ["remoteip"] = HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty
+            });
+
+            var response = await httpClient.PostAsync(verifyUrl, content);
+            if (!response.IsSuccessStatusCode)
+                return false;
+
+            var responseJson = await response.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<ReCaptchaVerificationResponse>(responseJson, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            return result?.Success == true;
+        }
+
+        private sealed class ReCaptchaVerificationResponse
+        {
+            public bool Success { get; set; }
+
+            [JsonPropertyName("error-codes")]
+            public string[]? ErrorCodes { get; set; }
         }
 
         [HttpPost("verify-2fa-login")]
         public async Task<IActionResult> Verify2FALogin([FromBody] Verify2FALoginRequest request)
         {
+            var userAgent = Request.Headers["User-Agent"].ToString();
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+            if (_ipDeviceReputationService.IsBlocked(ipAddress, userAgent, out var blockReason))
+                return StatusCode(429, new { message = $"Access blocked: {blockReason}. Please try again later." });
+
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null) return Unauthorized(new { message = "User not found" });
 
@@ -235,8 +347,6 @@ namespace TayoKonnektado_project.Controllers
 
             verification.IsUsed = true;
             
-            var userAgent = Request.Headers["User-Agent"].ToString();
-            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
             var device = GetDeviceFromUserAgent(userAgent);
             var location = "Philippines";
 
@@ -250,16 +360,25 @@ namespace TayoKonnektado_project.Controllers
             });
             await _context.SaveChangesAsync();
 
+            // Reset login attempts on successful 2FA verification
+            await _loginAttemptService.ResetAttemptsAsync(user.Id);
+            _ipDeviceReputationService.RegisterSuccess(ipAddress, userAgent);
+
             var roles = await _userManager.GetRolesAsync(user);
             var role = roles.FirstOrDefault() ?? user.Role;
-            var token = _tokenService.GenerateToken(user.Email!, user.Id, role);
+            var token = await _tokenService.GenerateTokenAsync(user.Email!, user.Id, role);
+
+            var settings = await _context.SystemSettings.FirstOrDefaultAsync();
+            var sessionTimeoutMinutes = settings?.SessionTimeout ?? 30;
+
+            await LogActivityAsync(user.Id, "Completed two-factor login", "Login");
 
             return Ok(new AuthResponse
             {
                 Token = token,
                 Email = user.Email!,
                 Role = role,
-                Expiration = DateTime.UtcNow.AddHours(24)
+                Expiration = DateTime.UtcNow.AddMinutes(sessionTimeoutMinutes)
             });
         }
 
@@ -307,18 +426,50 @@ namespace TayoKonnektado_project.Controllers
                 await _context.SaveChangesAsync();
             }
 
+            // Reset login attempts on successful Google login
+            await _loginAttemptService.ResetAttemptsAsync(user.Id);
+
             var roles = await _userManager.GetRolesAsync(user);
             var role = roles.FirstOrDefault() ?? user.Role;
 
-            var token = _tokenService.GenerateToken(user.Email!, user.Id, role);
+            var token = await _tokenService.GenerateTokenAsync(user.Email!, user.Id, role);
+
+            var settings = await _context.SystemSettings.FirstOrDefaultAsync();
+            var sessionTimeoutMinutes = settings?.SessionTimeout ?? 30;
+
+            await LogActivityAsync(user.Id, "Logged in with Google", "Login");
 
             return Ok(new AuthResponse
             {
                 Token = token,
                 Email = user.Email!,
                 Role = role,
-                Expiration = DateTime.UtcNow.AddHours(24)
+                Expiration = DateTime.UtcNow.AddMinutes(sessionTimeoutMinutes)
             });
+        }
+
+        private async Task LogActivityAsync(string userId, string action, string type)
+        {
+            if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(action))
+                return;
+
+            try
+            {
+                _context.ActivityLogs.Add(new ActivityLog
+                {
+                    UserID = userId,
+                    Action = action,
+                    Type = string.IsNullOrWhiteSpace(type) ? "Update" : type,
+                    IPAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
+                    Timestamp = DateTime.UtcNow
+                });
+
+                await _context.SaveChangesAsync();
+            }
+            catch
+            {
+                // Avoid blocking auth flows when activity logging fails.
+            }
         }
 
         [Authorize]
@@ -561,24 +712,43 @@ namespace TayoKonnektado_project.Controllers
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
         {
+            var userAgent = Request.Headers["User-Agent"].ToString();
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+            if (_ipDeviceReputationService.IsBlocked(ipAddress, userAgent, out var blockReason))
+                return StatusCode(429, new { message = $"Access blocked: {blockReason}. Please try again later." });
+
             var verification = await _context.VerificationCodes
                 .FirstOrDefaultAsync(v => v.Email == request.Email && v.Code == request.Code && !v.IsUsed && v.ExpiresAt > DateTime.UtcNow);
 
             if (verification == null)
+            {
+                _ipDeviceReputationService.RegisterFailure(ipAddress, userAgent);
                 return BadRequest(new { message = "Invalid or expired reset code" });
+            }
 
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
+            {
+                _ipDeviceReputationService.RegisterFailure(ipAddress, userAgent);
                 return NotFound(new { message = "User not found" });
+            }
+
+            if (await _passwordBreachService.IsBreachedAsync(request.NewPassword))
+                return BadRequest(new { message = "New password has been found in a breach. Please choose a different password." });
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
             var result = await _userManager.ResetPasswordAsync(user, token, request.NewPassword);
 
             if (!result.Succeeded)
+            {
+                _ipDeviceReputationService.RegisterFailure(ipAddress, userAgent);
                 return BadRequest(new { message = string.Join(", ", result.Errors.Select(e => e.Description)) });
+            }
 
             verification.IsUsed = true;
             await _context.SaveChangesAsync();
+
+            _ipDeviceReputationService.RegisterSuccess(ipAddress, userAgent);
 
             return Ok(new { message = "Password reset successfully" });
         }

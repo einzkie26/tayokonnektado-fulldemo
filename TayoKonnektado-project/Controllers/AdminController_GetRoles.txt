@@ -1,0 +1,38 @@
+        [Authorize(Roles = "SuperAdmin")]
+        [HttpGet("roles")]
+        public async Task<IActionResult> GetRoles()
+        {
+            var adminUsers = await _context.Users
+                .Where(u => u.Role == "Admin")
+                .Select(u => new { id = u.Id, name = $"{u.FirstName} {u.LastName}", email = u.Email })
+                .ToListAsync();
+
+            var staffUsers = await _context.Users
+                .Where(u => u.Role == "Staff")
+                .Select(u => new { id = u.Id, name = $"{u.FirstName} {u.LastName}", email = u.Email })
+                .ToListAsync();
+
+            var roles = new dynamic[]
+            {
+                new
+                {
+                    id = 1,
+                    name = "Admin",
+                    users = adminUsers.Count,
+                    members = adminUsers,
+                    permissions = new[] { "Full Access", "Manage Staff", "Manage Customers", "Manage Subscriptions", "Manage Payments", "Manage Invoices", "Manage Service Plans", "View Reports", "View Activity Logs", "Manage Roles", "Manage Payment Methods", "Manage FAQ" },
+                    color = "red"
+                },
+                new
+                {
+                    id = 2,
+                    name = "Staff",
+                    users = staffUsers.Count,
+                    members = staffUsers,
+                    permissions = new[] { "View Tickets", "Manage Tickets", "View Customers", "View Orders", "View Payments", "Verify Payments" },
+                    color = "blue"
+                }
+            };
+
+            return Ok(roles);
+        }

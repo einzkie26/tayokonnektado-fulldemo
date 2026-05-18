@@ -1,0 +1,7 @@
+organization=einzkie26
+projectKey=einzkie26_tayokonnektado-fulldemo
+serverUrl=https://sonarcloud.io
+serverVersion=8.0.0.86098
+dashboardUrl=https://sonarcloud.io/dashboard?id=einzkie26_tayokonnektado-fulldemo
+ceTaskId=AZ3JlhQ8cxBUhEoH8VU8
+ceTaskUrl=https://sonarcloud.io/api/ce/task?id=AZ3JlhQ8cxBUhEoH8VU8

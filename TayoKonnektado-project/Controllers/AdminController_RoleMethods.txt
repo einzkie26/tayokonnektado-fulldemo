@@ -1,0 +1,84 @@
+        [Authorize(Roles = "SuperAdmin")]
+        [HttpPut("roles/{roleName}")]
+        public async Task<IActionResult> UpdateRole(string roleName, [FromBody] UpdateRoleRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(roleName) || request?.Permissions == null)
+                return BadRequest(new { message = "Invalid role or permissions" });
+
+            try
+            {
+                var existingPermissions = await _context.RolePermissions
+                    .Where(rp => rp.RoleName == roleName)
+                    .ToListAsync();
+
+                _context.RolePermissions.RemoveRange(existingPermissions);
+
+                var newPermissions = request.Permissions.Select(p => new RolePermission
+                {
+                    RoleName = roleName,
+                    PermissionName = p,
+                    CreatedAt = DateTime.UtcNow
+                }).ToList();
+
+                _context.RolePermissions.AddRange(newPermissions);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = "Role permissions updated successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [Authorize(Roles = "SuperAdmin")]
+        [HttpGet("roles")]
+        public async Task<IActionResult> GetRoles()
+        {
+            var adminUsers = await _context.Users
+                .Where(u => u.Role == "Admin")
+                .Select(u => new { id = u.Id, name = $"{u.FirstName} {u.LastName}", email = u.Email })
+                .ToListAsync();
+
+            var staffUsers = await _context.Users
+                .Where(u => u.Role == "Staff")
+                .Select(u => new { id = u.Id, name = $"{u.FirstName} {u.LastName}", email = u.Email })
+                .ToListAsync();
+
+            var adminPermissions = await _context.RolePermissions
+                .Where(rp => rp.RoleName == "Admin")
+                .Select(rp => rp.PermissionName)
+                .ToListAsync();
+
+            var staffPermissions = await _context.RolePermissions
+                .Where(rp => rp.RoleName == "Staff")
+                .Select(rp => rp.PermissionName)
+                .ToListAsync();
+
+            var defaultAdminPermissions = new[] { "Full Access", "Manage Staff", "Manage Customers", "Manage Subscriptions", "Manage Payments", "Manage Invoices", "Manage Service Plans", "View Reports", "View Activity Logs", "Manage Roles", "Manage Payment Methods", "Manage FAQ" };
+            var defaultStaffPermissions = new[] { "View Tickets", "Manage Tickets", "View Customers", "View Orders", "View Payments", "Verify Payments" };
+
+            var roles = new object[]
+            {
+                new
+                {
+                    id = 1,
+                    name = "Admin",
+                    users = adminUsers.Count,
+                    members = adminUsers,
+                    permissions = adminPermissions.Count > 0 ? adminPermissions : defaultAdminPermissions.ToList(),
+                    color = "red"
+                },
+                new
+                {
+                    id = 2,
+                    name = "Staff",
+                    users = staffUsers.Count,
+                    members = staffUsers,
+                    permissions = staffPermissions.Count > 0 ? staffPermissions : defaultStaffPermissions.ToList(),
+                    color = "blue"
+                }
+            };
+
+            return Ok(roles);
+        }
