@@ -18,6 +18,18 @@ namespace TayoKonnektado_project.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
+        private const string StatusActive = "Active";
+        private const string StatusPending = "Pending";
+        private const string StatusInactive = "Inactive";
+        private const string StatusSuspended = "Suspended";
+        private const string ServicePrepaid = "Prepaid";
+        private const string ServiceSubscription = "Subscription";
+        private const string DeviceTypeWifi = "WiFi";
+        private const string RoleStaff = "Staff";
+        private const string RoleAdmin = "Admin";
+        private const string RoleSuperAdmin = "SuperAdmin";
+        private const string MessageUserNotFound = "User not found";
+        private const string DeviceUnknown = "Unknown Device";
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly TokenService _tokenService;
         private readonly EmailService _emailService;
@@ -51,13 +63,13 @@ namespace TayoKonnektado_project.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+        public async Task<IActionResult> Register([FromBody] RegisterRequest request, [FromHeader(Name = "User-Agent")] string? userAgent)
         {
             try
             {
-                var userAgent = Request.Headers["User-Agent"].ToString();
+                var userAgentValue = userAgent ?? string.Empty;
                 var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
-                if (_ipDeviceReputationService.IsBlocked(ipAddress, userAgent, out var blockReason))
+                if (_ipDeviceReputationService.IsBlocked(ipAddress, userAgentValue, out var blockReason))
                     return StatusCode(429, new { message = $"Access blocked: {blockReason}. Please try again later." });
 
                 if (!await VerifyReCaptchaAsync(request.CaptchaToken))
@@ -81,7 +93,7 @@ namespace TayoKonnektado_project.Controllers
                     LastName = request.LastName,
                     Birthday = request.Birthday,
                     Address = request.Address,
-                    Status = "Pending"
+                    Status = StatusPending
                 };
                 var result = await _userManager.CreateAsync(user, request.Password);
 
@@ -109,7 +121,7 @@ namespace TayoKonnektado_project.Controllers
 
                 await LogActivityAsync(user.Id, "Registered account", "Create");
 
-                _ipDeviceReputationService.RegisterSuccess(ipAddress, userAgent);
+                _ipDeviceReputationService.RegisterSuccess(ipAddress, userAgentValue);
 
                 return Ok(new { message = "Registration successful. Please check your email for verification code." });
             }
@@ -130,10 +142,10 @@ namespace TayoKonnektado_project.Controllers
 
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
-                return NotFound(new { message = "User not found" });
+                return NotFound(new { message = MessageUserNotFound });
 
             user.EmailConfirmed = true;
-            user.Status = "Active";
+            user.Status = StatusActive;
             await _userManager.UpdateAsync(user);
 
             verification.IsUsed = true;
@@ -164,11 +176,11 @@ namespace TayoKonnektado_project.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        public async Task<IActionResult> Login([FromBody] LoginRequest request, [FromHeader(Name = "User-Agent")] string? userAgent)
         {
-            var userAgent = Request.Headers["User-Agent"].ToString();
+            var userAgentValue = userAgent ?? string.Empty;
             var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
-            if (_ipDeviceReputationService.IsBlocked(ipAddress, userAgent, out var blockReason))
+            if (_ipDeviceReputationService.IsBlocked(ipAddress, userAgentValue, out var blockReason))
                 return StatusCode(429, new { message = $"Access blocked: {blockReason}. Please try again later." });
 
             if (!await VerifyReCaptchaAsync(request.CaptchaToken))
@@ -177,7 +189,7 @@ namespace TayoKonnektado_project.Controllers
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
             {
-                _ipDeviceReputationService.RegisterFailure(ipAddress, userAgent);
+                _ipDeviceReputationService.RegisterFailure(ipAddress, userAgentValue);
                 return Unauthorized(new { message = "Invalid credentials" });
             }
 
@@ -190,7 +202,7 @@ namespace TayoKonnektado_project.Controllers
             {
                 // Record failed attempt
                 await _loginAttemptService.RecordFailedAttemptAsync(user.Id);
-                _ipDeviceReputationService.RegisterFailure(ipAddress, userAgent);
+                _ipDeviceReputationService.RegisterFailure(ipAddress, userAgentValue);
                 return Unauthorized(new { message = "Invalid credentials" });
             }
 
@@ -214,13 +226,13 @@ namespace TayoKonnektado_project.Controllers
                 });
             }
 
-            if (user.Status == "Suspended")
+            if (user.Status == StatusSuspended)
                 return Unauthorized(new { message = "Your account has been suspended. Please contact support." });
 
             var roles = await _userManager.GetRolesAsync(user);
             var role = roles.FirstOrDefault() ?? user.Role;
 
-            if ((role == "Staff" || role == "Admin" || role == "SuperAdmin") && user.Status == "Inactive")
+            if ((role == RoleStaff || role == RoleAdmin || role == RoleSuperAdmin) && user.Status == StatusInactive)
                 return Unauthorized(new { message = "Your account is inactive. Please contact administrator." });
 
             var dbUser = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == user.Id);
@@ -240,7 +252,7 @@ namespace TayoKonnektado_project.Controllers
                 return Ok(new { requiresTwoFactor = true, email = user.Email, message = "Verification code sent to your email" });
             }
 
-            var device = GetDeviceFromUserAgent(userAgent);
+            var device = GetDeviceFromUserAgent(userAgentValue);
             var location = "Philippines";
 
             _context.LoginHistory.Add(new LoginHistory
@@ -272,7 +284,7 @@ namespace TayoKonnektado_project.Controllers
 
             // Reset login attempts on successful login
             await _loginAttemptService.ResetAttemptsAsync(user.Id);
-            _ipDeviceReputationService.RegisterSuccess(ipAddress, userAgent);
+            _ipDeviceReputationService.RegisterSuccess(ipAddress, userAgentValue);
 
             var token = await _tokenService.GenerateTokenAsync(user.Email!, user.Id, role);
 
@@ -331,15 +343,15 @@ namespace TayoKonnektado_project.Controllers
         }
 
         [HttpPost("verify-2fa-login")]
-        public async Task<IActionResult> Verify2FALogin([FromBody] Verify2FALoginRequest request)
+        public async Task<IActionResult> Verify2FALogin([FromBody] Verify2FALoginRequest request, [FromHeader(Name = "User-Agent")] string? userAgent)
         {
-            var userAgent = Request.Headers["User-Agent"].ToString();
+            var userAgentValue = userAgent ?? string.Empty;
             var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
-            if (_ipDeviceReputationService.IsBlocked(ipAddress, userAgent, out var blockReason))
+            if (_ipDeviceReputationService.IsBlocked(ipAddress, userAgentValue, out var blockReason))
                 return StatusCode(429, new { message = $"Access blocked: {blockReason}. Please try again later." });
 
             var user = await _userManager.FindByEmailAsync(request.Email);
-            if (user == null) return Unauthorized(new { message = "User not found" });
+            if (user == null) return Unauthorized(new { message = MessageUserNotFound });
 
             var verification = await _context.VerificationCodes
                 .FirstOrDefaultAsync(v => v.Email == request.Email && v.Code == request.Code && !v.IsUsed && v.ExpiresAt > DateTime.UtcNow);
@@ -347,7 +359,7 @@ namespace TayoKonnektado_project.Controllers
 
             verification.IsUsed = true;
             
-            var device = GetDeviceFromUserAgent(userAgent);
+            var device = GetDeviceFromUserAgent(userAgentValue);
             var location = "Philippines";
 
             _context.LoginHistory.Add(new LoginHistory
@@ -362,7 +374,7 @@ namespace TayoKonnektado_project.Controllers
 
             // Reset login attempts on successful 2FA verification
             await _loginAttemptService.ResetAttemptsAsync(user.Id);
-            _ipDeviceReputationService.RegisterSuccess(ipAddress, userAgent);
+            _ipDeviceReputationService.RegisterSuccess(ipAddress, userAgentValue);
 
             var roles = await _userManager.GetRolesAsync(user);
             var role = roles.FirstOrDefault() ?? user.Role;
@@ -382,10 +394,10 @@ namespace TayoKonnektado_project.Controllers
             });
         }
 
-        private string GetDeviceFromUserAgent(string userAgent)
+        private static string GetDeviceFromUserAgent(string userAgent)
         {
             if (string.IsNullOrEmpty(userAgent))
-                return "Unknown Device";
+                return DeviceUnknown;
 
             var rules = new (string[] MustContain, string Result)[]
             {
@@ -404,7 +416,7 @@ namespace TayoKonnektado_project.Controllers
                     return rule.Result;
             }
 
-            return "Unknown Device";
+            return DeviceUnknown;
         }
 
         [HttpPost("google-login")]
@@ -421,7 +433,7 @@ namespace TayoKonnektado_project.Controllers
                     FirstName = request.FirstName,
                     LastName = request.LastName,
                     EmailConfirmed = true,
-                    Status = "Active"
+                    Status = StatusActive
                 };
                 
                 var result = await _userManager.CreateAsync(user);
@@ -489,11 +501,11 @@ namespace TayoKonnektado_project.Controllers
         {
             var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
             var activeSubCount = await _context.Subscriptions
-                .CountAsync(s => s.UserID == userId && s.Status == "Active");
+                .CountAsync(s => s.UserID == userId && s.Status == StatusActive);
             var activePrepCount = await _context.Devices
                 .Where(d => d.UserID == userId)
                 .SelectMany(d => d.ServiceAccounts)
-                .Where(sa => sa.Status == "Active" && sa.ServiceType == "Prepaid")
+                .Where(sa => sa.Status == StatusActive && sa.ServiceType == ServicePrepaid)
                 .CountAsync();
             
             if (activeSubCount + activePrepCount >= 5)
@@ -518,12 +530,12 @@ namespace TayoKonnektado_project.Controllers
             var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
             
             var hasActiveSubscription = await _context.Subscriptions
-                .AnyAsync(s => s.UserID == userId && s.Status == "Active");
+                .AnyAsync(s => s.UserID == userId && s.Status == StatusActive);
             
             var hasActivePrepaid = await _context.Devices
                 .Where(d => d.UserID == userId)
                 .SelectMany(d => d.ServiceAccounts)
-                .Where(sa => sa.Status == "Active")
+                .Where(sa => sa.Status == StatusActive)
                 .SelectMany(sa => sa.PrepaidLoads)
                 .AnyAsync();
 
@@ -574,7 +586,7 @@ namespace TayoKonnektado_project.Controllers
                 var device = await CreateDeviceAsync(userId!, macAddress);
                 var serviceAccount = await CreateServiceAccountAsync(device.DeviceID, serviceType);
 
-                if (serviceType == "Prepaid")
+                if (serviceType == ServicePrepaid)
                 {
                     await CreatePrepaidLoadAsync(serviceAccount.ServiceAccountID, request.PhoneNumber);
                 }
@@ -600,11 +612,11 @@ namespace TayoKonnektado_project.Controllers
         private async Task<IActionResult?> EnforceServiceLimitAsync(string? userId)
         {
             var activeSubscriptionCount = await _context.Subscriptions
-                .CountAsync(s => s.UserID == userId && s.Status == "Active");
+                .CountAsync(s => s.UserID == userId && s.Status == StatusActive);
             var activePrepaidCount = await _context.Devices
                 .Where(d => d.UserID == userId)
                 .SelectMany(d => d.ServiceAccounts)
-                .Where(sa => sa.Status == "Active" && sa.ServiceType == "Prepaid")
+                .Where(sa => sa.Status == StatusActive && sa.ServiceType == ServicePrepaid)
                 .CountAsync();
 
             if (activeSubscriptionCount + activePrepaidCount >= 5)
@@ -615,12 +627,12 @@ namespace TayoKonnektado_project.Controllers
 
         private static string ResolveServiceType(string? serviceType)
         {
-            return string.IsNullOrWhiteSpace(serviceType) ? "Subscription" : serviceType;
+            return string.IsNullOrWhiteSpace(serviceType) ? ServiceSubscription : serviceType;
         }
 
-        private IActionResult? ValidatePrepaidRequest(string serviceType, string? phoneNumber)
+        private BadRequestObjectResult? ValidatePrepaidRequest(string serviceType, string? phoneNumber)
         {
-            if (serviceType == "Prepaid" && string.IsNullOrWhiteSpace(phoneNumber))
+            if (serviceType == ServicePrepaid && string.IsNullOrWhiteSpace(phoneNumber))
                 return BadRequest(new { message = "Phone number is required for Prepaid WiFi service" });
 
             return null;
@@ -628,7 +640,7 @@ namespace TayoKonnektado_project.Controllers
 
         private static string? ResolveMacAddress(string serviceType, string? macAddress)
         {
-            if (serviceType != "Prepaid" || !string.IsNullOrWhiteSpace(macAddress))
+            if (serviceType != ServicePrepaid || !string.IsNullOrWhiteSpace(macAddress))
                 return macAddress;
 
             return $"PP:{DateTime.UtcNow:HHmmss}:{new Random().Next(0x00, 0xFF):X2}:{new Random().Next(0x00, 0xFF):X2}:{new Random().Next(0x00, 0xFF):X2}:{new Random().Next(0x00, 0xFF):X2}";
@@ -640,8 +652,8 @@ namespace TayoKonnektado_project.Controllers
             {
                 UserID = userId,
                 MACAddress = macAddress,
-                Status = "Active",
-                DeviceType = "WiFi"
+                Status = StatusActive,
+                DeviceType = DeviceTypeWifi
             };
             _context.Devices.Add(device);
             await _context.SaveChangesAsync();
@@ -654,7 +666,7 @@ namespace TayoKonnektado_project.Controllers
             {
                 DeviceID = deviceId,
                 ServiceType = serviceType,
-                Status = "Active"
+                Status = StatusActive
             };
             _context.ServiceAccounts.Add(serviceAccount);
             await _context.SaveChangesAsync();
@@ -683,6 +695,8 @@ namespace TayoKonnektado_project.Controllers
                 return (null, BadRequest(new { message = "MAC address is required for subscription service" }));
 
             var normalized = macAddress.Replace(":", "").ToUpperInvariant();
+            if (normalized.Length < 2)
+                return (null, BadRequest(new { message = "Invalid MAC address" }));
             var macSuffix = normalized.Substring(normalized.Length - 2);
             var speedMbps = macSuffix switch
             {
@@ -715,7 +729,7 @@ namespace TayoKonnektado_project.Controllers
                 PlanID = planId,
                 UserID = userId,
                 StartDate = DateTime.UtcNow,
-                Status = "Active"
+                Status = StatusActive
             };
             _context.Subscriptions.Add(subscription);
             await _context.SaveChangesAsync();
@@ -737,11 +751,11 @@ namespace TayoKonnektado_project.Controllers
         {
             var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
             var activeSubCount = await _context.Subscriptions
-                .CountAsync(s => s.UserID == userId && s.Status == "Active");
+                .CountAsync(s => s.UserID == userId && s.Status == StatusActive);
             var activePrepCount = await _context.Devices
                 .Where(d => d.UserID == userId)
                 .SelectMany(d => d.ServiceAccounts)
-                .Where(sa => sa.Status == "Active" && sa.ServiceType == "Prepaid")
+                .Where(sa => sa.Status == StatusActive && sa.ServiceType == ServicePrepaid)
                 .CountAsync();
             
             if (activeSubCount + activePrepCount >= 5)
@@ -778,11 +792,11 @@ namespace TayoKonnektado_project.Controllers
         }
 
         [HttpPost("reset-password")]
-        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request, [FromHeader(Name = "User-Agent")] string? userAgent)
         {
-            var userAgent = Request.Headers["User-Agent"].ToString();
+            var userAgentValue = userAgent ?? string.Empty;
             var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
-            if (_ipDeviceReputationService.IsBlocked(ipAddress, userAgent, out var blockReason))
+            if (_ipDeviceReputationService.IsBlocked(ipAddress, userAgentValue, out var blockReason))
                 return StatusCode(429, new { message = $"Access blocked: {blockReason}. Please try again later." });
 
             var verification = await _context.VerificationCodes
@@ -790,15 +804,15 @@ namespace TayoKonnektado_project.Controllers
 
             if (verification == null)
             {
-                _ipDeviceReputationService.RegisterFailure(ipAddress, userAgent);
+                _ipDeviceReputationService.RegisterFailure(ipAddress, userAgentValue);
                 return BadRequest(new { message = "Invalid or expired reset code" });
             }
 
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
             {
-                _ipDeviceReputationService.RegisterFailure(ipAddress, userAgent);
-                return NotFound(new { message = "User not found" });
+                _ipDeviceReputationService.RegisterFailure(ipAddress, userAgentValue);
+                return NotFound(new { message = MessageUserNotFound });
             }
 
             if (await _passwordBreachService.IsBreachedAsync(request.NewPassword))
@@ -809,14 +823,14 @@ namespace TayoKonnektado_project.Controllers
 
             if (!result.Succeeded)
             {
-                _ipDeviceReputationService.RegisterFailure(ipAddress, userAgent);
+                _ipDeviceReputationService.RegisterFailure(ipAddress, userAgentValue);
                 return BadRequest(new { message = string.Join(", ", result.Errors.Select(e => e.Description)) });
             }
 
             verification.IsUsed = true;
             await _context.SaveChangesAsync();
 
-            _ipDeviceReputationService.RegisterSuccess(ipAddress, userAgent);
+            _ipDeviceReputationService.RegisterSuccess(ipAddress, userAgentValue);
 
             return Ok(new { message = "Password reset successfully" });
         }

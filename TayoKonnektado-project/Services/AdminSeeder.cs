@@ -3,25 +3,30 @@ using TayoKonnektado_project.Models;
 
 namespace TayoKonnektado_project.Services
 {
-    public class AdminSeeder
+    public static class AdminSeeder
     {
+        private const string RoleSuperAdmin = "SuperAdmin";
+        private const string RoleAdmin = "Admin";
+        private const string RoleStaff = "Staff";
+        private const string RoleUser = "User";
+
         public static async Task SeedAdminAsync(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
-            if (!await roleManager.RoleExistsAsync("SuperAdmin"))
+            if (!await roleManager.RoleExistsAsync(RoleSuperAdmin))
             {
-                await roleManager.CreateAsync(new IdentityRole("SuperAdmin"));
+                await roleManager.CreateAsync(new IdentityRole(RoleSuperAdmin));
             }
-            if (!await roleManager.RoleExistsAsync("Admin"))
+            if (!await roleManager.RoleExistsAsync(RoleAdmin))
             {
-                await roleManager.CreateAsync(new IdentityRole("Admin"));
+                await roleManager.CreateAsync(new IdentityRole(RoleAdmin));
             }
-            if (!await roleManager.RoleExistsAsync("Staff"))
+            if (!await roleManager.RoleExistsAsync(RoleStaff))
             {
-                await roleManager.CreateAsync(new IdentityRole("Staff"));
+                await roleManager.CreateAsync(new IdentityRole(RoleStaff));
             }
-            if (!await roleManager.RoleExistsAsync("User"))
+            if (!await roleManager.RoleExistsAsync(RoleUser))
             {
-                await roleManager.CreateAsync(new IdentityRole("User"));
+                await roleManager.CreateAsync(new IdentityRole(RoleUser));
             }
 
             var superAdminEmail = "admin@tayokonnektado.com";
@@ -38,25 +43,23 @@ namespace TayoKonnektado_project.Services
                     LastName = "Admin",
                     EmailConfirmed = true,
                     Status = "Active",
-                    Role = "SuperAdmin"
+                    Role = RoleSuperAdmin
                 };
 
                 var result = await userManager.CreateAsync(superAdminUser, superAdminPassword);
                 if (result.Succeeded)
-                {
-                    await userManager.AddToRoleAsync(superAdminUser, "SuperAdmin");
-                }
+                    await userManager.AddToRoleAsync(superAdminUser, RoleSuperAdmin);
             }
             else
             {
                 var token = await userManager.GeneratePasswordResetTokenAsync(superAdminUser);
                 await userManager.ResetPasswordAsync(superAdminUser, token, superAdminPassword);
-                superAdminUser.Role = "SuperAdmin";
+                superAdminUser.Role = RoleSuperAdmin;
                 await userManager.UpdateAsync(superAdminUser);
                 
-                if (!await userManager.IsInRoleAsync(superAdminUser, "SuperAdmin"))
+                if (!await userManager.IsInRoleAsync(superAdminUser, RoleSuperAdmin))
                 {
-                    await userManager.AddToRoleAsync(superAdminUser, "SuperAdmin");
+                    await userManager.AddToRoleAsync(superAdminUser, RoleSuperAdmin);
                 }
             }
         }

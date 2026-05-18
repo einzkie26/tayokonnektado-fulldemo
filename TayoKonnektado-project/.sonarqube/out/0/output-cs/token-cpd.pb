@@ -14198,7 +14198,7 @@ MonthlyFeeOO 
 ŸŸ 	
 }
    
-}¡¡ ó*
+}¡¡ Û/
 OE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Services\AdminSeeder.cs
 	namespace 	"
 TayoKonnektado_project
@@ -14207,313 +14207,332 @@ OE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Services\AdminSeeder.cs
 Services! )
 { 
 public 
-
-class 
-AdminSeeder 
-{ 
-public 
-static 
-async 
-Task  
-SeedAdminAsync! /
-(/ 0
-UserManager0 ;
-<; <
-ApplicationUser< K
->K L
-userManagerM X
-,X Y
-RoleManagerZ e
-<e f
-IdentityRolef r
->r s
-roleManagert 
-)	 €
-{		 	
-if
+
+static 
+class 
+AdminSeeder #
+{ 
+private 
+const 
+string 
+RoleSuperAdmin +
+=, -
+$str. :
+;: ;
+private		 
+const		 
+string		 
+	RoleAdmin		 &
+=		' (
+$str		) 0
+;		0 1
+private
 
- 
-(
+ 
+const
 
- 
-!
+ 
+string
 
- 
-await
+ 
+	RoleStaff
 
- 
-roleManager
+ &
+=
 
- "
-.
-
-" #
-RoleExistsAsync
-
-# 2
-(
-
-2 3
+' (
 $str
 
-3 ?
-)
+) 0
+;
 
-? @
-)
-
-@ A
-{ 
-await 
-roleManager !
-.! "
-CreateAsync" -
-(- .
-new. 1
-IdentityRole2 >
-(> ?
-$str? K
-)K L
-)L M
-;M N
-} 
-if 
-( 
-! 
-await 
-roleManager "
-." #
-RoleExistsAsync# 2
-(2 3
-$str3 :
-): ;
-); <
-{ 
-await 
-roleManager !
-.! "
-CreateAsync" -
-(- .
-new. 1
-IdentityRole2 >
-(> ?
-$str? F
-)F G
-)G H
-;H I
-} 
-if 
-( 
-! 
-await 
-roleManager "
-." #
-RoleExistsAsync# 2
-(2 3
-$str3 :
-): ;
-); <
-{ 
-await 
-roleManager !
-.! "
-CreateAsync" -
-(- .
-new. 1
-IdentityRole2 >
-(> ?
-$str? F
-)F G
-)G H
-;H I
-} 
-if 
-( 
-! 
-await 
-roleManager "
-." #
-RoleExistsAsync# 2
-(2 3
-$str3 9
-)9 :
-): ;
-{ 
-await 
-roleManager !
-.! "
-CreateAsync" -
-(- .
-new. 1
-IdentityRole2 >
-(> ?
-$str? E
-)E F
-)F G
-;G H
-} 
-var 
-superAdminEmail 
-=  !
-$str" <
-;< =
-var 
-superAdminPassword "
-=# $
-$str% 0
-;0 1
-var 
-superAdminUser 
-=  
-await! &
-userManager' 2
-.2 3
-FindByEmailAsync3 C
-(C D
-superAdminEmailD S
-)S T
-;T U
-if 
-( 
-superAdminUser 
-== !
-null" &
-)& '
-{   
-superAdminUser!! 
-=!!  
-new!!! $
-ApplicationUser!!% 4
-{"" 
-UserName## 
-=## 
-superAdminEmail## .
-,##. /
-Email$$ 
-=$$ 
-superAdminEmail$$ +
-,$$+ ,
-	FirstName%% 
-=%% 
-$str%%  '
-,%%' (
-LastName&& 
-=&& 
-$str&& &
-,&&& '
-EmailConfirmed'' "
-=''# $
-true''% )
-,'') *
-Status(( 
-=(( 
-$str(( %
-,((% &
-Role)) 
-=)) 
-$str)) '
-}** 
-;** 
-var,, 
-result,, 
-=,, 
-await,, "
-userManager,,# .
-.,,. /
-CreateAsync,,/ :
-(,,: ;
-superAdminUser,,; I
-,,,I J
-superAdminPassword,,K ]
-),,] ^
-;,,^ _
-if-- 
-(-- 
-result-- 
-.-- 
-	Succeeded-- $
-)--$ %
-{.. 
-await// 
-userManager// %
-.//% &
-AddToRoleAsync//& 4
-(//4 5
-superAdminUser//5 C
-,//C D
-$str//E Q
-)//Q R
-;//R S
-}00 
-}11 
-else22 
-{33 
-var44 
-token44 
-=44 
-await44 !
-userManager44" -
-.44- .+
-GeneratePasswordResetTokenAsync44. M
-(44M N
-superAdminUser44N \
-)44\ ]
-;44] ^
-await55 
-userManager55 !
-.55! "
-ResetPasswordAsync55" 4
-(554 5
-superAdminUser555 C
-,55C D
-token55E J
-,55J K
-superAdminPassword55L ^
-)55^ _
-;55_ `
-superAdminUser66 
-.66 
-Role66 #
-=66$ %
-$str66& 2
-;662 3
-await77 
-userManager77 !
-.77! "
-UpdateAsync77" -
-(77- .
-superAdminUser77. <
-)77< =
-;77= >
-if99 
-(99 
-!99 
-await99 
-userManager99 &
-.99& '
-IsInRoleAsync99' 4
-(994 5
-superAdminUser995 C
-,99C D
-$str99E Q
-)99Q R
-)99R S
-{:: 
-await;; 
-userManager;; %
-.;;% &
-AddToRoleAsync;;& 4
-(;;4 5
-superAdminUser;;5 C
-,;;C D
-$str;;E Q
-);;Q R
-;;;R S
-}<< 
-}== 
-}>> 	
-}?? 
-}@@ ¿r
+0 1
+private 
+const 
+string 
+RoleUser %
+=& '
+$str( .
+;. /
+public 
+static 
+async 
+Task  
+SeedAdminAsync! /
+(/ 0
+UserManager0 ;
+<; <
+ApplicationUser< K
+>K L
+userManagerM X
+,X Y
+RoleManagerZ e
+<e f
+IdentityRolef r
+>r s
+roleManagert 
+)	 €
+{ 	
+if 
+( 
+! 
+await 
+roleManager "
+." #
+RoleExistsAsync# 2
+(2 3
+RoleSuperAdmin3 A
+)A B
+)B C
+{ 
+await 
+roleManager !
+.! "
+CreateAsync" -
+(- .
+new. 1
+IdentityRole2 >
+(> ?
+RoleSuperAdmin? M
+)M N
+)N O
+;O P
+} 
+if 
+( 
+! 
+await 
+roleManager "
+." #
+RoleExistsAsync# 2
+(2 3
+	RoleAdmin3 <
+)< =
+)= >
+{ 
+await 
+roleManager !
+.! "
+CreateAsync" -
+(- .
+new. 1
+IdentityRole2 >
+(> ?
+	RoleAdmin? H
+)H I
+)I J
+;J K
+} 
+if 
+( 
+! 
+await 
+roleManager "
+." #
+RoleExistsAsync# 2
+(2 3
+	RoleStaff3 <
+)< =
+)= >
+{ 
+await 
+roleManager !
+.! "
+CreateAsync" -
+(- .
+new. 1
+IdentityRole2 >
+(> ?
+	RoleStaff? H
+)H I
+)I J
+;J K
+} 
+if 
+( 
+! 
+await 
+roleManager "
+." #
+RoleExistsAsync# 2
+(2 3
+RoleUser3 ;
+); <
+)< =
+{ 
+await 
+roleManager !
+.! "
+CreateAsync" -
+(- .
+new. 1
+IdentityRole2 >
+(> ?
+RoleUser? G
+)G H
+)H I
+;I J
+} 
+var   
+superAdminEmail   
+=    !
+$str  " <
+;  < =
+var!! 
+superAdminPassword!! "
+=!!# $
+$str!!% 0
+;!!0 1
+var"" 
+superAdminUser"" 
+=""  
+await""! &
+userManager""' 2
+.""2 3
+FindByEmailAsync""3 C
+(""C D
+superAdminEmail""D S
+)""S T
+;""T U
+if$$ 
+($$ 
+superAdminUser$$ 
+==$$ !
+null$$" &
+)$$& '
+{%% 
+superAdminUser&& 
+=&&  
+new&&! $
+ApplicationUser&&% 4
+{'' 
+UserName(( 
+=(( 
+superAdminEmail(( .
+,((. /
+Email)) 
+=)) 
+superAdminEmail)) +
+,))+ ,
+	FirstName** 
+=** 
+$str**  '
+,**' (
+LastName++ 
+=++ 
+$str++ &
+,++& '
+EmailConfirmed,, "
+=,,# $
+true,,% )
+,,,) *
+Status-- 
+=-- 
+$str-- %
+,--% &
+Role.. 
+=.. 
+RoleSuperAdmin.. )
+}// 
+;// 
+var11 
+result11 
+=11 
+await11 "
+userManager11# .
+.11. /
+CreateAsync11/ :
+(11: ;
+superAdminUser11; I
+,11I J
+superAdminPassword11K ]
+)11] ^
+;11^ _
+if22 
+(22 
+result22 
+.22 
+	Succeeded22 $
+)22$ %
+await33 
+userManager33 %
+.33% &
+AddToRoleAsync33& 4
+(334 5
+superAdminUser335 C
+,33C D
+RoleSuperAdmin33E S
+)33S T
+;33T U
+}44 
+else55 
+{66 
+var77 
+token77 
+=77 
+await77 !
+userManager77" -
+.77- .+
+GeneratePasswordResetTokenAsync77. M
+(77M N
+superAdminUser77N \
+)77\ ]
+;77] ^
+await88 
+userManager88 !
+.88! "
+ResetPasswordAsync88" 4
+(884 5
+superAdminUser885 C
+,88C D
+token88E J
+,88J K
+superAdminPassword88L ^
+)88^ _
+;88_ `
+superAdminUser99 
+.99 
+Role99 #
+=99$ %
+RoleSuperAdmin99& 4
+;994 5
+await:: 
+userManager:: !
+.::! "
+UpdateAsync::" -
+(::- .
+superAdminUser::. <
+)::< =
+;::= >
+if<< 
+(<< 
+!<< 
+await<< 
+userManager<< &
+.<<& '
+IsInRoleAsync<<' 4
+(<<4 5
+superAdminUser<<5 C
+,<<C D
+RoleSuperAdmin<<E S
+)<<S T
+)<<T U
+{== 
+await>> 
+userManager>> %
+.>>% &
+AddToRoleAsync>>& 4
+(>>4 5
+superAdminUser>>5 C
+,>>C D
+RoleSuperAdmin>>E S
+)>>S T
+;>>T U
+}?? 
+}@@ 
+}AA 	
+}BB 
+}CC ¿r
 ]E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Services\ActivityLoggingMiddleware.cs
 	namespace 	"
 TayoKonnektado_project
@@ -17547,7 +17566,134 @@ ForeignKey	 
 !8 9
 ;9 :
 } 
-} ›
+} ¥
+PE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Models\PaymentRequest.cs
+	namespace 	"
+TayoKonnektado_project
+  
+.  !
+Models! '
+{ 
+public 
+
+class 
+PaymentRequest 
+{ 
+public 
+decimal 
+Amount 
+{ 
+get  #
+;# $
+set% (
+;( )
+}* +
+public 
+string 
+Description !
+{" #
+get$ '
+;' (
+set) ,
+;, -
+}. /
+=0 1
+string2 8
+.8 9
+Empty9 >
+;> ?
+public 
+string 
+CustomerEmail #
+{$ %
+get& )
+;) *
+set+ .
+;. /
+}0 1
+=2 3
+string4 :
+.: ;
+Empty; @
+;@ A
+public 
+string 
+CustomerName "
+{# $
+get% (
+;( )
+set* -
+;- .
+}/ 0
+=1 2
+string3 9
+.9 :
+Empty: ?
+;? @
+public		 
+string		 
+PaymentMethod		 #
+{		$ %
+get		& )
+;		) *
+set		+ .
+;		. /
+}		0 1
+=		2 3
+$str		4 H
+;		H I
+}
+
+ 
+public 
+
+class 
+PaymentResponse  
+{ 
+public 
+string 
+	PaymentId 
+{  !
+get" %
+;% &
+set' *
+;* +
+}, -
+=. /
+string0 6
+.6 7
+Empty7 <
+;< =
+public 
+string 
+CheckoutUrl !
+{" #
+get$ '
+;' (
+set) ,
+;, -
+}. /
+=0 1
+string2 8
+.8 9
+Empty9 >
+;> ?
+public 
+string 
+Status 
+{ 
+get "
+;" #
+set$ '
+;' (
+}) *
+=+ ,
+string- 3
+.3 4
+Empty4 9
+;9 :
+} 
+} ›
 RE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Models\OnboardingModels.cs
 	namespace 	"
 TayoKonnektado_project
@@ -17730,134 +17876,7 @@ RE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Models\OnboardingModels
 false9 >
 ;> ?
 } 
-} ¥
-PE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Models\PaymentRequest.cs
-	namespace 	"
-TayoKonnektado_project
-  
-.  !
-Models! '
-{ 
-public 
-
-class 
-PaymentRequest 
-{ 
-public 
-decimal 
-Amount 
-{ 
-get  #
-;# $
-set% (
-;( )
-}* +
-public 
-string 
-Description !
-{" #
-get$ '
-;' (
-set) ,
-;, -
-}. /
-=0 1
-string2 8
-.8 9
-Empty9 >
-;> ?
-public 
-string 
-CustomerEmail #
-{$ %
-get& )
-;) *
-set+ .
-;. /
-}0 1
-=2 3
-string4 :
-.: ;
-Empty; @
-;@ A
-public 
-string 
-CustomerName "
-{# $
-get% (
-;( )
-set* -
-;- .
-}/ 0
-=1 2
-string3 9
-.9 :
-Empty: ?
-;? @
-public		 
-string		 
-PaymentMethod		 #
-{		$ %
-get		& )
-;		) *
-set		+ .
-;		. /
-}		0 1
-=		2 3
-$str		4 H
-;		H I
-}
-
- 
-public 
-
-class 
-PaymentResponse  
-{ 
-public 
-string 
-	PaymentId 
-{  !
-get" %
-;% &
-set' *
-;* +
-}, -
-=. /
-string0 6
-.6 7
-Empty7 <
-;< =
-public 
-string 
-CheckoutUrl !
-{" #
-get$ '
-;' (
-set) ,
-;, -
-}. /
-=0 1
-string2 8
-.8 9
-Empty9 >
-;> ?
-public 
-string 
-Status 
-{ 
-get "
-;" #
-set$ '
-;' (
-}) *
-=+ ,
-string- 3
-.3 4
-Empty4 9
-;9 :
-} 
-} ¹û
+} ¹û
 JE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Models\Entities.cs
 	namespace 	"
 TayoKonnektado_project
@@ -56981,7 +57000,7 @@ PromoTitle
 êê1 2
 }
 ëë 
-}ìì œ…
+}ìì Ù
 UE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Controllers\AuthController.cs
 	namespace 	"
 TayoKonnektado_project
@@ -57013,2994 +57032,3019 @@ UE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Controllers\AuthControl
 :  !
 ControllerBase" 0
 { 
-private 
-readonly 
-UserManager $
-<$ %
-ApplicationUser% 4
->4 5
-_userManager6 B
-;B C
-private 
-readonly 
-TokenService %
-_tokenService& 3
-;3 4
-private 
-readonly 
-EmailService %
-_emailService& 3
-;3 4
-private 
-readonly  
-ApplicationDbContext -
-_context. 6
-;6 7
-private 
-readonly 
-IConfiguration '
-_configuration( 6
-;6 7
-private 
-readonly 
-IHttpClientFactory +
-_httpClientFactory, >
-;> ?
-private 
-readonly 
-LoginAttemptService , 
-_loginAttemptService- A
-;A B
-private 
-readonly %
-IpDeviceReputationService 2&
-_ipDeviceReputationService3 M
-;M N
-private 
-readonly !
-PasswordBreachService ."
-_passwordBreachService/ E
-;E F
-public 
-AuthController 
-( 
-UserManager   
-<   
-ApplicationUser   '
->  ' (
-userManager  ) 4
-,  4 5
-TokenService!! 
-tokenService!! %
-,!!% &
-EmailService"" 
-emailService"" %
-,""% & 
-ApplicationDbContext##  
-context##! (
-,##( )
-IConfiguration$$ 
-configuration$$ (
-,$$( )
-IHttpClientFactory%% 
-httpClientFactory%% 0
-,%%0 1
-LoginAttemptService&& 
-loginAttemptService&&  3
-,&&3 4%
-IpDeviceReputationService'' %%
-ipDeviceReputationService''& ?
-,''? @!
-PasswordBreachService(( !!
-passwordBreachService((" 7
-)((7 8
-{)) 	
-_userManager** 
-=** 
-userManager** &
-;**& '
-_tokenService++ 
-=++ 
-tokenService++ (
-;++( )
-_emailService,, 
-=,, 
-emailService,, (
-;,,( )
-_context-- 
-=-- 
-context-- 
-;-- 
-_configuration.. 
-=.. 
-configuration.. *
-;..* +
-_httpClientFactory// 
-=//  
-httpClientFactory//! 2
-;//2 3 
-_loginAttemptService00  
-=00! "
-loginAttemptService00# 6
-;006 7&
-_ipDeviceReputationService11 &
-=11' (%
-ipDeviceReputationService11) B
-;11B C"
-_passwordBreachService22 "
-=22# $!
-passwordBreachService22% :
-;22: ;
-}33 	
-[55 	
-HttpPost55	 
-(55 
-$str55 
-)55 
-]55 
-public66 
-async66 
-Task66 
-<66 
-IActionResult66 '
->66' (
-Register66) 1
-(661 2
-[662 3
-FromBody663 ;
-]66; <
-RegisterRequest66= L
-request66M T
-)66T U
-{77 	
-try88 
-{99 
-var:: 
-	userAgent:: 
-=:: 
-Request::  '
-.::' (
-Headers::( /
-[::/ 0
-$str::0 <
-]::< =
-.::= >
-ToString::> F
-(::F G
-)::G H
-;::H I
-var;; 
-	ipAddress;; 
-=;; 
-HttpContext;;  +
-.;;+ ,
+private 
+const 
+string 
+StatusActive )
+=* +
+$str, 4
+;4 5
+private 
+const 
+string 
+StatusPending *
+=+ ,
+$str- 6
+;6 7
+private 
+const 
+string 
+StatusInactive +
+=, -
+$str. 8
+;8 9
+private 
+const 
+string 
+StatusSuspended ,
+=- .
+$str/ :
+;: ;
+private 
+const 
+string 
+ServicePrepaid +
+=, -
+$str. 7
+;7 8
+private 
+const 
+string 
+ServiceSubscription 0
+=1 2
+$str3 A
+;A B
+private 
+const 
+string 
+DeviceTypeWifi +
+=, -
+$str. 4
+;4 5
+private 
+const 
+string 
+	RoleStaff &
+=' (
+$str) 0
+;0 1
+private 
+const 
+string 
+	RoleAdmin &
+=' (
+$str) 0
+;0 1
+private 
+const 
+string 
+RoleSuperAdmin +
+=, -
+$str. :
+;: ;
+private 
+const 
+string 
+MessageUserNotFound 0
+=1 2
+$str3 C
+;C D
+private   
+const   
+string   
+DeviceUnknown   *
+=  + ,
+$str  - =
+;  = >
+private!! 
+readonly!! 
+UserManager!! $
+<!!$ %
+ApplicationUser!!% 4
+>!!4 5
+_userManager!!6 B
+;!!B C
+private"" 
+readonly"" 
+TokenService"" %
+_tokenService""& 3
+;""3 4
+private## 
+readonly## 
+EmailService## %
+_emailService##& 3
+;##3 4
+private$$ 
+readonly$$  
+ApplicationDbContext$$ -
+_context$$. 6
+;$$6 7
+private%% 
+readonly%% 
+IConfiguration%% '
+_configuration%%( 6
+;%%6 7
+private&& 
+readonly&& 
+IHttpClientFactory&& +
+_httpClientFactory&&, >
+;&&> ?
+private'' 
+readonly'' 
+LoginAttemptService'' , 
+_loginAttemptService''- A
+;''A B
+private(( 
+readonly(( %
+IpDeviceReputationService(( 2&
+_ipDeviceReputationService((3 M
+;((M N
+private)) 
+readonly)) !
+PasswordBreachService)) ."
+_passwordBreachService))/ E
+;))E F
+public++ 
+AuthController++ 
+(++ 
+UserManager,, 
+<,, 
+ApplicationUser,, '
+>,,' (
+userManager,,) 4
+,,,4 5
+TokenService-- 
+tokenService-- %
+,--% &
+EmailService.. 
+emailService.. %
+,..% & 
+ApplicationDbContext//  
+context//! (
+,//( )
+IConfiguration00 
+configuration00 (
+,00( )
+IHttpClientFactory11 
+httpClientFactory11 0
+,110 1
+LoginAttemptService22 
+loginAttemptService22  3
+,223 4%
+IpDeviceReputationService33 %%
+ipDeviceReputationService33& ?
+,33? @!
+PasswordBreachService44 !!
+passwordBreachService44" 7
+)447 8
+{55 	
+_userManager66 
+=66 
+userManager66 &
+;66& '
+_tokenService77 
+=77 
+tokenService77 (
+;77( )
+_emailService88 
+=88 
+emailService88 (
+;88( )
+_context99 
+=99 
+context99 
+;99 
+_configuration:: 
+=:: 
+configuration:: *
+;::* +
+_httpClientFactory;; 
+=;;  
+httpClientFactory;;! 2
+;;;2 3 
+_loginAttemptService<<  
+=<<! "
+loginAttemptService<<# 6
+;<<6 7&
+_ipDeviceReputationService== &
+===' (%
+ipDeviceReputationService==) B
+;==B C"
+_passwordBreachService>> "
+=>># $!
+passwordBreachService>>% :
+;>>: ;
+}?? 	
+[AA 	
+HttpPostAA	 
+(AA 
+$strAA 
+)AA 
+]AA 
+publicBB 
+asyncBB 
+TaskBB 
+<BB 
+IActionResultBB '
+>BB' (
+RegisterBB) 1
+(BB1 2
+[BB2 3
+FromBodyBB3 ;
+]BB; <
+RegisterRequestBB= L
+requestBBM T
+,BBT U
+[BBV W
 
-Connection;;, 6
-.;;6 7
-RemoteIpAddress;;7 F
-?;;F G
-.;;G H
-ToString;;H P
-(;;P Q
-);;Q R
-;;;R S
-if<< 
-(<< &
-_ipDeviceReputationService<< .
-.<<. /
-	IsBlocked<</ 8
-(<<8 9
-	ipAddress<<9 B
-,<<B C
-	userAgent<<D M
-,<<M N
-out<<O R
-var<<S V
-blockReason<<W b
-)<<b c
-)<<c d
-return== 
+FromHeaderBBW a
+(BBa b
+NameBBb f
+=BBg h
+$strBBi u
+)BBu v
+]BBv w
+stringBBx ~
+?BB~ 
+	userAgent
+BB€ ‰
+)
+BB‰ Š
+{CC 	
+tryDD 
+{EE 
+varFF 
+userAgentValueFF "
+=FF# $
+	userAgentFF% .
+??FF/ 1
+stringFF2 8
+.FF8 9
+EmptyFF9 >
+;FF> ?
+varGG 
+	ipAddressGG 
+=GG 
+HttpContextGG  +
+.GG+ ,
 
-StatusCode== %
-(==% &
-$num==& )
-,==) *
-new==+ .
-{==/ 0
-message==1 8
-===9 :
-$"==; =
-$str=== M
-{==M N
-blockReason==N Y
-}==Y Z
-$str==Z s
-"==s t
-}==u v
-)==v w
-;==w x
-if?? 
-(?? 
-!?? 
-await??  
-VerifyReCaptchaAsync?? /
-(??/ 0
-request??0 7
-.??7 8
-CaptchaToken??8 D
-)??D E
-)??E F
-return@@ 
+ConnectionGG, 6
+.GG6 7
+RemoteIpAddressGG7 F
+?GGF G
+.GGG H
+ToStringGGH P
+(GGP Q
+)GGQ R
+;GGR S
+ifHH 
+(HH &
+_ipDeviceReputationServiceHH .
+.HH. /
+	IsBlockedHH/ 8
+(HH8 9
+	ipAddressHH9 B
+,HHB C
+userAgentValueHHD R
+,HHR S
+outHHT W
+varHHX [
+blockReasonHH\ g
+)HHg h
+)HHh i
+returnII 
 
-BadRequest@@ %
-(@@% &
-new@@& )
-{@@* +
-message@@, 3
-=@@4 5
-$str@@6 S
-}@@T U
-)@@U V
-;@@V W
-ifBB 
-(BB 
-!BB 
-requestBB 
-.BB 
-EmailBB "
-.BB" #
-EndsWithBB# +
-(BB+ ,
-$strBB, 8
-,BB8 9
-StringComparisonBB: J
-.BBJ K
-OrdinalIgnoreCaseBBK \
-)BB\ ]
-)BB] ^
-returnCC 
+StatusCodeII %
+(II% &
+$numII& )
+,II) *
+newII+ .
+{II/ 0
+messageII1 8
+=II9 :
+$"II; =
+$strII= M
+{IIM N
+blockReasonIIN Y
+}IIY Z
+$strIIZ s
+"IIs t
+}IIu v
+)IIv w
+;IIw x
+ifKK 
+(KK 
+!KK 
+awaitKK  
+VerifyReCaptchaAsyncKK /
+(KK/ 0
+requestKK0 7
+.KK7 8
+CaptchaTokenKK8 D
+)KKD E
+)KKE F
+returnLL 
 
-BadRequestCC %
-(CC% &
-newCC& )
-{CC* +
-messageCC, 3
-=CC4 5
-$strCC6 X
-}CCY Z
-)CCZ [
-;CC[ \
-ifEE 
-(EE 
-awaitEE "
-_passwordBreachServiceEE 0
-.EE0 1
-IsBreachedAsyncEE1 @
-(EE@ A
-requestEEA H
-.EEH I
-PasswordEEI Q
-)EEQ R
-)EER S
-returnFF 
+BadRequestLL %
+(LL% &
+newLL& )
+{LL* +
+messageLL, 3
+=LL4 5
+$strLL6 S
+}LLT U
+)LLU V
+;LLV W
+ifNN 
+(NN 
+!NN 
+requestNN 
+.NN 
+EmailNN "
+.NN" #
+EndsWithNN# +
+(NN+ ,
+$strNN, 8
+,NN8 9
+StringComparisonNN: J
+.NNJ K
+OrdinalIgnoreCaseNNK \
+)NN\ ]
+)NN] ^
+returnOO 
 
-BadRequestFF %
-(FF% &
-newFF& )
-{FF* +
-messageFF, 3
-=FF4 5
-$str	FF6 €
+BadRequestOO %
+(OO% &
+newOO& )
+{OO* +
+messageOO, 3
+=OO4 5
+$strOO6 X
+}OOY Z
+)OOZ [
+;OO[ \
+ifQQ 
+(QQ 
+awaitQQ "
+_passwordBreachServiceQQ 0
+.QQ0 1
+IsBreachedAsyncQQ1 @
+(QQ@ A
+requestQQA H
+.QQH I
+PasswordQQI Q
+)QQQ R
+)QQR S
+returnRR 
+
+BadRequestRR %
+(RR% &
+newRR& )
+{RR* +
+messageRR, 3
+=RR4 5
+$str	RR6 €
 }
-FF ‚
+RR ‚
 )
-FF‚ ƒ
+RR‚ ƒ
 ;
-FFƒ „
-varHH 
-existingUserHH  
-=HH! "
-awaitHH# (
-_userManagerHH) 5
-.HH5 6
-FindByEmailAsyncHH6 F
-(HHF G
-requestHHG N
-.HHN O
-EmailHHO T
-)HHT U
-;HHU V
-ifII 
-(II 
-existingUserII  
-!=II! #
-nullII$ (
-)II( )
-returnJJ 
+RRƒ „
+varTT 
+existingUserTT  
+=TT! "
+awaitTT# (
+_userManagerTT) 5
+.TT5 6
+FindByEmailAsyncTT6 F
+(TTF G
+requestTTG N
+.TTN O
+EmailTTO T
+)TTT U
+;TTU V
+ifUU 
+(UU 
+existingUserUU  
+!=UU! #
+nullUU$ (
+)UU( )
+returnVV 
 
-BadRequestJJ %
-(JJ% &
-newJJ& )
-{JJ* +
-messageJJ, 3
-=JJ4 5
-$strJJ6 s
-}JJt u
-)JJu v
-;JJv w
-varLL 
-userLL 
-=LL 
-newLL 
-ApplicationUserLL .
-{MM 
-UserNameNN 
-=NN 
-requestNN &
-.NN& '
-EmailNN' ,
-,NN, -
-EmailOO 
-=OO 
-requestOO #
-.OO# $
-EmailOO$ )
-,OO) *
-	FirstNamePP 
-=PP 
-requestPP  '
-.PP' (
-	FirstNamePP( 1
-,PP1 2
-LastNameQQ 
-=QQ 
-requestQQ &
-.QQ& '
-LastNameQQ' /
-,QQ/ 0
-BirthdayRR 
-=RR 
-requestRR &
-.RR& '
-BirthdayRR' /
-,RR/ 0
-AddressSS 
-=SS 
-requestSS %
-.SS% &
-AddressSS& -
-,SS- .
-StatusTT 
-=TT 
-$strTT &
-}UU 
-;UU 
-varVV 
-resultVV 
-=VV 
-awaitVV "
-_userManagerVV# /
-.VV/ 0
-CreateAsyncVV0 ;
-(VV; <
-userVV< @
-,VV@ A
-requestVVB I
-.VVI J
-PasswordVVJ R
-)VVR S
-;VVS T
-ifXX 
-(XX 
-!XX 
-resultXX 
-.XX 
-	SucceededXX %
-)XX% &
-{YY 
-varZZ 
-errorsZZ 
-=ZZ  
-stringZZ! '
-.ZZ' (
-JoinZZ( ,
-(ZZ, -
-$strZZ- 1
-,ZZ1 2
-resultZZ3 9
-.ZZ9 :
-ErrorsZZ: @
-.ZZ@ A
-SelectZZA G
-(ZZG H
-eZZH I
-=>ZZJ L
-eZZM N
-.ZZN O
-DescriptionZZO Z
-)ZZZ [
-)ZZ[ \
-;ZZ\ ]
-return[[ 
+BadRequestVV %
+(VV% &
+newVV& )
+{VV* +
+messageVV, 3
+=VV4 5
+$strVV6 s
+}VVt u
+)VVu v
+;VVv w
+varXX 
+userXX 
+=XX 
+newXX 
+ApplicationUserXX .
+{YY 
+UserNameZZ 
+=ZZ 
+requestZZ &
+.ZZ& '
+EmailZZ' ,
+,ZZ, -
+Email[[ 
+=[[ 
+request[[ #
+.[[# $
+Email[[$ )
+,[[) *
+	FirstName\\ 
+=\\ 
+request\\  '
+.\\' (
+	FirstName\\( 1
+,\\1 2
+LastName]] 
+=]] 
+request]] &
+.]]& '
+LastName]]' /
+,]]/ 0
+Birthday^^ 
+=^^ 
+request^^ &
+.^^& '
+Birthday^^' /
+,^^/ 0
+Address__ 
+=__ 
+request__ %
+.__% &
+Address__& -
+,__- .
+Status`` 
+=`` 
+StatusPending`` *
+}aa 
+;aa 
+varbb 
+resultbb 
+=bb 
+awaitbb "
+_userManagerbb# /
+.bb/ 0
+CreateAsyncbb0 ;
+(bb; <
+userbb< @
+,bb@ A
+requestbbB I
+.bbI J
+PasswordbbJ R
+)bbR S
+;bbS T
+ifdd 
+(dd 
+!dd 
+resultdd 
+.dd 
+	Succeededdd %
+)dd% &
+{ee 
+varff 
+errorsff 
+=ff  
+stringff! '
+.ff' (
+Joinff( ,
+(ff, -
+$strff- 1
+,ff1 2
+resultff3 9
+.ff9 :
+Errorsff: @
+.ff@ A
+SelectffA G
+(ffG H
+effH I
+=>ffJ L
+effM N
+.ffN O
+DescriptionffO Z
+)ffZ [
+)ff[ \
+;ff\ ]
+returngg 
 
-BadRequest[[ %
-([[% &
-new[[& )
-{[[* +
-message[[, 3
-=[[4 5
-errors[[6 <
-}[[= >
-)[[> ?
-;[[? @
-}\\ 
-var^^ 
-code^^ 
-=^^ 
-new^^ 
-Random^^ %
-(^^% &
-)^^& '
-.^^' (
-Next^^( ,
-(^^, -
-$num^^- 3
-,^^3 4
-$num^^5 ;
-)^^; <
-.^^< =
-ToString^^= E
-(^^E F
-)^^F G
-;^^G H
-_context__ 
-.__ 
-VerificationCodes__ *
-.__* +
-Add__+ .
-(__. /
-new__/ 2
-VerificationCode__3 C
-{`` 
-Emailaa 
-=aa 
-requestaa #
-.aa# $
-Emailaa$ )
-,aa) *
-Codebb 
-=bb 
-codebb 
-,bb  
-	ExpiresAtcc 
-=cc 
-DateTimecc  (
-.cc( )
-UtcNowcc) /
-.cc/ 0
+BadRequestgg %
+(gg% &
+newgg& )
+{gg* +
+messagegg, 3
+=gg4 5
+errorsgg6 <
+}gg= >
+)gg> ?
+;gg? @
+}hh 
+varjj 
+codejj 
+=jj 
+newjj 
+Randomjj %
+(jj% &
+)jj& '
+.jj' (
+Nextjj( ,
+(jj, -
+$numjj- 3
+,jj3 4
+$numjj5 ;
+)jj; <
+.jj< =
+ToStringjj= E
+(jjE F
+)jjF G
+;jjG H
+_contextkk 
+.kk 
+VerificationCodeskk *
+.kk* +
+Addkk+ .
+(kk. /
+newkk/ 2
+VerificationCodekk3 C
+{ll 
+Emailmm 
+=mm 
+requestmm #
+.mm# $
+Emailmm$ )
+,mm) *
+Codenn 
+=nn 
+codenn 
+,nn  
+	ExpiresAtoo 
+=oo 
+DateTimeoo  (
+.oo( )
+UtcNowoo) /
+.oo/ 0
 
-AddMinutescc0 :
-(cc: ;
-$numcc; =
-)cc= >
-}dd 
-)dd 
-;dd 
-_contextff 
-.ff 
-OnboardingStatusesff +
-.ff+ ,
-Addff, /
-(ff/ 0
-newff0 3
-OnboardingStatusff4 D
-{gg 
-UserIDhh 
-=hh 
-userhh !
-.hh! "
-Idhh" $
-}ii 
-)ii 
-;ii 
-awaitkk 
-_contextkk 
-.kk 
-SaveChangesAsynckk /
-(kk/ 0
-)kk0 1
-;kk1 2
-awaitll 
-_emailServicell #
-.ll# $%
-SendVerificationCodeAsyncll$ =
-(ll= >
-requestll> E
-.llE F
-EmailllF K
-,llK L
-codellM Q
-)llQ R
-;llR S
-awaitnn 
-LogActivityAsyncnn &
-(nn& '
-usernn' +
-.nn+ ,
-Idnn, .
-,nn. /
-$strnn0 D
-,nnD E
-$strnnF N
-)nnN O
-;nnO P&
-_ipDeviceReputationServicepp *
-.pp* +
-RegisterSuccesspp+ :
-(pp: ;
-	ipAddresspp; D
-,ppD E
-	userAgentppF O
-)ppO P
-;ppP Q
-returnrr 
-Okrr 
-(rr 
-newrr 
-{rr 
-messagerr  '
-=rr( )
-$strrr* s
-}rrt u
-)rru v
-;rrv w
-}ss 
-catchtt 
-(tt 
-	Exceptiontt 
-extt 
-)tt  
-{uu 
-returnvv 
-
-BadRequestvv !
-(vv! "
-newvv" %
-{vv& '
-messagevv( /
-=vv0 1
-$"vv2 4
-$strvv4 I
-{vvI J
-exvvJ L
-.vvL M
-MessagevvM T
-}vvT U
-"vvU V
-}vvW X
-)vvX Y
-;vvY Z
-}ww 
-}xx 	
-[zz 	
-HttpPostzz	 
-(zz 
-$strzz  
-)zz  !
-]zz! "
-public{{ 
-async{{ 
-Task{{ 
-<{{ 
-IActionResult{{ '
->{{' (
-VerifyEmail{{) 4
-({{4 5
-[{{5 6
-FromBody{{6 >
-]{{> ?
-VerifyEmailRequest{{@ R
-request{{S Z
-){{Z [
-{|| 	
-var}} 
-verification}} 
-=}} 
-await}} $
-_context}}% -
-.}}- .
-VerificationCodes}}. ?
-.~~ 
-FirstOrDefaultAsync~~ $
-(~~$ %
-v~~% &
-=>~~' )
-v~~* +
-.~~+ ,
-Email~~, 1
-==~~2 4
-request~~5 <
-.~~< =
-Email~~= B
-&&~~C E
-v~~F G
-.~~G H
-Code~~H L
-==~~M O
-request~~P W
-.~~W X
-Code~~X \
-&&~~] _
-!~~` a
-v~~a b
-.~~b c
-IsUsed~~c i
-&&~~j l
-v~~m n
-.~~n o
-	ExpiresAt~~o x
->~~y z
-DateTime	~~{ ƒ
-.
-~~ƒ „
-UtcNow
-~~„ Š
-)
-~~Š ‹
-;
-~~‹ Œ
-if
-€€ 
+AddMinutesoo0 :
+(oo: ;
+$numoo; =
+)oo= >
+}pp 
+)pp 
+;pp 
+_contextrr 
+.rr 
+OnboardingStatusesrr +
+.rr+ ,
+Addrr, /
+(rr/ 0
+newrr0 3
+OnboardingStatusrr4 D
+{ss 
+UserIDtt 
+=tt 
+usertt !
+.tt! "
+Idtt" $
+}uu 
+)uu 
+;uu 
+awaitww 
+_contextww 
+.ww 
+SaveChangesAsyncww /
+(ww/ 0
+)ww0 1
+;ww1 2
+awaitxx 
+_emailServicexx #
+.xx# $%
+SendVerificationCodeAsyncxx$ =
+(xx= >
+requestxx> E
+.xxE F
+EmailxxF K
+,xxK L
+codexxM Q
+)xxQ R
+;xxR S
+awaitzz 
+LogActivityAsynczz &
+(zz& '
+userzz' +
+.zz+ ,
+Idzz, .
+,zz. /
+$strzz0 D
+,zzD E
+$strzzF N
+)zzN O
+;zzO P&
+_ipDeviceReputationService|| *
+.||* +
+RegisterSuccess||+ :
+(||: ;
+	ipAddress||; D
+,||D E
+userAgentValue||F T
+)||T U
+;||U V
+return~~ 
+Ok~~ 
+(~~ 
+new~~ 
+{~~ 
+message~~  '
+=~~( )
+$str~~* s
+}~~t u
+)~~u v
+;~~v w
+} 
+catch
+€€ 
 (
-€€ 
-verification
-€€ 
-==
-€€ 
-null
-€€  $
+€€ 
+	Exception
+€€ 
+ex
+€€ 
 )
-€€$ %
+€€  
+{
+ 
 return
- 
+‚‚ 
 
 BadRequest
- !
+‚‚ !
 (
-! "
+‚‚! "
 new
-" %
+‚‚" %
 {
-& '
+‚‚& '
 message
-( /
+‚‚( /
 =
-0 1
+‚‚0 1
+$"
+‚‚2 4
 $str
-2 X
-}
-Y Z
-)
-Z [
-;
-[ \
-var
-ƒƒ 
-user
-ƒƒ 
-=
-ƒƒ 
-await
-ƒƒ 
-_userManager
-ƒƒ )
-.
-ƒƒ) *
-FindByEmailAsync
-ƒƒ* :
-(
-ƒƒ: ;
-request
-ƒƒ; B
-.
-ƒƒB C
-Email
-ƒƒC H
-)
-ƒƒH I
-;
-ƒƒI J
-if
-„„ 
-(
-„„ 
-user
-„„ 
-==
-„„ 
-null
-„„ 
-)
-„„ 
-return
-…… 
-NotFound
-…… 
-(
-……  
-new
-……  #
+‚‚4 I
 {
-……$ %
-message
-……& -
-=
-……. /
-$str
-……0 @
+‚‚I J
+ex
+‚‚J L
+.
+‚‚L M
+Message
+‚‚M T
 }
-……A B
-)
-……B C
-;
-……C D
-user
-‡‡ 
-.
-‡‡ 
-EmailConfirmed
-‡‡ 
-=
-‡‡  !
-true
-‡‡" &
-;
-‡‡& '
-user
-ˆˆ 
-.
-ˆˆ 
-Status
-ˆˆ 
-=
-ˆˆ 
-$str
-ˆˆ "
-;
-ˆˆ" #
-await
-‰‰ 
-_userManager
-‰‰ 
-.
-‰‰ 
-UpdateAsync
-‰‰ *
-(
-‰‰* +
-user
-‰‰+ /
-)
-‰‰/ 0
-;
-‰‰0 1
-verification
-‹‹ 
-.
-‹‹ 
-IsUsed
-‹‹ 
-=
-‹‹  !
-true
-‹‹" &
-;
-‹‹& '
-var
- 
-
-onboarding
- 
-=
- 
-await
- "
-_context
-# +
-.
-+ , 
-OnboardingStatuses
-, >
-.
-> ?!
-FirstOrDefaultAsync
-? R
-(
-R S
-o
-S T
-=>
-U W
-o
-X Y
-.
-Y Z
-UserID
-Z `
-==
-a c
-user
-d h
-.
-h i
-Id
-i k
-)
-k l
-;
-l m
-if
- 
-(
- 
-
-onboarding
- 
-!=
- 
-null
- "
-)
-" #
-
-onboarding
- 
-.
- 
-IsEmailVerified
- *
-=
-+ ,
-true
-- 1
-;
-1 2
-await
-‘‘ 
-_context
-‘‘ 
-.
-‘‘ 
-SaveChangesAsync
-‘‘ +
-(
-‘‘+ ,
-)
-‘‘, -
-;
-‘‘- .
-return
-““ 
-Ok
-““ 
-(
-““ 
-new
-““ 
-{
-““ 
-message
-““ #
-=
-““$ %
-$str
-““& C
+‚‚T U
+"
+‚‚U V
 }
-““D E
+‚‚W X
 )
-““E F
+‚‚X Y
 ;
-““F G
+‚‚Y Z
 }
-”” 	
+ƒƒ 
+}
+„„ 	
 [
-–– 	
+†† 	
 HttpPost
-––	 
+††	 
 (
-–– 
+†† 
 $str
-–– 
+††  
 )
-––  
+††  !
 ]
-––  !
+††! "
 public
-—— 
+‡‡ 
 async
-—— 
+‡‡ 
 Task
-—— 
+‡‡ 
 <
-—— 
+‡‡ 
 IActionResult
-—— '
+‡‡ '
 >
-——' (
+‡‡' (
+VerifyEmail
+‡‡) 4
+(
+‡‡4 5
+[
+‡‡5 6
+FromBody
+‡‡6 >
+]
+‡‡> ? 
+VerifyEmailRequest
+‡‡@ R
+request
+‡‡S Z
+)
+‡‡Z [
+{
+ˆˆ 	
+var
+‰‰ 
+verification
+‰‰ 
+=
+‰‰ 
+await
+‰‰ $
+_context
+‰‰% -
+.
+‰‰- .
+VerificationCodes
+‰‰. ?
+.
+ŠŠ !
+FirstOrDefaultAsync
+ŠŠ $
+(
+ŠŠ$ %
+v
+ŠŠ% &
+=>
+ŠŠ' )
+v
+ŠŠ* +
+.
+ŠŠ+ ,
+Email
+ŠŠ, 1
+==
+ŠŠ2 4
+request
+ŠŠ5 <
+.
+ŠŠ< =
+Email
+ŠŠ= B
+&&
+ŠŠC E
+v
+ŠŠF G
+.
+ŠŠG H
+Code
+ŠŠH L
+==
+ŠŠM O
+request
+ŠŠP W
+.
+ŠŠW X
+Code
+ŠŠX \
+&&
+ŠŠ] _
+!
+ŠŠ` a
+v
+ŠŠa b
+.
+ŠŠb c
+IsUsed
+ŠŠc i
+&&
+ŠŠj l
+v
+ŠŠm n
+.
+ŠŠn o
+	ExpiresAt
+ŠŠo x
+>
+ŠŠy z
+DateTimeŠŠ{ ƒ
+.ŠŠƒ „
+UtcNowŠŠ„ Š
+)ŠŠŠ ‹
+;ŠŠ‹ Œ
+if
+ŒŒ 
+(
+ŒŒ 
+verification
+ŒŒ 
+==
+ŒŒ 
+null
+ŒŒ  $
+)
+ŒŒ$ %
+return
+ 
+
+BadRequest
+ !
+(
+! "
+new
+" %
+{
+& '
+message
+( /
+=
+0 1
+$str
+2 X
+}
+Y Z
+)
+Z [
+;
+[ \
+var
+ 
+user
+ 
+=
+ 
+await
+ 
+_userManager
+ )
+.
+) *
+FindByEmailAsync
+* :
+(
+: ;
+request
+; B
+.
+B C
+Email
+C H
+)
+H I
+;
+I J
+if
+ 
+(
+ 
+user
+ 
+==
+ 
+null
+ 
+)
+ 
+return
+‘‘ 
+NotFound
+‘‘ 
+(
+‘‘  
+new
+‘‘  #
+{
+‘‘$ %
+message
+‘‘& -
+=
+‘‘. /!
+MessageUserNotFound
+‘‘0 C
+}
+‘‘D E
+)
+‘‘E F
+;
+‘‘F G
+user
+““ 
+.
+““ 
+EmailConfirmed
+““ 
+=
+““  !
+true
+““" &
+;
+““& '
+user
+”” 
+.
+”” 
+Status
+”” 
+=
+”” 
+StatusActive
+”” &
+;
+””& '
+await
+•• 
+_userManager
+•• 
+.
+•• 
+UpdateAsync
+•• *
+(
+••* +
+user
+••+ /
+)
+••/ 0
+;
+••0 1
+verification
+—— 
+.
+—— 
+IsUsed
+—— 
+=
+——  !
+true
+——" &
+;
+——& '
+var
+™™ 
+
+onboarding
+™™ 
+=
+™™ 
+await
+™™ "
+_context
+™™# +
+.
+™™+ , 
+OnboardingStatuses
+™™, >
+.
+™™> ?!
+FirstOrDefaultAsync
+™™? R
+(
+™™R S
+o
+™™S T
+=>
+™™U W
+o
+™™X Y
+.
+™™Y Z
+UserID
+™™Z `
+==
+™™a c
+user
+™™d h
+.
+™™h i
+Id
+™™i k
+)
+™™k l
+;
+™™l m
+if
+šš 
+(
+šš 
+
+onboarding
+šš 
+!=
+šš 
+null
+šš "
+)
+šš" #
+
+onboarding
+›› 
+.
+›› 
+IsEmailVerified
+›› *
+=
+››+ ,
+true
+››- 1
+;
+››1 2
+await
+ 
+_context
+ 
+.
+ 
+SaveChangesAsync
+ +
+(
++ ,
+)
+, -
+;
+- .
+return
+ŸŸ 
+Ok
+ŸŸ 
+(
+ŸŸ 
+new
+ŸŸ 
+{
+ŸŸ 
+message
+ŸŸ #
+=
+ŸŸ$ %
+$str
+ŸŸ& C
+}
+ŸŸD E
+)
+ŸŸE F
+;
+ŸŸF G
+}
+   	
+[
+¢¢ 	
+HttpPost
+¢¢	 
+(
+¢¢ 
+$str
+¢¢ 
+)
+¢¢  
+]
+¢¢  !
+public
+££ 
+async
+££ 
+Task
+££ 
+<
+££ 
+IActionResult
+££ '
+>
+££' (
 
 ResendCode
-——) 3
+££) 3
 (
-——3 4
+££3 4
 [
-——4 5
+££4 5
 FromBody
-——5 =
+££5 =
 ]
-——= >
+££= >
 string
-——? E
+££? E
 email
-——F K
+££F K
 )
-——K L
+££K L
 {
-˜˜ 	
+¤¤ 	
 var
-™™ 
+¥¥ 
 code
-™™ 
+¥¥ 
 =
-™™ 
+¥¥ 
 new
-™™ 
+¥¥ 
 Random
-™™ !
+¥¥ !
 (
-™™! "
+¥¥! "
 )
-™™" #
+¥¥" #
 .
-™™# $
+¥¥# $
 Next
-™™$ (
+¥¥$ (
 (
-™™( )
+¥¥( )
 $num
-™™) /
+¥¥) /
 ,
-™™/ 0
+¥¥/ 0
 $num
-™™1 7
+¥¥1 7
 )
-™™7 8
+¥¥7 8
 .
-™™8 9
+¥¥8 9
 ToString
-™™9 A
+¥¥9 A
 (
-™™A B
+¥¥A B
 )
-™™B C
+¥¥B C
 ;
-™™C D
+¥¥C D
 _context
-šš 
+¦¦ 
 .
-šš 
+¦¦ 
 VerificationCodes
-šš &
+¦¦ &
 .
-šš& '
+¦¦& '
 Add
-šš' *
+¦¦' *
 (
-šš* +
+¦¦* +
 new
-šš+ .
+¦¦+ .
 VerificationCode
-šš/ ?
+¦¦/ ?
 {
-›› 
+§§ 
 Email
-œœ 
+¨¨ 
 =
-œœ 
+¨¨ 
 email
-œœ 
+¨¨ 
 ,
-œœ 
+¨¨ 
 Code
- 
+©© 
 =
- 
+©© 
 code
- 
+©© 
 ,
- 
+©© 
 	ExpiresAt
- 
-=
- 
-DateTime
- $
-.
-$ %
-UtcNow
-% +
-.
-+ ,
-
-AddMinutes
-, 6
-(
-6 7
-$num
-7 9
-)
-9 :
-}
-ŸŸ 
-)
-ŸŸ 
-;
-ŸŸ 
-await
-   
-_context
-   
-.
-   
-SaveChangesAsync
-   +
-(
-  + ,
-)
-  , -
-;
-  - .
-await
-¡¡ 
-_emailService
-¡¡ 
-.
-¡¡  '
-SendVerificationCodeAsync
-¡¡  9
-(
-¡¡9 :
-email
-¡¡: ?
-,
-¡¡? @
-code
-¡¡A E
-)
-¡¡E F
-;
-¡¡F G
-return
-££ 
-Ok
-££ 
-(
-££ 
-new
-££ 
-{
-££ 
-message
-££ #
-=
-££$ %
-$str
-££& >
-}
-££? @
-)
-££@ A
-;
-££A B
-}
-¤¤ 	
-[
-¦¦ 	
-HttpPost
-¦¦	 
-(
-¦¦ 
-$str
-¦¦ 
-)
-¦¦ 
-]
-¦¦ 
-public
-§§ 
-async
-§§ 
-Task
-§§ 
-<
-§§ 
-IActionResult
-§§ '
->
-§§' (
-Login
-§§) .
-(
-§§. /
-[
-§§/ 0
-FromBody
-§§0 8
-]
-§§8 9
-LoginRequest
-§§: F
-request
-§§G N
-)
-§§N O
-{
-¨¨ 	
-var
-©© 
-	userAgent
-©© 
-=
-©© 
-Request
-©© #
-.
-©©# $
-Headers
-©©$ +
-[
-©©+ ,
-$str
-©©, 8
-]
-©©8 9
-.
-©©9 :
-ToString
-©©: B
-(
-©©B C
-)
-©©C D
-;
-©©D E
-var
-ªª 
-	ipAddress
 ªª 
 =
-ªª 
-HttpContext
-ªª '
+ªª 
+DateTime
+ªª $
 .
-ªª' (
+ªª$ %
+UtcNow
+ªª% +
+.
+ªª+ ,
+
+AddMinutes
+ªª, 6
+(
+ªª6 7
+$num
+ªª7 9
+)
+ªª9 :
+}
+«« 
+)
+«« 
+;
+«« 
+await
+¬¬ 
+_context
+¬¬ 
+.
+¬¬ 
+SaveChangesAsync
+¬¬ +
+(
+¬¬+ ,
+)
+¬¬, -
+;
+¬¬- .
+await
+­­ 
+_emailService
+­­ 
+.
+­­  '
+SendVerificationCodeAsync
+­­  9
+(
+­­9 :
+email
+­­: ?
+,
+­­? @
+code
+­­A E
+)
+­­E F
+;
+­­F G
+return
+¯¯ 
+Ok
+¯¯ 
+(
+¯¯ 
+new
+¯¯ 
+{
+¯¯ 
+message
+¯¯ #
+=
+¯¯$ %
+$str
+¯¯& >
+}
+¯¯? @
+)
+¯¯@ A
+;
+¯¯A B
+}
+°° 	
+[
+²² 	
+HttpPost
+²²	 
+(
+²² 
+$str
+²² 
+)
+²² 
+]
+²² 
+public
+³³ 
+async
+³³ 
+Task
+³³ 
+<
+³³ 
+IActionResult
+³³ '
+>
+³³' (
+Login
+³³) .
+(
+³³. /
+[
+³³/ 0
+FromBody
+³³0 8
+]
+³³8 9
+LoginRequest
+³³: F
+request
+³³G N
+,
+³³N O
+[
+³³P Q
+
+FromHeader
+³³Q [
+(
+³³[ \
+Name
+³³\ `
+=
+³³a b
+$str
+³³c o
+)
+³³o p
+]
+³³p q
+string
+³³r x
+?
+³³x y
+	userAgent³³z ƒ
+)³³ƒ „
+{
+´´ 	
+var
+µµ 
+userAgentValue
+µµ 
+=
+µµ  
+	userAgent
+µµ! *
+??
+µµ+ -
+string
+µµ. 4
+.
+µµ4 5
+Empty
+µµ5 :
+;
+µµ: ;
+var
+¶¶ 
+	ipAddress
+¶¶ 
+=
+¶¶ 
+HttpContext
+¶¶ '
+.
+¶¶' (
 
 Connection
-ªª( 2
+¶¶( 2
 .
-ªª2 3
+¶¶2 3
 RemoteIpAddress
-ªª3 B
+¶¶3 B
 ?
-ªªB C
+¶¶B C
 .
-ªªC D
+¶¶C D
 ToString
-ªªD L
+¶¶D L
 (
-ªªL M
+¶¶L M
 )
-ªªM N
+¶¶M N
 ;
-ªªN O
+¶¶N O
 if
-«« 
+·· 
 (
-«« (
+·· (
 _ipDeviceReputationService
-«« *
+·· *
 .
-««* +
+··* +
 	IsBlocked
-««+ 4
+··+ 4
 (
-««4 5
+··4 5
 	ipAddress
-««5 >
+··5 >
 ,
-««> ?
-	userAgent
-««@ I
+··> ?
+userAgentValue
+··@ N
 ,
-««I J
+··N O
 out
-««K N
+··P S
 var
-««O R
+··T W
 blockReason
-««S ^
+··X c
 )
-««^ _
+··c d
 )
-««_ `
+··d e
 return
-¬¬ 
+¸¸ 
 
 StatusCode
-¬¬ !
+¸¸ !
 (
-¬¬! "
+¸¸! "
 $num
-¬¬" %
+¸¸" %
 ,
-¬¬% &
+¸¸% &
 new
-¬¬' *
+¸¸' *
 {
-¬¬+ ,
+¸¸+ ,
 message
-¬¬- 4
+¸¸- 4
 =
-¬¬5 6
+¸¸5 6
 $"
-¬¬7 9
+¸¸7 9
 $str
-¬¬9 I
+¸¸9 I
 {
-¬¬I J
+¸¸I J
 blockReason
-¬¬J U
+¸¸J U
 }
-¬¬U V
+¸¸U V
 $str
-¬¬V o
+¸¸V o
 "
-¬¬o p
+¸¸o p
 }
-¬¬q r
+¸¸q r
 )
-¬¬r s
+¸¸r s
 ;
-¬¬s t
-if
-®® 
-(
-®® 
-!
-®® 
-await
-®® "
-VerifyReCaptchaAsync
-®® +
-(
-®®+ ,
-request
-®®, 3
-.
-®®3 4
-CaptchaToken
-®®4 @
-)
-®®@ A
-)
-®®A B
-return
-¯¯ 
-
-BadRequest
-¯¯ !
-(
-¯¯! "
-new
-¯¯" %
-{
-¯¯& '
-message
-¯¯( /
-=
-¯¯0 1
-$str
-¯¯2 O
-}
-¯¯P Q
-)
-¯¯Q R
-;
-¯¯R S
-var
-±± 
-user
-±± 
-=
-±± 
-await
-±± 
-_userManager
-±± )
-.
-±±) *
-FindByEmailAsync
-±±* :
-(
-±±: ;
-request
-±±; B
-.
-±±B C
-Email
-±±C H
-)
-±±H I
-;
-±±I J
-if
-²² 
-(
-²² 
-user
-²² 
-==
-²² 
-null
-²² 
-)
-²² 
-{
-³³ (
-_ipDeviceReputationService
-´´ *
-.
-´´* +
-RegisterFailure
-´´+ :
-(
-´´: ;
-	ipAddress
-´´; D
-,
-´´D E
-	userAgent
-´´F O
-)
-´´O P
-;
-´´P Q
-return
-µµ 
-Unauthorized
-µµ #
-(
-µµ# $
-new
-µµ$ '
-{
-µµ( )
-message
-µµ* 1
-=
-µµ2 3
-$str
-µµ4 I
-}
-µµJ K
-)
-µµK L
-;
-µµL M
-}
-¶¶ 
-var
-¹¹ 
-lockoutCheck
-¹¹ 
-=
-¹¹ 
-await
-¹¹ $"
-_loginAttemptService
-¹¹% 9
-.
-¹¹9 :$
-CheckLoginAttemptAsync
-¹¹: P
-(
-¹¹P Q
-user
-¹¹Q U
-.
-¹¹U V
-Id
-¹¹V X
-)
-¹¹X Y
-;
-¹¹Y Z
+¸¸s t
 if
 ºº 
 (
-ºº 
-lockoutCheck
-ºº 
-.
-ºº 
-isLocked
-ºº %
-)
-ºº% &
-return
-»» 
-Unauthorized
-»» #
-(
-»»# $
-new
-»»$ '
-{
-»»( )
-message
-»»* 1
-=
-»»2 3
-$"
-»»4 6
-$str
-»»6 y
-{
-»»y z
-lockoutCheck»»z †
-.»»† ‡
-message»»‡ 
-}»» 
-"»» 
-}»»‘ ’
-)»»’ “
-;»»“ ”
-if
-½½ 
-(
-½½ 
+ºº 
 !
-½½ 
+ºº 
 await
-½½ 
-_userManager
-½½ #
-.
-½½# $ 
-CheckPasswordAsync
-½½$ 6
+ºº "
+VerifyReCaptchaAsync
+ºº +
 (
-½½6 7
-user
-½½7 ;
-,
-½½; <
+ºº+ ,
 request
-½½= D
+ºº, 3
 .
-½½D E
-Password
-½½E M
+ºº3 4
+CaptchaToken
+ºº4 @
 )
-½½M N
+ºº@ A
 )
-½½N O
-{
-¾¾ 
-await
-ÀÀ "
-_loginAttemptService
-ÀÀ *
-.
-ÀÀ* +&
-RecordFailedAttemptAsync
-ÀÀ+ C
+ººA B
+return
+»» 
+
+BadRequest
+»» !
 (
-ÀÀC D
-user
-ÀÀD H
-.
-ÀÀH I
-Id
-ÀÀI K
+»»! "
+new
+»»" %
+{
+»»& '
+message
+»»( /
+=
+»»0 1
+$str
+»»2 O
+}
+»»P Q
 )
-ÀÀK L
+»»Q R
 ;
-ÀÀL M(
+»»R S
+var
+½½ 
+user
+½½ 
+=
+½½ 
+await
+½½ 
+_userManager
+½½ )
+.
+½½) *
+FindByEmailAsync
+½½* :
+(
+½½: ;
+request
+½½; B
+.
+½½B C
+Email
+½½C H
+)
+½½H I
+;
+½½I J
+if
+¾¾ 
+(
+¾¾ 
+user
+¾¾ 
+==
+¾¾ 
+null
+¾¾ 
+)
+¾¾ 
+{
+¿¿ (
 _ipDeviceReputationService
-ÁÁ *
+ÀÀ *
 .
-ÁÁ* +
+ÀÀ* +
 RegisterFailure
-ÁÁ+ :
+ÀÀ+ :
 (
-ÁÁ: ;
+ÀÀ: ;
 	ipAddress
-ÁÁ; D
+ÀÀ; D
 ,
-ÁÁD E
-	userAgent
-ÁÁF O
+ÀÀD E
+userAgentValue
+ÀÀF T
 )
-ÁÁO P
+ÀÀT U
 ;
-ÁÁP Q
+ÀÀU V
 return
-ÂÂ 
+ÁÁ 
 Unauthorized
-ÂÂ #
+ÁÁ #
 (
-ÂÂ# $
+ÁÁ# $
 new
-ÂÂ$ '
+ÁÁ$ '
 {
-ÂÂ( )
+ÁÁ( )
 message
-ÂÂ* 1
+ÁÁ* 1
 =
-ÂÂ2 3
+ÁÁ2 3
 $str
-ÂÂ4 I
+ÁÁ4 I
 }
-ÂÂJ K
+ÁÁJ K
 )
-ÂÂK L
+ÁÁK L
 ;
-ÂÂL M
+ÁÁL M
 }
-ÃÃ 
-if
-ÅÅ 
-(
-ÅÅ 
-!
-ÅÅ 
-user
-ÅÅ 
-.
-ÅÅ 
-EmailConfirmed
-ÅÅ $
-)
-ÅÅ$ %
-{
-ÆÆ 
+ÂÂ 
 var
-ÈÈ 
-code
-ÈÈ 
+ÅÅ 
+lockoutCheck
+ÅÅ 
 =
-ÈÈ 
-new
-ÈÈ 
-Random
-ÈÈ %
-(
-ÈÈ% &
-)
-ÈÈ& '
-.
-ÈÈ' (
-Next
-ÈÈ( ,
-(
-ÈÈ, -
-$num
-ÈÈ- 3
-,
-ÈÈ3 4
-$num
-ÈÈ5 ;
-)
-ÈÈ; <
-.
-ÈÈ< =
-ToString
-ÈÈ= E
-(
-ÈÈE F
-)
-ÈÈF G
-;
-ÈÈG H
-_context
-ÉÉ 
-.
-ÉÉ 
-VerificationCodes
-ÉÉ *
-.
-ÉÉ* +
-Add
-ÉÉ+ .
-(
-ÉÉ. /
-new
-ÉÉ/ 2
-VerificationCode
-ÉÉ3 C
-{
-ÊÊ 
-Email
-ËË 
-=
-ËË 
-request
-ËË #
-.
-ËË# $
-Email
-ËË$ )
-,
-ËË) *
-Code
-ÌÌ 
-=
-ÌÌ 
-code
-ÌÌ 
-,
-ÌÌ  
-	ExpiresAt
-ÍÍ 
-=
-ÍÍ 
-DateTime
-ÍÍ  (
-.
-ÍÍ( )
-UtcNow
-ÍÍ) /
-.
-ÍÍ/ 0
-
-AddMinutes
-ÍÍ0 :
-(
-ÍÍ: ;
-$num
-ÍÍ; =
-)
-ÍÍ= >
-}
-ÎÎ 
-)
-ÎÎ 
-;
-ÎÎ 
+ÅÅ 
 await
-ÏÏ 
-_context
-ÏÏ 
+ÅÅ $"
+_loginAttemptService
+ÅÅ% 9
 .
-ÏÏ 
-SaveChangesAsync
-ÏÏ /
+ÅÅ9 :$
+CheckLoginAttemptAsync
+ÅÅ: P
 (
-ÏÏ/ 0
-)
-ÏÏ0 1
-;
-ÏÏ1 2
-await
-ĞĞ 
-_emailService
-ĞĞ #
-.
-ĞĞ# $'
-SendVerificationCodeAsync
-ĞĞ$ =
-(
-ĞĞ= >
-request
-ĞĞ> E
-.
-ĞĞE F
-Email
-ĞĞF K
-,
-ĞĞK L
-code
-ĞĞM Q
-)
-ĞĞQ R
-;
-ĞĞR S
-return
-ÒÒ 
-Ok
-ÒÒ 
-(
-ÒÒ 
-new
-ÒÒ 
-{
-ÒÒ '
-requiresEmailVerification
-ÓÓ -
-=
-ÓÓ. /
-true
-ÓÓ0 4
-,
-ÓÓ4 5
-email
-ÔÔ 
-=
-ÔÔ 
-request
-ÔÔ #
-.
-ÔÔ# $
-Email
-ÔÔ$ )
-,
-ÔÔ) *
-message
-ÕÕ 
-=
-ÕÕ 
-$str
-ÕÕ f
-}
-ÖÖ 
-)
-ÖÖ 
-;
-ÖÖ 
-}
-×× 
-if
-ÙÙ 
-(
-ÙÙ 
+ÅÅP Q
 user
-ÙÙ 
+ÅÅQ U
 .
-ÙÙ 
-Status
-ÙÙ 
-==
-ÙÙ 
-$str
-ÙÙ *
-)
-ÙÙ* +
-return
-ÚÚ 
-Unauthorized
-ÚÚ #
-(
-ÚÚ# $
-new
-ÚÚ$ '
-{
-ÚÚ( )
-message
-ÚÚ* 1
-=
-ÚÚ2 3
-$str
-ÚÚ4 n
-}
-ÚÚo p
-)
-ÚÚp q
-;
-ÚÚq r
-var
-ÜÜ 
-roles
-ÜÜ 
-=
-ÜÜ 
-await
-ÜÜ 
-_userManager
-ÜÜ *
-.
-ÜÜ* +
-GetRolesAsync
-ÜÜ+ 8
-(
-ÜÜ8 9
-user
-ÜÜ9 =
-)
-ÜÜ= >
-;
-ÜÜ> ?
-var
-İİ 
-role
-İİ 
-=
-İİ 
-roles
-İİ 
-.
-İİ 
-FirstOrDefault
-İİ +
-(
-İİ+ ,
-)
-İİ, -
-??
-İİ. 0
-user
-İİ1 5
-.
-İİ5 6
-Role
-İİ6 :
-;
-İİ: ;
-if
-ßß 
-(
-ßß 
-(
-ßß 
-role
-ßß 
-==
-ßß 
-$str
-ßß  
-||
-ßß! #
-role
-ßß$ (
-==
-ßß) +
-$str
-ßß, 3
-||
-ßß4 6
-role
-ßß7 ;
-==
-ßß< >
-$str
-ßß? K
-)
-ßßK L
-&&
-ßßM O
-user
-ßßP T
-.
-ßßT U
-Status
-ßßU [
-==
-ßß\ ^
-$str
-ßß_ i
-)
-ßßi j
-return
-àà 
-Unauthorized
-àà #
-(
-àà# $
-new
-àà$ '
-{
-àà( )
-message
-àà* 1
-=
-àà2 3
-$str
-àà4 m
-}
-ààn o
-)
-àào p
-;
-ààp q
-var
-ââ 
-dbUser
-ââ 
-=
-ââ 
-await
-ââ 
-_context
-ââ '
-.
-ââ' (
-Users
-ââ( -
-.
-ââ- .
-AsNoTracking
-ââ. :
-(
-ââ: ;
-)
-ââ; <
-.
-ââ< =!
-FirstOrDefaultAsync
-ââ= P
-(
-ââP Q
-u
-ââQ R
-=>
-ââS U
-u
-ââV W
-.
-ââW X
+ÅÅU V
 Id
-ââX Z
-==
-ââ[ ]
-user
-ââ^ b
-.
-ââb c
-Id
-ââc e
+ÅÅV X
 )
-ââe f
+ÅÅX Y
 ;
-ââf g
+ÅÅY Z
 if
-ää 
+ÆÆ 
 (
-ää 
-dbUser
-ää 
-?
-ää 
+ÆÆ 
+lockoutCheck
+ÆÆ 
 .
-ää 
-TwoFactorEnabled
-ää (
-==
-ää) +
-true
-ää, 0
+ÆÆ 
+isLocked
+ÆÆ %
 )
-ää0 1
-{
-åå 
-var
-ææ 
-code
-ææ 
-=
-ææ 
+ÆÆ% &
+return
+ÇÇ 
+Unauthorized
+ÇÇ #
+(
+ÇÇ# $
 new
-ææ 
-Random
-ææ %
-(
-ææ% &
-)
-ææ& '
-.
-ææ' (
-Next
-ææ( ,
-(
-ææ, -
-$num
-ææ- 3
-,
-ææ3 4
-$num
-ææ5 ;
-)
-ææ; <
-.
-ææ< =
-ToString
-ææ= E
-(
-ææE F
-)
-ææF G
-;
-ææG H
-_context
-çç 
-.
-çç 
-VerificationCodes
-çç *
-.
-çç* +
-Add
-çç+ .
-(
-çç. /
-new
-çç/ 2
-VerificationCode
-çç3 C
+ÇÇ$ '
 {
-èè 
-Email
-éé 
+ÇÇ( )
+message
+ÇÇ* 1
 =
-éé 
-user
-éé  
-.
-éé  !
-Email
-éé! &
-!
-éé& '
-,
-éé' (
-Code
-êê 
-=
-êê 
-code
-êê 
-,
-êê  
-	ExpiresAt
-ëë 
-=
-ëë 
-DateTime
-ëë  (
-.
-ëë( )
-UtcNow
-ëë) /
-.
-ëë/ 0
-
-AddMinutes
-ëë0 :
-(
-ëë: ;
-$num
-ëë; =
-)
-ëë= >
-}
-ìì 
-)
-ìì 
-;
-ìì 
-await
-íí 
-_context
-íí 
-.
-íí 
-SaveChangesAsync
-íí /
-(
-íí/ 0
-)
-íí0 1
-;
-íí1 2
-await
-îî 
-_emailService
-îî #
-.
-îî# $
-SendEmailAsync
-îî$ 2
-(
-îî2 3
-user
-îî3 7
-.
-îî7 8
-Email
-îî8 =
-!
-îî= >
-,
-îî> ?
-$str
-îî@ e
-,
-îîe f
+ÇÇ2 3
 $"
-îîg i
-$strîîi Š
-{îîŠ ‹
-codeîî‹ 
-}îî 
-"îî ‘
-)îî‘ ’
-;îî’ “
-return
-ğğ 
-Ok
-ğğ 
-(
-ğğ 
-new
-ğğ 
-{
-ğğ 
-requiresTwoFactor
-ğğ  1
-=
-ğğ2 3
-true
-ğğ4 8
-,
-ğğ8 9
-email
-ğğ: ?
-=
-ğğ@ A
-user
-ğğB F
-.
-ğğF G
-Email
-ğğG L
-,
-ğğL M
-message
-ğğN U
-=
-ğğV W
+ÇÇ4 6
 $str
-ğğX ~
-}ğğ €
-)ğğ€ 
-;ğğ ‚
+ÇÇ6 y
+{
+ÇÇy z
+lockoutCheckÇÇz †
+.ÇÇ† ‡
+messageÇÇ‡ 
+}ÇÇ 
+"ÇÇ 
+}ÇÇ‘ ’
+)ÇÇ’ “
+;ÇÇ“ ”
+if
+ÉÉ 
+(
+ÉÉ 
+!
+ÉÉ 
+await
+ÉÉ 
+_userManager
+ÉÉ #
+.
+ÉÉ# $ 
+CheckPasswordAsync
+ÉÉ$ 6
+(
+ÉÉ6 7
+user
+ÉÉ7 ;
+,
+ÉÉ; <
+request
+ÉÉ= D
+.
+ÉÉD E
+Password
+ÉÉE M
+)
+ÉÉM N
+)
+ÉÉN O
+{
+ÊÊ 
+await
+ÌÌ "
+_loginAttemptService
+ÌÌ *
+.
+ÌÌ* +&
+RecordFailedAttemptAsync
+ÌÌ+ C
+(
+ÌÌC D
+user
+ÌÌD H
+.
+ÌÌH I
+Id
+ÌÌI K
+)
+ÌÌK L
+;
+ÌÌL M(
+_ipDeviceReputationService
+ÍÍ *
+.
+ÍÍ* +
+RegisterFailure
+ÍÍ+ :
+(
+ÍÍ: ;
+	ipAddress
+ÍÍ; D
+,
+ÍÍD E
+userAgentValue
+ÍÍF T
+)
+ÍÍT U
+;
+ÍÍU V
+return
+ÎÎ 
+Unauthorized
+ÎÎ #
+(
+ÎÎ# $
+new
+ÎÎ$ '
+{
+ÎÎ( )
+message
+ÎÎ* 1
+=
+ÎÎ2 3
+$str
+ÎÎ4 I
 }
+ÎÎJ K
+)
+ÎÎK L
+;
+ÎÎL M
+}
+ÏÏ 
+if
+ÑÑ 
+(
+ÑÑ 
+!
+ÑÑ 
+user
+ÑÑ 
+.
+ÑÑ 
+EmailConfirmed
+ÑÑ $
+)
+ÑÑ$ %
+{
+ÒÒ 
+var
+ÔÔ 
+code
+ÔÔ 
+=
+ÔÔ 
+new
+ÔÔ 
+Random
+ÔÔ %
+(
+ÔÔ% &
+)
+ÔÔ& '
+.
+ÔÔ' (
+Next
+ÔÔ( ,
+(
+ÔÔ, -
+$num
+ÔÔ- 3
+,
+ÔÔ3 4
+$num
+ÔÔ5 ;
+)
+ÔÔ; <
+.
+ÔÔ< =
+ToString
+ÔÔ= E
+(
+ÔÔE F
+)
+ÔÔF G
+;
+ÔÔG H
+_context
+ÕÕ 
+.
+ÕÕ 
+VerificationCodes
+ÕÕ *
+.
+ÕÕ* +
+Add
+ÕÕ+ .
+(
+ÕÕ. /
+new
+ÕÕ/ 2
+VerificationCode
+ÕÕ3 C
+{
+ÖÖ 
+Email
+×× 
+=
+×× 
+request
+×× #
+.
+××# $
+Email
+××$ )
+,
+××) *
+Code
+ØØ 
+=
+ØØ 
+code
+ØØ 
+,
+ØØ  
+	ExpiresAt
+ÙÙ 
+=
+ÙÙ 
+DateTime
+ÙÙ  (
+.
+ÙÙ( )
+UtcNow
+ÙÙ) /
+.
+ÙÙ/ 0
+
+AddMinutes
+ÙÙ0 :
+(
+ÙÙ: ;
+$num
+ÙÙ; =
+)
+ÙÙ= >
+}
+ÚÚ 
+)
+ÚÚ 
+;
+ÚÚ 
+await
+ÛÛ 
+_context
+ÛÛ 
+.
+ÛÛ 
+SaveChangesAsync
+ÛÛ /
+(
+ÛÛ/ 0
+)
+ÛÛ0 1
+;
+ÛÛ1 2
+await
+ÜÜ 
+_emailService
+ÜÜ #
+.
+ÜÜ# $'
+SendVerificationCodeAsync
+ÜÜ$ =
+(
+ÜÜ= >
+request
+ÜÜ> E
+.
+ÜÜE F
+Email
+ÜÜF K
+,
+ÜÜK L
+code
+ÜÜM Q
+)
+ÜÜQ R
+;
+ÜÜR S
+return
+ŞŞ 
+Ok
+ŞŞ 
+(
+ŞŞ 
+new
+ŞŞ 
+{
+ŞŞ '
+requiresEmailVerification
+ßß -
+=
+ßß. /
+true
+ßß0 4
+,
+ßß4 5
+email
+àà 
+=
+àà 
+request
+àà #
+.
+àà# $
+Email
+àà$ )
+,
+àà) *
+message
+áá 
+=
+áá 
+$str
+áá f
+}
+ââ 
+)
+ââ 
+;
+ââ 
+}
+ãã 
+if
+åå 
+(
+åå 
+user
+åå 
+.
+åå 
+Status
+åå 
+==
+åå 
+StatusSuspended
+åå .
+)
+åå. /
+return
+ææ 
+Unauthorized
+ææ #
+(
+ææ# $
+new
+ææ$ '
+{
+ææ( )
+message
+ææ* 1
+=
+ææ2 3
+$str
+ææ4 n
+}
+ææo p
+)
+ææp q
+;
+ææq r
+var
+èè 
+roles
+èè 
+=
+èè 
+await
+èè 
+_userManager
+èè *
+.
+èè* +
+GetRolesAsync
+èè+ 8
+(
+èè8 9
+user
+èè9 =
+)
+èè= >
+;
+èè> ?
+var
+éé 
+role
+éé 
+=
+éé 
+roles
+éé 
+.
+éé 
+FirstOrDefault
+éé +
+(
+éé+ ,
+)
+éé, -
+??
+éé. 0
+user
+éé1 5
+.
+éé5 6
+Role
+éé6 :
+;
+éé: ;
+if
+ëë 
+(
+ëë 
+(
+ëë 
+role
+ëë 
+==
+ëë 
+	RoleStaff
+ëë "
+||
+ëë# %
+role
+ëë& *
+==
+ëë+ -
+	RoleAdmin
+ëë. 7
+||
+ëë8 :
+role
+ëë; ?
+==
+ëë@ B
+RoleSuperAdmin
+ëëC Q
+)
+ëëQ R
+&&
+ëëS U
+user
+ëëV Z
+.
+ëëZ [
+Status
+ëë[ a
+==
+ëëb d
+StatusInactive
+ëëe s
+)
+ëës t
+return
+ìì 
+Unauthorized
+ìì #
+(
+ìì# $
+new
+ìì$ '
+{
+ìì( )
+message
+ìì* 1
+=
+ìì2 3
+$str
+ìì4 m
+}
+ììn o
+)
+ììo p
+;
+ììp q
+var
+îî 
+dbUser
+îî 
+=
+îî 
+await
+îî 
+_context
+îî '
+.
+îî' (
+Users
+îî( -
+.
+îî- .
+AsNoTracking
+îî. :
+(
+îî: ;
+)
+îî; <
+.
+îî< =!
+FirstOrDefaultAsync
+îî= P
+(
+îîP Q
+u
+îîQ R
+=>
+îîS U
+u
+îîV W
+.
+îîW X
+Id
+îîX Z
+==
+îî[ ]
+user
+îî^ b
+.
+îîb c
+Id
+îîc e
+)
+îîe f
+;
+îîf g
+if
+ğğ 
+(
+ğğ 
+dbUser
+ğğ 
+?
+ğğ 
+.
+ğğ 
+TwoFactorEnabled
+ğğ (
+==
+ğğ) +
+true
+ğğ, 0
+)
+ğğ0 1
+{
 ññ 
 var
-óó 
-device
-óó 
+òò 
+code
+òò 
 =
-óó $
-GetDeviceFromUserAgent
-óó /
-(
-óó/ 0
-	userAgent
-óó0 9
-)
-óó9 :
-;
-óó: ;
-var
-ôô 
-location
-ôô 
-=
-ôô 
-$str
-ôô (
-;
-ôô( )
-_context
-öö 
-.
-öö 
-LoginHistory
-öö !
-.
-öö! "
-Add
-öö" %
-(
-öö% &
+òò 
 new
-öö& )
-LoginHistory
-öö* 6
+òò 
+Random
+òò %
+(
+òò% &
+)
+òò& '
+.
+òò' (
+Next
+òò( ,
+(
+òò, -
+$num
+òò- 3
+,
+òò3 4
+$num
+òò5 ;
+)
+òò; <
+.
+òò< =
+ToString
+òò= E
+(
+òòE F
+)
+òòF G
+;
+òòG H
+_context
+óó 
+.
+óó 
+VerificationCodes
+óó *
+.
+óó* +
+Add
+óó+ .
+(
+óó. /
+new
+óó/ 2
+VerificationCode
+óó3 C
 {
-÷÷ 
-UserID
-øø 
+ôô 
+Email
+õõ 
 =
-øø 
+õõ 
 user
-øø 
+õõ  
 .
-øø 
-Id
-øø  
-,
-øø  !
-Device
-ùù 
-=
-ùù 
-device
-ùù 
-,
-ùù  
-Location
-úú 
-=
-úú 
-location
-úú #
-,
-úú# $
-	IPAddress
-ûû 
-=
-ûû 
-	ipAddress
-ûû %
-,
-ûû% &
-	LoginTime
-üü 
-=
-üü 
-DateTime
-üü $
-.
-üü$ %
-UtcNow
-üü% +
-}
-ıı 
-)
-ıı 
-;
-ıı 
-await
-şş 
-_context
-şş 
-.
-şş 
-SaveChangesAsync
-şş +
-(
-şş+ ,
-)
-şş, -
-;
-şş- .
-var
-€€ 
-isNewDevice
-€€ 
-=
-€€ 
+õõ  !
+Email
+õõ! &
 !
-€€ 
-await
-€€ $
-_context
-€€% -
-.
-€€- .
-LoginHistory
-€€. :
-.
- 
-AnyAsync
- 
-(
- 
-lh
- 
-=>
- 
-lh
-  "
-.
-" #
-UserID
-# )
-==
-* ,
-user
-- 1
-.
-1 2
-Id
-2 4
-&&
-5 7
-lh
-8 :
-.
-: ;
-Device
-; A
-==
-B D
-device
-E K
-&&
-L N
-lh
-O Q
-.
-Q R
-	LoginTime
-R [
-<
-\ ]
+õõ& '
+,
+õõ' (
+Code
+öö 
+=
+öö 
+code
+öö 
+,
+öö  
+	ExpiresAt
+÷÷ 
+=
+÷÷ 
 DateTime
-^ f
+÷÷  (
 .
-f g
+÷÷( )
 UtcNow
-g m
+÷÷) /
 .
-m n
+÷÷/ 0
 
 AddMinutes
-n x
+÷÷0 :
 (
-x y
--
-y z
+÷÷: ;
 $num
-z {
+÷÷; =
 )
-{ |
+÷÷= >
+}
+øø 
 )
-| }
+øø 
 ;
-} ~
-if
-ƒƒ 
-(
-ƒƒ 
-isNewDevice
-ƒƒ 
-)
-ƒƒ 
-{
-„„ 
-var
-…… 
-	loginPref
-…… 
-=
-…… 
+øø 
 await
-……  %
+ùù 
 _context
-……& .
+ùù 
 .
-……. /%
-NotificationPreferences
-……/ F
-.
-†† !
-FirstOrDefaultAsync
-†† (
+ùù 
+SaveChangesAsync
+ùù /
 (
-††( )
-np
-††) +
-=>
-††, .
-np
-††/ 1
-.
-††1 2
-UserID
-††2 8
-==
-††9 ;
-user
-††< @
-.
-††@ A
-Id
-††A C
-&&
-††D F
-np
-††G I
-.
-††I J
-NotificationType
-††J Z
-==
-††[ ]
-$str
-††^ i
+ùù/ 0
 )
-††i j
+ùù0 1
 ;
-††j k
-if
-‡‡ 
-(
-‡‡ 
-	loginPref
-‡‡ 
-?
-‡‡ 
-.
-‡‡ 
-EmailEnabled
-‡‡ +
-!=
-‡‡, .
-false
-‡‡/ 4
-)
-‡‡4 5
-{
-ˆˆ 
+ùù1 2
 await
-‰‰ 
+úú 
 _emailService
-‰‰ '
+úú #
 .
-‰‰' (
+úú# $
 SendEmailAsync
-‰‰( 6
+úú$ 2
 (
-‰‰6 7
+úú2 3
 user
-ŠŠ 
+úú3 7
 .
-ŠŠ 
+úú7 8
 Email
-ŠŠ "
+úú8 =
 !
-ŠŠ" #
+úú= >
 ,
-ŠŠ# $
+úú> ?
 $str
-‹‹ ;
+úú@ e
 ,
-‹‹; <
+úúe f
 $"
-ŒŒ 
-$str
-ŒŒ  
-{
-ŒŒ  !
-user
-ŒŒ! %
-.
-ŒŒ% &
-	FirstName
-ŒŒ& /
-}
-ŒŒ/ 0
-$strŒŒ0 ƒ
-{ŒŒƒ „
-deviceŒŒ„ Š
-}ŒŒŠ ‹
-$strŒŒ‹ ª
-{ŒŒª «
-locationŒŒ« ³
-}ŒŒ³ ´
-$strŒŒ´ Ï
-{ŒŒÏ Ğ
-DateTimeŒŒĞ Ø
-.ŒŒØ Ù
-UtcNowŒŒÙ ß
-:ŒŒß à
-$strŒŒà ó
-}ŒŒó ô
-$strŒŒô »
-"ŒŒ» ¼
-)
- 
-;
- 
-}
- 
-}
- 
-await
-’’ "
-_loginAttemptService
-’’ &
-.
-’’& ' 
-ResetAttemptsAsync
-’’' 9
-(
-’’9 :
-user
-’’: >
-.
-’’> ?
-Id
-’’? A
-)
-’’A B
-;
-’’B C(
-_ipDeviceReputationService
-““ &
-.
-““& '
-RegisterSuccess
-““' 6
-(
-““6 7
-	ipAddress
-““7 @
-,
-““@ A
-	userAgent
-““B K
-)
-““K L
-;
-““L M
-var
-•• 
-token
-•• 
-=
-•• 
-await
-•• 
-_tokenService
-•• +
-.
-••+ , 
-GenerateTokenAsync
-••, >
-(
-••> ?
-user
-••? C
-.
-••C D
-Email
-••D I
-!
-••I J
-,
-••J K
-user
-••L P
-.
-••P Q
-Id
-••Q S
-,
-••S T
-role
-••U Y
-)
-••Y Z
-;
-••Z [
-var
-—— 
-settings
-—— 
-=
-—— 
-await
-——  
-_context
-——! )
-.
-——) *
-SystemSettings
-——* 8
-.
-——8 9!
-FirstOrDefaultAsync
-——9 L
-(
-——L M
-)
-——M N
-;
-——N O
-var
-˜˜ #
-sessionTimeoutMinutes
-˜˜ %
-=
-˜˜& '
-settings
-˜˜( 0
-?
-˜˜0 1
-.
-˜˜1 2
-SessionTimeout
-˜˜2 @
-??
-˜˜A C
-$num
-˜˜D F
-;
-˜˜F G
-await
-šš 
-LogActivityAsync
-šš "
-(
-šš" #
-user
-šš# '
-.
-šš' (
-Id
-šš( *
-,
-šš* +
-$str
-šš, 7
-,
-šš7 8
-$str
-šš9 @
-)
-šš@ A
-;
-ššA B
+úúg i
+$strúúi Š
+{úúŠ ‹
+codeúú‹ 
+}úú 
+"úú ‘
+)úú‘ ’
+;úú’ “
 return
-œœ 
+üü 
 Ok
-œœ 
+üü 
 (
-œœ 
+üü 
 new
-œœ 
-AuthResponse
-œœ &
+üü 
 {
- 
-Token
- 
+üü 
+requiresTwoFactor
+üü  1
 =
- 
-token
- 
+üü2 3
+true
+üü4 8
 ,
- 
-Email
-ŸŸ 
+üü8 9
+email
+üü: ?
 =
-ŸŸ 
+üü@ A
 user
-ŸŸ 
+üüB F
 .
-ŸŸ 
+üüF G
 Email
-ŸŸ "
-!
-ŸŸ" #
+üüG L
 ,
-ŸŸ# $
-Role
-   
+üüL M
+message
+üüN U
 =
-   
-role
-   
+üüV W
+$str
+üüX ~
+}üü €
+)üü€ 
+;üü ‚
+}
+ıı 
+var
+ÿÿ 
+device
+ÿÿ 
+=
+ÿÿ $
+GetDeviceFromUserAgent
+ÿÿ /
+(
+ÿÿ/ 0
+userAgentValue
+ÿÿ0 >
+)
+ÿÿ> ?
+;
+ÿÿ? @
+var
+€€ 
+location
+€€ 
+=
+€€ 
+$str
+€€ (
+;
+€€( )
+_context
+‚‚ 
+.
+‚‚ 
+LoginHistory
+‚‚ !
+.
+‚‚! "
+Add
+‚‚" %
+(
+‚‚% &
+new
+‚‚& )
+LoginHistory
+‚‚* 6
+{
+ƒƒ 
+UserID
+„„ 
+=
+„„ 
+user
+„„ 
+.
+„„ 
+Id
+„„  
 ,
-   
+„„  !
+Device
+…… 
+=
+…… 
+device
+…… 
+,
+……  
+Location
+†† 
+=
+†† 
+location
+†† #
+,
+††# $
+	IPAddress
+‡‡ 
+=
+‡‡ 
+	ipAddress
+‡‡ %
+,
+‡‡% &
+	LoginTime
+ˆˆ 
+=
+ˆˆ 
+DateTime
+ˆˆ $
+.
+ˆˆ$ %
+UtcNow
+ˆˆ% +
+}
+‰‰ 
+)
+‰‰ 
+;
+‰‰ 
+await
+ŠŠ 
+_context
+ŠŠ 
+.
+ŠŠ 
+SaveChangesAsync
+ŠŠ +
+(
+ŠŠ+ ,
+)
+ŠŠ, -
+;
+ŠŠ- .
+var
+ŒŒ 
+isNewDevice
+ŒŒ 
+=
+ŒŒ 
+!
+ŒŒ 
+await
+ŒŒ $
+_context
+ŒŒ% -
+.
+ŒŒ- .
+LoginHistory
+ŒŒ. :
+.
+ 
+AnyAsync
+ 
+(
+ 
+lh
+ 
+=>
+ 
+lh
+  "
+.
+" #
+UserID
+# )
+==
+* ,
+user
+- 1
+.
+1 2
+Id
+2 4
+&&
+5 7
+lh
+8 :
+.
+: ;
+Device
+; A
+==
+B D
+device
+E K
+&&
+L N
+lh
+O Q
+.
+Q R
+	LoginTime
+R [
+<
+\ ]
+DateTime
+^ f
+.
+f g
+UtcNow
+g m
+.
+m n
+
+AddMinutes
+n x
+(
+x y
+-
+y z
+$num
+z {
+)
+{ |
+)
+| }
+;
+} ~
+if
+ 
+(
+ 
+isNewDevice
+ 
+)
+ 
+{
+ 
+var
+‘‘ 
+	loginPref
+‘‘ 
+=
+‘‘ 
+await
+‘‘  %
+_context
+‘‘& .
+.
+‘‘. /%
+NotificationPreferences
+‘‘/ F
+.
+’’ !
+FirstOrDefaultAsync
+’’ (
+(
+’’( )
+np
+’’) +
+=>
+’’, .
+np
+’’/ 1
+.
+’’1 2
+UserID
+’’2 8
+==
+’’9 ;
+user
+’’< @
+.
+’’@ A
+Id
+’’A C
+&&
+’’D F
+np
+’’G I
+.
+’’I J
+NotificationType
+’’J Z
+==
+’’[ ]
+$str
+’’^ i
+)
+’’i j
+;
+’’j k
+if
+““ 
+(
+““ 
+	loginPref
+““ 
+?
+““ 
+.
+““ 
+EmailEnabled
+““ +
+!=
+““, .
+false
+““/ 4
+)
+““4 5
+{
+”” 
+await
+•• 
+_emailService
+•• '
+.
+••' (
+SendEmailAsync
+••( 6
+(
+••6 7
+user
+–– 
+.
+–– 
+Email
+–– "
+!
+––" #
+,
+––# $
+$str
+—— ;
+,
+——; <
+$"
+˜˜ 
+$str
+˜˜  
+{
+˜˜  !
+user
+˜˜! %
+.
+˜˜% &
+	FirstName
+˜˜& /
+}
+˜˜/ 0
+$str˜˜0 ƒ
+{˜˜ƒ „
+device˜˜„ Š
+}˜˜Š ‹
+$str˜˜‹ ª
+{˜˜ª «
+location˜˜« ³
+}˜˜³ ´
+$str˜˜´ Ï
+{˜˜Ï Ğ
+DateTime˜˜Ğ Ø
+.˜˜Ø Ù
+UtcNow˜˜Ù ß
+:˜˜ß à
+$str˜˜à ó
+}˜˜ó ô
+$str˜˜ô »
+"˜˜» ¼
+)
+™™ 
+;
+™™ 
+}
+šš 
+}
+›› 
+await
+ "
+_loginAttemptService
+ &
+.
+& ' 
+ResetAttemptsAsync
+' 9
+(
+9 :
+user
+: >
+.
+> ?
+Id
+? A
+)
+A B
+;
+B C(
+_ipDeviceReputationService
+ŸŸ &
+.
+ŸŸ& '
+RegisterSuccess
+ŸŸ' 6
+(
+ŸŸ6 7
+	ipAddress
+ŸŸ7 @
+,
+ŸŸ@ A
+userAgentValue
+ŸŸB P
+)
+ŸŸP Q
+;
+ŸŸQ R
+var
+¡¡ 
+token
+¡¡ 
+=
+¡¡ 
+await
+¡¡ 
+_tokenService
+¡¡ +
+.
+¡¡+ , 
+GenerateTokenAsync
+¡¡, >
+(
+¡¡> ?
+user
+¡¡? C
+.
+¡¡C D
+Email
+¡¡D I
+!
+¡¡I J
+,
+¡¡J K
+user
+¡¡L P
+.
+¡¡P Q
+Id
+¡¡Q S
+,
+¡¡S T
+role
+¡¡U Y
+)
+¡¡Y Z
+;
+¡¡Z [
+var
+££ 
+settings
+££ 
+=
+££ 
+await
+££  
+_context
+££! )
+.
+££) *
+SystemSettings
+££* 8
+.
+££8 9!
+FirstOrDefaultAsync
+££9 L
+(
+££L M
+)
+££M N
+;
+££N O
+var
+¤¤ #
+sessionTimeoutMinutes
+¤¤ %
+=
+¤¤& '
+settings
+¤¤( 0
+?
+¤¤0 1
+.
+¤¤1 2
+SessionTimeout
+¤¤2 @
+??
+¤¤A C
+$num
+¤¤D F
+;
+¤¤F G
+await
+¦¦ 
+LogActivityAsync
+¦¦ "
+(
+¦¦" #
+user
+¦¦# '
+.
+¦¦' (
+Id
+¦¦( *
+,
+¦¦* +
+$str
+¦¦, 7
+,
+¦¦7 8
+$str
+¦¦9 @
+)
+¦¦@ A
+;
+¦¦A B
+return
+¨¨ 
+Ok
+¨¨ 
+(
+¨¨ 
+new
+¨¨ 
+AuthResponse
+¨¨ &
+{
+©© 
+Token
+ªª 
+=
+ªª 
+token
+ªª 
+,
+ªª 
+Email
+«« 
+=
+«« 
+user
+«« 
+.
+«« 
+Email
+«« "
+!
+««" #
+,
+««# $
+Role
+¬¬ 
+=
+¬¬ 
+role
+¬¬ 
+,
+¬¬ 
 
 Expiration
-¡¡ 
+­­ 
 =
-¡¡ 
+­­ 
 DateTime
-¡¡ %
+­­ %
 .
-¡¡% &
+­­% &
 UtcNow
-¡¡& ,
+­­& ,
 .
-¡¡, -
+­­, -
 
 AddMinutes
-¡¡- 7
+­­- 7
 (
-¡¡7 8#
+­­7 8#
 sessionTimeoutMinutes
-¡¡8 M
+­­8 M
 )
-¡¡M N
+­­M N
 }
-¢¢ 
+®® 
 )
-¢¢ 
+®® 
 ;
-¢¢ 
+®® 
 }
-££ 	
+¯¯ 	
 private
-¥¥ 
+±± 
 async
-¥¥ 
+±± 
 Task
-¥¥ 
+±± 
 <
-¥¥ 
+±± 
 bool
-¥¥ 
+±± 
 >
-¥¥  "
+±±  "
 VerifyReCaptchaAsync
-¥¥! 5
+±±! 5
 (
-¥¥5 6
+±±5 6
 string
-¥¥6 <
+±±6 <
 ?
-¥¥< =
+±±< =
 captchaToken
-¥¥> J
+±±> J
 )
-¥¥J K
+±±J K
 {
-¦¦ 	
+²² 	
 if
-§§ 
+³³ 
 (
-§§ 
+³³ 
 string
-§§ 
+³³ 
 .
-§§  
+³³  
 IsNullOrWhiteSpace
-§§ )
+³³ )
 (
-§§) *
+³³) *
 captchaToken
-§§* 6
+³³* 6
 )
-§§6 7
+³³6 7
 )
-§§7 8
+³³7 8
 return
-¨¨ 
+´´ 
 false
-¨¨ 
+´´ 
 ;
-¨¨ 
+´´ 
 var
-ªª 
+¶¶ 
 	secretKey
-ªª 
+¶¶ 
 =
-ªª 
+¶¶ 
 _configuration
-ªª *
+¶¶ *
 [
-ªª* +
+¶¶* +
 $str
-ªª+ @
+¶¶+ @
 ]
-ªª@ A
+¶¶@ A
 ;
-ªªA B
+¶¶A B
 var
-«« 
+·· 
 	verifyUrl
-«« 
+·· 
 =
-«« 
+·· 
 _configuration
-«« *
+·· *
 [
-««* +
+··* +
 $str
-««+ @
+··+ @
 ]
-««@ A
+··@ A
 ??
-««B D
+··B D
 $str
-««E v
+··E v
 ;
-««v w
-if
-­­ 
-(
-­­ 
-string
-­­ 
-.
-­­  
-IsNullOrWhiteSpace
-­­ )
-(
-­­) *
-	secretKey
-­­* 3
-)
-­­3 4
-)
-­­4 5
-return
-®® 
-false
-®® 
-;
-®® 
-var
-°° 
-
-httpClient
-°° 
-=
-°°  
-_httpClientFactory
-°° /
-.
-°°/ 0
-CreateClient
-°°0 <
-(
-°°< =
-)
-°°= >
-;
-°°> ?
-var
-±± 
-content
-±± 
-=
-±± 
-new
-±± #
-FormUrlEncodedContent
-±± 3
-(
-±±3 4
-new
-±±4 7
-
-Dictionary
-±±8 B
-<
-±±B C
-string
-±±C I
-,
-±±I J
-string
-±±K Q
->
-±±Q R
-{
-²² 
-[
-³³ 
-$str
-³³ 
-]
-³³ 
-=
-³³ 
-	secretKey
-³³ &
-,
-³³& '
-[
-´´ 
-$str
-´´ 
-]
-´´ 
-=
-´´ 
-captchaToken
-´´ +
-,
-´´+ ,
-[
-µµ 
-$str
-µµ 
-]
-µµ 
-=
-µµ 
-HttpContext
-µµ *
-.
-µµ* +
-
-Connection
-µµ+ 5
-.
-µµ5 6
-RemoteIpAddress
-µµ6 E
-?
-µµE F
-.
-µµF G
-ToString
-µµG O
-(
-µµO P
-)
-µµP Q
-??
-µµR T
-string
-µµU [
-.
-µµ[ \
-Empty
-µµ\ a
-}
-¶¶ 
-)
-¶¶ 
-;
-¶¶ 
-var
-¸¸ 
-response
-¸¸ 
-=
-¸¸ 
-await
-¸¸  
-
-httpClient
-¸¸! +
-.
-¸¸+ ,
-	PostAsync
-¸¸, 5
-(
-¸¸5 6
-	verifyUrl
-¸¸6 ?
-,
-¸¸? @
-content
-¸¸A H
-)
-¸¸H I
-;
-¸¸I J
+··v w
 if
 ¹¹ 
 (
-¹¹ 
-!
-¹¹ 
-response
-¹¹ 
+¹¹ 
+string
+¹¹ 
 .
-¹¹ !
-IsSuccessStatusCode
-¹¹ -
+¹¹  
+IsNullOrWhiteSpace
+¹¹ )
+(
+¹¹) *
+	secretKey
+¹¹* 3
 )
-¹¹- .
+¹¹3 4
+)
+¹¹4 5
 return
 ºº 
 false
@@ -60008,4701 +60052,4799 @@ httpClient
 ;
 ºº 
 var
-¼¼ 
-responseJson
-¼¼ 
+¼¼ 
+
+httpClient
+¼¼ 
 =
-¼¼ 
-await
-¼¼ $
-response
-¼¼% -
+¼¼  
+_httpClientFactory
+¼¼ /
 .
-¼¼- .
-Content
-¼¼. 5
-.
-¼¼5 6
-ReadAsStringAsync
-¼¼6 G
+¼¼/ 0
+CreateClient
+¼¼0 <
 (
-¼¼G H
+¼¼< =
 )
-¼¼H I
+¼¼= >
 ;
-¼¼I J
+¼¼> ?
 var
-½½ 
-result
-½½ 
+½½ 
+content
+½½ 
 =
-½½ 
-JsonSerializer
-½½ '
-.
-½½' (
-Deserialize
-½½( 3
+½½ 
+new
+½½ #
+FormUrlEncodedContent
+½½ 3
+(
+½½3 4
+new
+½½4 7
+
+Dictionary
+½½8 B
 <
-½½3 4+
-ReCaptchaVerificationResponse
-½½4 Q
+½½B C
+string
+½½C I
+,
+½½I J
+string
+½½K Q
 >
 ½½Q R
-(
-½½R S
-responseJson
-½½S _
+{
+¾¾ 
+[
+¿¿ 
+$str
+¿¿ 
+]
+¿¿ 
+=
+¿¿ 
+	secretKey
+¿¿ &
 ,
-½½_ `
-new
-½½a d#
-JsonSerializerOptions
-½½e z
-{
-¾¾ )
-PropertyNameCaseInsensitive
-¿¿ +
-=
-¿¿, -
-true
-¿¿. 2
-}
-ÀÀ 
-)
-ÀÀ 
-;
-ÀÀ 
-return
-ÂÂ 
-result
-ÂÂ 
-?
-ÂÂ 
-.
-ÂÂ 
-Success
-ÂÂ "
-==
-ÂÂ# %
-true
-ÂÂ& *
-;
-ÂÂ* +
-}
-ÃÃ 	
-private
-ÅÅ 
-sealed
-ÅÅ 
-class
-ÅÅ +
-ReCaptchaVerificationResponse
-ÅÅ :
-{
-ÆÆ 	
-public
-ÇÇ 
-bool
-ÇÇ 
-Success
-ÇÇ 
-{
-ÇÇ  !
-get
-ÇÇ" %
-;
-ÇÇ% &
-set
-ÇÇ' *
-;
-ÇÇ* +
-}
-ÇÇ, -
+¿¿& '
 [
-ÉÉ 
-JsonPropertyName
-ÉÉ 
-(
-ÉÉ 
+ÀÀ 
 $str
-ÉÉ +
-)
-ÉÉ+ ,
+ÀÀ 
 ]
-ÉÉ, -
-public
-ÊÊ 
-string
-ÊÊ 
-[
-ÊÊ 
-]
-ÊÊ 
-?
-ÊÊ 
-
-ErrorCodes
-ÊÊ '
-{
-ÊÊ( )
-get
-ÊÊ* -
-;
-ÊÊ- .
-set
-ÊÊ/ 2
-;
-ÊÊ2 3
-}
-ÊÊ4 5
-}
-ËË 	
-[
-ÍÍ 	
-HttpPost
-ÍÍ	 
-(
-ÍÍ 
-$str
-ÍÍ $
-)
-ÍÍ$ %
-]
-ÍÍ% &
-public
-ÎÎ 
-async
-ÎÎ 
-Task
-ÎÎ 
-<
-ÎÎ 
-IActionResult
-ÎÎ '
->
-ÎÎ' (
-Verify2FALogin
-ÎÎ) 7
-(
-ÎÎ7 8
-[
-ÎÎ8 9
-FromBody
-ÎÎ9 A
-]
-ÎÎA B#
-Verify2FALoginRequest
-ÎÎC X
-request
-ÎÎY `
-)
-ÎÎ` a
-{
-ÏÏ 	
-var
-ĞĞ 
-	userAgent
-ĞĞ 
+ÀÀ 
 =
-ĞĞ 
-Request
-ĞĞ #
-.
-ĞĞ# $
-Headers
-ĞĞ$ +
+ÀÀ 
+captchaToken
+ÀÀ +
+,
+ÀÀ+ ,
 [
-ĞĞ+ ,
+ÁÁ 
 $str
-ĞĞ, 8
+ÁÁ 
 ]
-ĞĞ8 9
-.
-ĞĞ9 :
-ToString
-ĞĞ: B
-(
-ĞĞB C
-)
-ĞĞC D
-;
-ĞĞD E
-var
-ÑÑ 
-	ipAddress
-ÑÑ 
+ÁÁ 
 =
-ÑÑ 
+ÁÁ 
 HttpContext
-ÑÑ '
+ÁÁ *
 .
-ÑÑ' (
+ÁÁ* +
 
 Connection
-ÑÑ( 2
+ÁÁ+ 5
 .
-ÑÑ2 3
+ÁÁ5 6
 RemoteIpAddress
-ÑÑ3 B
+ÁÁ6 E
 ?
-ÑÑB C
+ÁÁE F
 .
-ÑÑC D
+ÁÁF G
 ToString
-ÑÑD L
+ÁÁG O
 (
-ÑÑL M
+ÁÁO P
 )
-ÑÑM N
-;
-ÑÑN O
-if
-ÒÒ 
-(
-ÒÒ (
-_ipDeviceReputationService
-ÒÒ *
+ÁÁP Q
+??
+ÁÁR T
+string
+ÁÁU [
 .
-ÒÒ* +
-	IsBlocked
-ÒÒ+ 4
-(
-ÒÒ4 5
-	ipAddress
-ÒÒ5 >
-,
-ÒÒ> ?
-	userAgent
-ÒÒ@ I
-,
-ÒÒI J
-out
-ÒÒK N
+ÁÁ[ \
+Empty
+ÁÁ\ a
+}
+ÂÂ 
+)
+ÂÂ 
+;
+ÂÂ 
 var
-ÒÒO R
-blockReason
-ÒÒS ^
+ÄÄ 
+response
+ÄÄ 
+=
+ÄÄ 
+await
+ÄÄ  
+
+httpClient
+ÄÄ! +
+.
+ÄÄ+ ,
+	PostAsync
+ÄÄ, 5
+(
+ÄÄ5 6
+	verifyUrl
+ÄÄ6 ?
+,
+ÄÄ? @
+content
+ÄÄA H
 )
-ÒÒ^ _
+ÄÄH I
+;
+ÄÄI J
+if
+ÅÅ 
+(
+ÅÅ 
+!
+ÅÅ 
+response
+ÅÅ 
+.
+ÅÅ !
+IsSuccessStatusCode
+ÅÅ -
 )
-ÒÒ_ `
+ÅÅ- .
 return
-ÓÓ 
+ÆÆ 
+false
+ÆÆ 
+;
+ÆÆ 
+var
+ÈÈ 
+responseJson
+ÈÈ 
+=
+ÈÈ 
+await
+ÈÈ $
+response
+ÈÈ% -
+.
+ÈÈ- .
+Content
+ÈÈ. 5
+.
+ÈÈ5 6
+ReadAsStringAsync
+ÈÈ6 G
+(
+ÈÈG H
+)
+ÈÈH I
+;
+ÈÈI J
+var
+ÉÉ 
+result
+ÉÉ 
+=
+ÉÉ 
+JsonSerializer
+ÉÉ '
+.
+ÉÉ' (
+Deserialize
+ÉÉ( 3
+<
+ÉÉ3 4+
+ReCaptchaVerificationResponse
+ÉÉ4 Q
+>
+ÉÉQ R
+(
+ÉÉR S
+responseJson
+ÉÉS _
+,
+ÉÉ_ `
+new
+ÉÉa d#
+JsonSerializerOptions
+ÉÉe z
+{
+ÊÊ )
+PropertyNameCaseInsensitive
+ËË +
+=
+ËË, -
+true
+ËË. 2
+}
+ÌÌ 
+)
+ÌÌ 
+;
+ÌÌ 
+return
+ÎÎ 
+result
+ÎÎ 
+?
+ÎÎ 
+.
+ÎÎ 
+Success
+ÎÎ "
+==
+ÎÎ# %
+true
+ÎÎ& *
+;
+ÎÎ* +
+}
+ÏÏ 	
+private
+ÑÑ 
+sealed
+ÑÑ 
+class
+ÑÑ +
+ReCaptchaVerificationResponse
+ÑÑ :
+{
+ÒÒ 	
+public
+ÓÓ 
+bool
+ÓÓ 
+Success
+ÓÓ 
+{
+ÓÓ  !
+get
+ÓÓ" %
+;
+ÓÓ% &
+set
+ÓÓ' *
+;
+ÓÓ* +
+}
+ÓÓ, -
+[
+ÕÕ 
+JsonPropertyName
+ÕÕ 
+(
+ÕÕ 
+$str
+ÕÕ +
+)
+ÕÕ+ ,
+]
+ÕÕ, -
+public
+ÖÖ 
+string
+ÖÖ 
+[
+ÖÖ 
+]
+ÖÖ 
+?
+ÖÖ 
+
+ErrorCodes
+ÖÖ '
+{
+ÖÖ( )
+get
+ÖÖ* -
+;
+ÖÖ- .
+set
+ÖÖ/ 2
+;
+ÖÖ2 3
+}
+ÖÖ4 5
+}
+×× 	
+[
+ÙÙ 	
+HttpPost
+ÙÙ	 
+(
+ÙÙ 
+$str
+ÙÙ $
+)
+ÙÙ$ %
+]
+ÙÙ% &
+public
+ÚÚ 
+async
+ÚÚ 
+Task
+ÚÚ 
+<
+ÚÚ 
+IActionResult
+ÚÚ '
+>
+ÚÚ' (
+Verify2FALogin
+ÚÚ) 7
+(
+ÚÚ7 8
+[
+ÚÚ8 9
+FromBody
+ÚÚ9 A
+]
+ÚÚA B#
+Verify2FALoginRequest
+ÚÚC X
+request
+ÚÚY `
+,
+ÚÚ` a
+[
+ÚÚb c
+
+FromHeader
+ÚÚc m
+(
+ÚÚm n
+Name
+ÚÚn r
+=
+ÚÚs t
+$strÚÚu 
+)ÚÚ ‚
+]ÚÚ‚ ƒ
+stringÚÚ„ Š
+?ÚÚŠ ‹
+	userAgentÚÚŒ •
+)ÚÚ• –
+{
+ÛÛ 	
+var
+ÜÜ 
+userAgentValue
+ÜÜ 
+=
+ÜÜ  
+	userAgent
+ÜÜ! *
+??
+ÜÜ+ -
+string
+ÜÜ. 4
+.
+ÜÜ4 5
+Empty
+ÜÜ5 :
+;
+ÜÜ: ;
+var
+İİ 
+	ipAddress
+İİ 
+=
+İİ 
+HttpContext
+İİ '
+.
+İİ' (
+
+Connection
+İİ( 2
+.
+İİ2 3
+RemoteIpAddress
+İİ3 B
+?
+İİB C
+.
+İİC D
+ToString
+İİD L
+(
+İİL M
+)
+İİM N
+;
+İİN O
+if
+ŞŞ 
+(
+ŞŞ (
+_ipDeviceReputationService
+ŞŞ *
+.
+ŞŞ* +
+	IsBlocked
+ŞŞ+ 4
+(
+ŞŞ4 5
+	ipAddress
+ŞŞ5 >
+,
+ŞŞ> ?
+userAgentValue
+ŞŞ@ N
+,
+ŞŞN O
+out
+ŞŞP S
+var
+ŞŞT W
+blockReason
+ŞŞX c
+)
+ŞŞc d
+)
+ŞŞd e
+return
+ßß 
 
 StatusCode
-ÓÓ !
+ßß !
 (
-ÓÓ! "
+ßß! "
 $num
-ÓÓ" %
+ßß" %
 ,
-ÓÓ% &
+ßß% &
 new
-ÓÓ' *
+ßß' *
 {
-ÓÓ+ ,
+ßß+ ,
 message
-ÓÓ- 4
+ßß- 4
 =
-ÓÓ5 6
+ßß5 6
 $"
-ÓÓ7 9
+ßß7 9
 $str
-ÓÓ9 I
+ßß9 I
 {
-ÓÓI J
+ßßI J
 blockReason
-ÓÓJ U
+ßßJ U
 }
-ÓÓU V
+ßßU V
 $str
-ÓÓV o
+ßßV o
 "
-ÓÓo p
+ßßo p
 }
-ÓÓq r
+ßßq r
 )
-ÓÓr s
+ßßr s
 ;
-ÓÓs t
+ßßs t
 var
-ÕÕ 
+áá 
 user
-ÕÕ 
+áá 
 =
-ÕÕ 
+áá 
 await
-ÕÕ 
+áá 
 _userManager
-ÕÕ )
+áá )
 .
-ÕÕ) *
+áá) *
 FindByEmailAsync
-ÕÕ* :
+áá* :
 (
-ÕÕ: ;
+áá: ;
 request
-ÕÕ; B
+áá; B
 .
-ÕÕB C
+ááB C
 Email
-ÕÕC H
+ááC H
 )
-ÕÕH I
+ááH I
 ;
-ÕÕI J
+ááI J
 if
-ÖÖ 
+ââ 
 (
-ÖÖ 
+ââ 
 user
-ÖÖ 
+ââ 
 ==
-ÖÖ 
+ââ 
 null
-ÖÖ 
+ââ 
 )
-ÖÖ 
+ââ 
 return
-ÖÖ $
+ââ $
 Unauthorized
-ÖÖ% 1
+ââ% 1
 (
-ÖÖ1 2
+ââ1 2
 new
-ÖÖ2 5
+ââ2 5
 {
-ÖÖ6 7
+ââ6 7
 message
-ÖÖ8 ?
+ââ8 ?
 =
-ÖÖ@ A
-$str
-ÖÖB R
+ââ@ A!
+MessageUserNotFound
+ââB U
 }
-ÖÖS T
+ââV W
 )
-ÖÖT U
+ââW X
 ;
-ÖÖU V
+ââX Y
 var
-ØØ 
+ää 
 verification
-ØØ 
+ää 
 =
-ØØ 
+ää 
 await
-ØØ $
+ää $
 _context
-ØØ% -
+ää% -
 .
-ØØ- .
+ää- .
 VerificationCodes
-ØØ. ?
+ää. ?
 .
-ÙÙ !
+åå !
 FirstOrDefaultAsync
-ÙÙ $
+åå $
 (
-ÙÙ$ %
+åå$ %
 v
-ÙÙ% &
+åå% &
 =>
-ÙÙ' )
+åå' )
 v
-ÙÙ* +
+åå* +
 .
-ÙÙ+ ,
+åå+ ,
 Email
-ÙÙ, 1
+åå, 1
 ==
-ÙÙ2 4
+åå2 4
 request
-ÙÙ5 <
+åå5 <
 .
-ÙÙ< =
+åå< =
 Email
-ÙÙ= B
+åå= B
 &&
-ÙÙC E
+ååC E
 v
-ÙÙF G
+ååF G
 .
-ÙÙG H
+ååG H
 Code
-ÙÙH L
+ååH L
 ==
-ÙÙM O
+ååM O
 request
-ÙÙP W
+ååP W
 .
-ÙÙW X
+ååW X
 Code
-ÙÙX \
+ååX \
 &&
-ÙÙ] _
+åå] _
 !
-ÙÙ` a
+åå` a
 v
-ÙÙa b
+ååa b
 .
-ÙÙb c
+ååb c
 IsUsed
-ÙÙc i
+ååc i
 &&
-ÙÙj l
+ååj l
 v
-ÙÙm n
+ååm n
 .
-ÙÙn o
+åån o
 	ExpiresAt
-ÙÙo x
+ååo x
 >
-ÙÙy z
-DateTimeÙÙ{ ƒ
-.ÙÙƒ „
-UtcNowÙÙ„ Š
-)ÙÙŠ ‹
-;ÙÙ‹ Œ
+ååy z
+DateTimeåå{ ƒ
+.ååƒ „
+UtcNowåå„ Š
+)ååŠ ‹
+;åå‹ Œ
 if
-ÚÚ 
+ææ 
 (
-ÚÚ 
+ææ 
 verification
-ÚÚ 
+ææ 
 ==
-ÚÚ 
+ææ 
 null
-ÚÚ  $
+ææ  $
 )
-ÚÚ$ %
+ææ$ %
 return
-ÚÚ& ,
+ææ& ,
 
 BadRequest
-ÚÚ- 7
+ææ- 7
 (
-ÚÚ7 8
+ææ7 8
 new
-ÚÚ8 ;
+ææ8 ;
 {
-ÚÚ< =
+ææ< =
 message
-ÚÚ> E
+ææ> E
 =
-ÚÚF G
+ææF G
 $str
-ÚÚH n
+ææH n
 }
-ÚÚo p
+ææo p
 )
-ÚÚp q
+ææp q
 ;
-ÚÚq r
+ææq r
 verification
-ÜÜ 
+èè 
 .
-ÜÜ 
+èè 
 IsUsed
-ÜÜ 
+èè 
 =
-ÜÜ  !
+èè  !
 true
-ÜÜ" &
+èè" &
 ;
-ÜÜ& '
+èè& '
 var
-ŞŞ 
+êê 
 device
-ŞŞ 
+êê 
 =
-ŞŞ $
+êê $
 GetDeviceFromUserAgent
-ŞŞ /
+êê /
 (
-ŞŞ/ 0
-	userAgent
-ŞŞ0 9
+êê/ 0
+userAgentValue
+êê0 >
 )
-ŞŞ9 :
+êê> ?
 ;
-ŞŞ: ;
+êê? @
 var
-ßß 
+ëë 
 location
-ßß 
+ëë 
 =
-ßß 
+ëë 
 $str
-ßß (
+ëë (
 ;
-ßß( )
+ëë( )
 _context
-áá 
+íí 
 .
-áá 
+íí 
 LoginHistory
-áá !
+íí !
 .
-áá! "
+íí! "
 Add
-áá" %
+íí" %
 (
-áá% &
+íí% &
 new
-áá& )
+íí& )
 LoginHistory
-áá* 6
+íí* 6
 {
-ââ 
+îî 
 UserID
-ãã 
+ïï 
 =
-ãã 
+ïï 
 user
-ãã 
+ïï 
 .
-ãã 
+ïï 
 Id
-ãã  
+ïï  
 ,
-ãã  !
+ïï  !
 Device
-ää 
+ğğ 
 =
-ää 
+ğğ 
 device
-ää 
+ğğ 
 ,
-ää  
+ğğ  
 Location
-åå 
+ññ 
 =
-åå 
+ññ 
 location
-åå #
+ññ #
 ,
-åå# $
+ññ# $
 	IPAddress
-ææ 
+òò 
 =
-ææ 
+òò 
 	ipAddress
-ææ %
+òò %
 ,
-ææ% &
+òò% &
 	LoginTime
-çç 
+óó 
 =
-çç 
+óó 
 DateTime
-çç $
+óó $
 .
-çç$ %
+óó$ %
 UtcNow
-çç% +
+óó% +
 }
-èè 
+ôô 
 )
-èè 
+ôô 
 ;
-èè 
+ôô 
 await
-éé 
+õõ 
 _context
-éé 
+õõ 
 .
-éé 
+õõ 
 SaveChangesAsync
-éé +
+õõ +
 (
-éé+ ,
+õõ+ ,
 )
-éé, -
+õõ, -
 ;
-éé- .
+õõ- .
 await
-ìì "
+øø "
 _loginAttemptService
-ìì &
+øø &
 .
-ìì& ' 
+øø& ' 
 ResetAttemptsAsync
-ìì' 9
+øø' 9
 (
-ìì9 :
+øø9 :
 user
-ìì: >
+øø: >
 .
-ìì> ?
+øø> ?
 Id
-ìì? A
+øø? A
 )
-ììA B
+øøA B
 ;
-ììB C(
+øøB C(
 _ipDeviceReputationService
-íí &
+ùù &
 .
-íí& '
+ùù& '
 RegisterSuccess
-íí' 6
+ùù' 6
 (
-íí6 7
+ùù6 7
 	ipAddress
-íí7 @
+ùù7 @
 ,
-íí@ A
-	userAgent
-ííB K
+ùù@ A
+userAgentValue
+ùùB P
 )
-ííK L
+ùùP Q
 ;
-ííL M
+ùùQ R
 var
-ïï 
+ûû 
 roles
-ïï 
-=
-ïï 
-await
-ïï 
-_userManager
-ïï *
-.
-ïï* +
-GetRolesAsync
-ïï+ 8
-(
-ïï8 9
-user
-ïï9 =
-)
-ïï= >
-;
-ïï> ?
-var
-ğğ 
-role
-ğğ 
-=
-ğğ 
-roles
-ğğ 
-.
-ğğ 
-FirstOrDefault
-ğğ +
-(
-ğğ+ ,
-)
-ğğ, -
-??
-ğğ. 0
-user
-ğğ1 5
-.
-ğğ5 6
-Role
-ğğ6 :
-;
-ğğ: ;
-var
-ññ 
-token
-ññ 
-=
-ññ 
-await
-ññ 
-_tokenService
-ññ +
-.
-ññ+ , 
-GenerateTokenAsync
-ññ, >
-(
-ññ> ?
-user
-ññ? C
-.
-ññC D
-Email
-ññD I
-!
-ññI J
-,
-ññJ K
-user
-ññL P
-.
-ññP Q
-Id
-ññQ S
-,
-ññS T
-role
-ññU Y
-)
-ññY Z
-;
-ññZ [
-var
-óó 
-settings
-óó 
-=
-óó 
-await
-óó  
-_context
-óó! )
-.
-óó) *
-SystemSettings
-óó* 8
-.
-óó8 9!
-FirstOrDefaultAsync
-óó9 L
-(
-óóL M
-)
-óóM N
-;
-óóN O
-var
-ôô #
-sessionTimeoutMinutes
-ôô %
-=
-ôô& '
-settings
-ôô( 0
-?
-ôô0 1
-.
-ôô1 2
-SessionTimeout
-ôô2 @
-??
-ôôA C
-$num
-ôôD F
-;
-ôôF G
-await
-öö 
-LogActivityAsync
-öö "
-(
-öö" #
-user
-öö# '
-.
-öö' (
-Id
-öö( *
-,
-öö* +
-$str
-öö, H
-,
-ööH I
-$str
-ööJ Q
-)
-ööQ R
-;
-ööR S
-return
-øø 
-Ok
-øø 
-(
-øø 
-new
-øø 
-AuthResponse
-øø &
-{
-ùù 
-Token
-úú 
-=
-úú 
-token
-úú 
-,
-úú 
-Email
 ûû 
 =
-ûû 
-user
-ûû 
+ûû 
+await
+ûû 
+_userManager
+ûû *
 .
-ûû 
-Email
-ûû "
-!
-ûû" #
-,
-ûû# $
-Role
+ûû* +
+GetRolesAsync
+ûû+ 8
+(
+ûû8 9
+user
+ûû9 =
+)
+ûû= >
+;
+ûû> ?
+var
+üü 
+role
 üü 
 =
-üü 
-role
-üü 
-,
-üü 
-
-Expiration
-ıı 
-=
-ıı 
-DateTime
-ıı %
+üü 
+roles
+üü 
 .
-ıı% &
-UtcNow
-ıı& ,
-.
-ıı, -
-
-AddMinutes
-ıı- 7
+üü 
+FirstOrDefault
+üü +
 (
-ıı7 8#
-sessionTimeoutMinutes
-ıı8 M
+üü+ ,
 )
-ııM N
-}
-şş 
-)
-şş 
+üü, -
+??
+üü. 0
+user
+üü1 5
+.
+üü5 6
+Role
+üü6 :
 ;
-şş 
-}
-ÿÿ 	
-private
- 
-string
- $
-GetDeviceFromUserAgent
- -
-(
-- .
-string
-. 4
-	userAgent
-5 >
-)
-> ?
-{
-‚‚ 	
-if
-ƒƒ 
-(
-ƒƒ 
-string
-ƒƒ 
-.
-ƒƒ 
-IsNullOrEmpty
-ƒƒ $
-(
-ƒƒ$ %
-	userAgent
-ƒƒ% .
-)
-ƒƒ. /
-)
-ƒƒ/ 0
-return
-„„ 
-$str
-„„ '
-;
-„„' (
+üü: ;
 var
-†† 
-rules
+ıı 
+token
+ıı 
+=
+ıı 
+await
+ıı 
+_tokenService
+ıı +
+.
+ıı+ , 
+GenerateTokenAsync
+ıı, >
+(
+ıı> ?
+user
+ıı? C
+.
+ııC D
+Email
+ııD I
+!
+ııI J
+,
+ııJ K
+user
+ııL P
+.
+ııP Q
+Id
+ııQ S
+,
+ııS T
+role
+ııU Y
+)
+ııY Z
+;
+ııZ [
+var
+ÿÿ 
+settings
+ÿÿ 
+=
+ÿÿ 
+await
+ÿÿ  
+_context
+ÿÿ! )
+.
+ÿÿ) *
+SystemSettings
+ÿÿ* 8
+.
+ÿÿ8 9!
+FirstOrDefaultAsync
+ÿÿ9 L
+(
+ÿÿL M
+)
+ÿÿM N
+;
+ÿÿN O
+var
+€€ #
+sessionTimeoutMinutes
+€€ %
+=
+€€& '
+settings
+€€( 0
+?
+€€0 1
+.
+€€1 2
+SessionTimeout
+€€2 @
+??
+€€A C
+$num
+€€D F
+;
+€€F G
+await
+‚‚ 
+LogActivityAsync
+‚‚ "
+(
+‚‚" #
+user
+‚‚# '
+.
+‚‚' (
+Id
+‚‚( *
+,
+‚‚* +
+$str
+‚‚, H
+,
+‚‚H I
+$str
+‚‚J Q
+)
+‚‚Q R
+;
+‚‚R S
+return
+„„ 
+Ok
+„„ 
+(
+„„ 
+new
+„„ 
+AuthResponse
+„„ &
+{
+…… 
+Token
 †† 
 =
-†† 
-new
-†† 
-(
-†† 
-string
-†† #
-[
-††# $
-]
-††$ %
-MustContain
-††& 1
-,
-††1 2
-string
-††3 9
-Result
-††: @
-)
-††@ A
-[
-††A B
-]
-††B C
-{
-‡‡ 
-(
-ˆˆ 
-new
-ˆˆ 
-[
-ˆˆ 
-]
-ˆˆ 
-{
-ˆˆ 
-$str
-ˆˆ !
-,
-ˆˆ! "
-$str
-ˆˆ# ,
-}
-ˆˆ- .
-,
-ˆˆ. /
-$str
-ˆˆ0 C
-)
-ˆˆC D
-,
-ˆˆD E
-(
-‰‰ 
-new
-‰‰ 
-[
-‰‰ 
-]
-‰‰ 
-{
-‰‰ 
-$str
-‰‰ !
-,
-‰‰! "
-$str
-‰‰# (
-}
-‰‰) *
-,
-‰‰* +
-$str
-‰‰, ;
-)
-‰‰; <
-,
-‰‰< =
-(
-ŠŠ 
-new
-ŠŠ 
-[
-ŠŠ 
-]
-ŠŠ 
-{
-ŠŠ 
-$str
-ŠŠ !
-,
-ŠŠ! "
-$str
-ŠŠ# ,
-}
-ŠŠ- .
-,
-ŠŠ. /
-$str
-ŠŠ0 C
-)
-ŠŠC D
-,
-ŠŠD E
-(
-‹‹ 
-new
-‹‹ 
-[
-‹‹ 
-]
-‹‹ 
-{
-‹‹ 
-$str
-‹‹ !
-,
-‹‹! "
-$str
-‹‹# +
-}
-‹‹, -
-,
-‹‹- .
-$str
-‹‹/ A
-)
-‹‹A B
-,
-‹‹B C
-(
-ŒŒ 
-new
-ŒŒ 
-[
-ŒŒ 
-]
-ŒŒ 
-{
-ŒŒ 
-$str
-ŒŒ !
-,
-ŒŒ! "
-$str
-ŒŒ# )
-}
-ŒŒ* +
-,
-ŒŒ+ ,
-$str
-ŒŒ- =
-)
-ŒŒ= >
-,
-ŒŒ> ?
-(
- 
-new
- 
-[
- 
-]
- 
-{
- 
-$str
- "
-}
-# $
-,
-$ %
-$str
-& 7
-)
-7 8
-,
-8 9
-(
- 
-new
- 
-[
- 
-]
- 
-{
- 
-$str
- 
-}
-  !
-,
-! "
-$str
-# 3
-)
-3 4
-}
- 
-;
- 
-foreach
-‘‘ 
-(
-‘‘ 
-var
-‘‘ 
-rule
-‘‘ 
-in
-‘‘  
-rules
-‘‘! &
-)
-‘‘& '
-{
-’’ 
-if
-““ 
-(
-““ 
-rule
-““ 
-.
-““ 
-MustContain
-““ $
-.
-““$ %
-All
-““% (
-(
-““( )
+†† 
 token
-““) .
-=>
-““/ 1
-	userAgent
-““2 ;
-.
-““; <
-Contains
-““< D
-(
-““D E
-token
-““E J
+†† 
 ,
-““J K
-StringComparison
-““L \
-.
-““\ ]
-OrdinalIgnoreCase
-““] n
-)
-““n o
-)
-““o p
-)
-““p q
-return
-”” 
-rule
-”” 
-.
-””  
-Result
-””  &
-;
-””& '
-}
-•• 
-return
-—— 
-$str
-—— #
-;
-——# $
-}
-˜˜ 	
-[
-šš 	
-HttpPost
-šš	 
-(
-šš 
-$str
-šš  
-)
-šš  !
-]
-šš! "
-public
-›› 
-async
-›› 
-Task
-›› 
-<
-›› 
-IActionResult
-›› '
->
-››' (
-GoogleLogin
-››) 4
-(
-››4 5
-[
-››5 6
-FromBody
-››6 >
-]
-››> ? 
-GoogleLoginRequest
-››@ R
-request
-››S Z
-)
-››Z [
-{
-œœ 	
-var
- 
-user
- 
-=
- 
-await
- 
-_userManager
- )
-.
-) *
-FindByEmailAsync
-* :
-(
-: ;
-request
-; B
-.
-B C
+†† 
 Email
-C H
-)
-H I
-;
-I J
-if
-ŸŸ 
-(
-ŸŸ 
+‡‡ 
+=
+‡‡ 
 user
-ŸŸ 
-==
-ŸŸ 
-null
-ŸŸ 
-)
-ŸŸ 
-{
-   
-user
-¡¡ 
-=
-¡¡ 
-new
-¡¡ 
-ApplicationUser
-¡¡ *
-{
-¢¢ 
-UserName
-££ 
-=
-££ 
-request
-££ &
+‡‡ 
 .
-££& '
+‡‡ 
 Email
-££' ,
-,
-££, -
-Email
-¤¤ 
-=
-¤¤ 
-request
-¤¤ #
-.
-¤¤# $
-Email
-¤¤$ )
-,
-¤¤) *
-	FirstName
-¥¥ 
-=
-¥¥ 
-request
-¥¥  '
-.
-¥¥' (
-	FirstName
-¥¥( 1
-,
-¥¥1 2
-LastName
-¦¦ 
-=
-¦¦ 
-request
-¦¦ &
-.
-¦¦& '
-LastName
-¦¦' /
-,
-¦¦/ 0
-EmailConfirmed
-§§ "
-=
-§§# $
-true
-§§% )
-,
-§§) *
-Status
-¨¨ 
-=
-¨¨ 
-$str
-¨¨ %
-}
-©© 
-;
-©© 
-var
-«« 
-result
-«« 
-=
-«« 
-await
-«« "
-_userManager
-««# /
-.
-««/ 0
-CreateAsync
-««0 ;
-(
-««; <
-user
-««< @
-)
-««@ A
-;
-««A B
-if
-¬¬ 
-(
-¬¬ 
+‡‡ "
 !
-¬¬ 
-result
-¬¬ 
+‡‡" #
+,
+‡‡# $
+Role
+ˆˆ 
+=
+ˆˆ 
+role
+ˆˆ 
+,
+ˆˆ 
+
+Expiration
+‰‰ 
+=
+‰‰ 
+DateTime
+‰‰ %
 .
-¬¬ 
-	Succeeded
-¬¬ %
+‰‰% &
+UtcNow
+‰‰& ,
+.
+‰‰, -
+
+AddMinutes
+‰‰- 7
+(
+‰‰7 8#
+sessionTimeoutMinutes
+‰‰8 M
 )
-¬¬% &
+‰‰M N
+}
+ŠŠ 
+)
+ŠŠ 
+;
+ŠŠ 
+}
+‹‹ 	
+private
+ 
+static
+ 
+string
+ $
+GetDeviceFromUserAgent
+ 4
+(
+4 5
+string
+5 ;
+	userAgent
+< E
+)
+E F
+{
+ 	
+if
+ 
+(
+ 
+string
+ 
+.
+ 
+IsNullOrEmpty
+ $
+(
+$ %
+	userAgent
+% .
+)
+. /
+)
+/ 0
 return
-­­ 
+ 
+DeviceUnknown
+ $
+;
+$ %
+var
+’’ 
+rules
+’’ 
+=
+’’ 
+new
+’’ 
+(
+’’ 
+string
+’’ #
+[
+’’# $
+]
+’’$ %
+MustContain
+’’& 1
+,
+’’1 2
+string
+’’3 9
+Result
+’’: @
+)
+’’@ A
+[
+’’A B
+]
+’’B C
+{
+““ 
+(
+”” 
+new
+”” 
+[
+”” 
+]
+”” 
+{
+”” 
+$str
+”” !
+,
+””! "
+$str
+””# ,
+}
+””- .
+,
+””. /
+$str
+””0 C
+)
+””C D
+,
+””D E
+(
+•• 
+new
+•• 
+[
+•• 
+]
+•• 
+{
+•• 
+$str
+•• !
+,
+••! "
+$str
+••# (
+}
+••) *
+,
+••* +
+$str
+••, ;
+)
+••; <
+,
+••< =
+(
+–– 
+new
+–– 
+[
+–– 
+]
+–– 
+{
+–– 
+$str
+–– !
+,
+––! "
+$str
+––# ,
+}
+––- .
+,
+––. /
+$str
+––0 C
+)
+––C D
+,
+––D E
+(
+—— 
+new
+—— 
+[
+—— 
+]
+—— 
+{
+—— 
+$str
+—— !
+,
+——! "
+$str
+——# +
+}
+——, -
+,
+——- .
+$str
+——/ A
+)
+——A B
+,
+——B C
+(
+˜˜ 
+new
+˜˜ 
+[
+˜˜ 
+]
+˜˜ 
+{
+˜˜ 
+$str
+˜˜ !
+,
+˜˜! "
+$str
+˜˜# )
+}
+˜˜* +
+,
+˜˜+ ,
+$str
+˜˜- =
+)
+˜˜= >
+,
+˜˜> ?
+(
+™™ 
+new
+™™ 
+[
+™™ 
+]
+™™ 
+{
+™™ 
+$str
+™™ "
+}
+™™# $
+,
+™™$ %
+$str
+™™& 7
+)
+™™7 8
+,
+™™8 9
+(
+šš 
+new
+šš 
+[
+šš 
+]
+šš 
+{
+šš 
+$str
+šš 
+}
+šš  !
+,
+šš! "
+$str
+šš# 3
+)
+šš3 4
+}
+›› 
+;
+›› 
+foreach
+ 
+(
+ 
+var
+ 
+rule
+ 
+in
+  
+rules
+! &
+)
+& '
+{
+ 
+if
+ŸŸ 
+(
+ŸŸ 
+rule
+ŸŸ 
+.
+ŸŸ 
+MustContain
+ŸŸ $
+.
+ŸŸ$ %
+All
+ŸŸ% (
+(
+ŸŸ( )
+token
+ŸŸ) .
+=>
+ŸŸ/ 1
+	userAgent
+ŸŸ2 ;
+.
+ŸŸ; <
+Contains
+ŸŸ< D
+(
+ŸŸD E
+token
+ŸŸE J
+,
+ŸŸJ K
+StringComparison
+ŸŸL \
+.
+ŸŸ\ ]
+OrdinalIgnoreCase
+ŸŸ] n
+)
+ŸŸn o
+)
+ŸŸo p
+)
+ŸŸp q
+return
+   
+rule
+   
+.
+    
+Result
+    &
+;
+  & '
+}
+¡¡ 
+return
+££ 
+DeviceUnknown
+££  
+;
+££  !
+}
+¤¤ 	
+[
+¦¦ 	
+HttpPost
+¦¦	 
+(
+¦¦ 
+$str
+¦¦  
+)
+¦¦  !
+]
+¦¦! "
+public
+§§ 
+async
+§§ 
+Task
+§§ 
+<
+§§ 
+IActionResult
+§§ '
+>
+§§' (
+GoogleLogin
+§§) 4
+(
+§§4 5
+[
+§§5 6
+FromBody
+§§6 >
+]
+§§> ? 
+GoogleLoginRequest
+§§@ R
+request
+§§S Z
+)
+§§Z [
+{
+¨¨ 	
+var
+©© 
+user
+©© 
+=
+©© 
+await
+©© 
+_userManager
+©© )
+.
+©©) *
+FindByEmailAsync
+©©* :
+(
+©©: ;
+request
+©©; B
+.
+©©B C
+Email
+©©C H
+)
+©©H I
+;
+©©I J
+if
+«« 
+(
+«« 
+user
+«« 
+==
+«« 
+null
+«« 
+)
+«« 
+{
+¬¬ 
+user
+­­ 
+=
+­­ 
+new
+­­ 
+ApplicationUser
+­­ *
+{
+®® 
+UserName
+¯¯ 
+=
+¯¯ 
+request
+¯¯ &
+.
+¯¯& '
+Email
+¯¯' ,
+,
+¯¯, -
+Email
+°° 
+=
+°° 
+request
+°° #
+.
+°°# $
+Email
+°°$ )
+,
+°°) *
+	FirstName
+±± 
+=
+±± 
+request
+±±  '
+.
+±±' (
+	FirstName
+±±( 1
+,
+±±1 2
+LastName
+²² 
+=
+²² 
+request
+²² &
+.
+²²& '
+LastName
+²²' /
+,
+²²/ 0
+EmailConfirmed
+³³ "
+=
+³³# $
+true
+³³% )
+,
+³³) *
+Status
+´´ 
+=
+´´ 
+StatusActive
+´´ )
+}
+µµ 
+;
+µµ 
+var
+·· 
+result
+·· 
+=
+·· 
+await
+·· "
+_userManager
+··# /
+.
+··/ 0
+CreateAsync
+··0 ;
+(
+··; <
+user
+··< @
+)
+··@ A
+;
+··A B
+if
+¸¸ 
+(
+¸¸ 
+!
+¸¸ 
+result
+¸¸ 
+.
+¸¸ 
+	Succeeded
+¸¸ %
+)
+¸¸% &
+return
+¹¹ 
 
 BadRequest
-­­ %
+¹¹ %
 (
-­­% &
+¹¹% &
 result
-­­& ,
+¹¹& ,
 .
-­­, -
+¹¹, -
 Errors
-­­- 3
+¹¹- 3
 )
-­­3 4
+¹¹3 4
 ;
-­­4 5
+¹¹4 5
 _context
-¯¯ 
+»» 
 .
-¯¯  
+»»  
 OnboardingStatuses
-¯¯ +
+»» +
 .
-¯¯+ ,
+»»+ ,
 Add
-¯¯, /
+»», /
 (
-¯¯/ 0
+»»/ 0
 new
-¯¯0 3
+»»0 3
 OnboardingStatus
-¯¯4 D
+»»4 D
 {
-°° 
+¼¼ 
 UserID
-±± 
+½½ 
 =
-±± 
+½½ 
 user
-±± !
+½½ !
 .
-±±! "
+½½! "
 Id
-±±" $
+½½" $
 ,
-±±$ %
+½½$ %
 IsEmailVerified
-²² #
+¾¾ #
 =
-²²$ %
+¾¾$ %
 true
-²²& *
+¾¾& *
 }
-³³ 
+¿¿ 
 )
-³³ 
+¿¿ 
 ;
-³³ 
+¿¿ 
 await
-´´ 
+ÀÀ 
 _context
-´´ 
+ÀÀ 
 .
-´´ 
+ÀÀ 
 SaveChangesAsync
-´´ /
+ÀÀ /
 (
-´´/ 0
+ÀÀ/ 0
 )
-´´0 1
-;
-´´1 2
-}
-µµ 
-await
-¸¸ "
-_loginAttemptService
-¸¸ &
-.
-¸¸& ' 
-ResetAttemptsAsync
-¸¸' 9
-(
-¸¸9 :
-user
-¸¸: >
-.
-¸¸> ?
-Id
-¸¸? A
-)
-¸¸A B
-;
-¸¸B C
-var
-ºº 
-roles
-ºº 
-=
-ºº 
-await
-ºº 
-_userManager
-ºº *
-.
-ºº* +
-GetRolesAsync
-ºº+ 8
-(
-ºº8 9
-user
-ºº9 =
-)
-ºº= >
-;
-ºº> ?
-var
-»» 
-role
-»» 
-=
-»» 
-roles
-»» 
-.
-»» 
-FirstOrDefault
-»» +
-(
-»»+ ,
-)
-»», -
-??
-»». 0
-user
-»»1 5
-.
-»»5 6
-Role
-»»6 :
-;
-»»: ;
-var
-½½ 
-token
-½½ 
-=
-½½ 
-await
-½½ 
-_tokenService
-½½ +
-.
-½½+ , 
-GenerateTokenAsync
-½½, >
-(
-½½> ?
-user
-½½? C
-.
-½½C D
-Email
-½½D I
-!
-½½I J
-,
-½½J K
-user
-½½L P
-.
-½½P Q
-Id
-½½Q S
-,
-½½S T
-role
-½½U Y
-)
-½½Y Z
-;
-½½Z [
-var
-¿¿ 
-settings
-¿¿ 
-=
-¿¿ 
-await
-¿¿  
-_context
-¿¿! )
-.
-¿¿) *
-SystemSettings
-¿¿* 8
-.
-¿¿8 9!
-FirstOrDefaultAsync
-¿¿9 L
-(
-¿¿L M
-)
-¿¿M N
-;
-¿¿N O
-var
-ÀÀ #
-sessionTimeoutMinutes
-ÀÀ %
-=
-ÀÀ& '
-settings
-ÀÀ( 0
-?
 ÀÀ0 1
-.
-ÀÀ1 2
-SessionTimeout
-ÀÀ2 @
-??
-ÀÀA C
-$num
-ÀÀD F
 ;
-ÀÀF G
+ÀÀ1 2
+}
+ÁÁ 
 await
-ÂÂ 
-LogActivityAsync
-ÂÂ "
-(
-ÂÂ" #
-user
-ÂÂ# '
+ÄÄ "
+_loginAttemptService
+ÄÄ &
 .
-ÂÂ' (
-Id
-ÂÂ( *
-,
-ÂÂ* +
-$str
-ÂÂ, C
-,
-ÂÂC D
-$str
-ÂÂE L
-)
-ÂÂL M
-;
-ÂÂM N
-return
-ÄÄ 
-Ok
-ÄÄ 
+ÄÄ& ' 
+ResetAttemptsAsync
+ÄÄ' 9
 (
-ÄÄ 
-new
-ÄÄ 
-AuthResponse
-ÄÄ &
-{
-ÅÅ 
-Token
+ÄÄ9 :
+user
+ÄÄ: >
+.
+ÄÄ> ?
+Id
+ÄÄ? A
+)
+ÄÄA B
+;
+ÄÄB C
+var
+ÆÆ 
+roles
 ÆÆ 
 =
 ÆÆ 
-token
-ÆÆ 
-,
-ÆÆ 
-Email
-ÇÇ 
-=
-ÇÇ 
-user
-ÇÇ 
+await
+ÆÆ 
+_userManager
+ÆÆ *
 .
-ÇÇ 
-Email
-ÇÇ "
-!
-ÇÇ" #
-,
-ÇÇ# $
-Role
-ÈÈ 
-=
-ÈÈ 
+ÆÆ* +
+GetRolesAsync
+ÆÆ+ 8
+(
+ÆÆ8 9
+user
+ÆÆ9 =
+)
+ÆÆ= >
+;
+ÆÆ> ?
+var
+ÇÇ 
 role
-ÈÈ 
+ÇÇ 
+=
+ÇÇ 
+roles
+ÇÇ 
+.
+ÇÇ 
+FirstOrDefault
+ÇÇ +
+(
+ÇÇ+ ,
+)
+ÇÇ, -
+??
+ÇÇ. 0
+user
+ÇÇ1 5
+.
+ÇÇ5 6
+Role
+ÇÇ6 :
+;
+ÇÇ: ;
+var
+ÉÉ 
+token
+ÉÉ 
+=
+ÉÉ 
+await
+ÉÉ 
+_tokenService
+ÉÉ +
+.
+ÉÉ+ , 
+GenerateTokenAsync
+ÉÉ, >
+(
+ÉÉ> ?
+user
+ÉÉ? C
+.
+ÉÉC D
+Email
+ÉÉD I
+!
+ÉÉI J
 ,
-ÈÈ 
+ÉÉJ K
+user
+ÉÉL P
+.
+ÉÉP Q
+Id
+ÉÉQ S
+,
+ÉÉS T
+role
+ÉÉU Y
+)
+ÉÉY Z
+;
+ÉÉZ [
+var
+ËË 
+settings
+ËË 
+=
+ËË 
+await
+ËË  
+_context
+ËË! )
+.
+ËË) *
+SystemSettings
+ËË* 8
+.
+ËË8 9!
+FirstOrDefaultAsync
+ËË9 L
+(
+ËËL M
+)
+ËËM N
+;
+ËËN O
+var
+ÌÌ #
+sessionTimeoutMinutes
+ÌÌ %
+=
+ÌÌ& '
+settings
+ÌÌ( 0
+?
+ÌÌ0 1
+.
+ÌÌ1 2
+SessionTimeout
+ÌÌ2 @
+??
+ÌÌA C
+$num
+ÌÌD F
+;
+ÌÌF G
+await
+ÎÎ 
+LogActivityAsync
+ÎÎ "
+(
+ÎÎ" #
+user
+ÎÎ# '
+.
+ÎÎ' (
+Id
+ÎÎ( *
+,
+ÎÎ* +
+$str
+ÎÎ, C
+,
+ÎÎC D
+$str
+ÎÎE L
+)
+ÎÎL M
+;
+ÎÎM N
+return
+ĞĞ 
+Ok
+ĞĞ 
+(
+ĞĞ 
+new
+ĞĞ 
+AuthResponse
+ĞĞ &
+{
+ÑÑ 
+Token
+ÒÒ 
+=
+ÒÒ 
+token
+ÒÒ 
+,
+ÒÒ 
+Email
+ÓÓ 
+=
+ÓÓ 
+user
+ÓÓ 
+.
+ÓÓ 
+Email
+ÓÓ "
+!
+ÓÓ" #
+,
+ÓÓ# $
+Role
+ÔÔ 
+=
+ÔÔ 
+role
+ÔÔ 
+,
+ÔÔ 
 
 Expiration
-ÉÉ 
+ÕÕ 
 =
-ÉÉ 
+ÕÕ 
 DateTime
-ÉÉ %
+ÕÕ %
 .
-ÉÉ% &
+ÕÕ% &
 UtcNow
-ÉÉ& ,
+ÕÕ& ,
 .
-ÉÉ, -
+ÕÕ, -
 
 AddMinutes
-ÉÉ- 7
+ÕÕ- 7
 (
-ÉÉ7 8#
+ÕÕ7 8#
 sessionTimeoutMinutes
-ÉÉ8 M
+ÕÕ8 M
 )
-ÉÉM N
+ÕÕM N
 }
-ÊÊ 
+ÖÖ 
 )
-ÊÊ 
+ÖÖ 
 ;
-ÊÊ 
+ÖÖ 
 }
-ËË 	
+×× 	
 private
-ÍÍ 
+ÙÙ 
 async
-ÍÍ 
+ÙÙ 
 Task
-ÍÍ 
+ÙÙ 
 LogActivityAsync
-ÍÍ +
+ÙÙ +
 (
-ÍÍ+ ,
+ÙÙ+ ,
 string
-ÍÍ, 2
+ÙÙ, 2
 userId
-ÍÍ3 9
+ÙÙ3 9
 ,
-ÍÍ9 :
+ÙÙ9 :
 string
-ÍÍ; A
+ÙÙ; A
 action
-ÍÍB H
+ÙÙB H
 ,
-ÍÍH I
+ÙÙH I
 string
-ÍÍJ P
+ÙÙJ P
 type
-ÍÍQ U
+ÙÙQ U
 )
-ÍÍU V
+ÙÙU V
 {
-ÎÎ 	
+ÚÚ 	
 if
-ÏÏ 
+ÛÛ 
 (
-ÏÏ 
+ÛÛ 
 string
-ÏÏ 
+ÛÛ 
 .
-ÏÏ  
+ÛÛ  
 IsNullOrWhiteSpace
-ÏÏ )
+ÛÛ )
 (
-ÏÏ) *
+ÛÛ) *
 userId
-ÏÏ* 0
+ÛÛ* 0
 )
-ÏÏ0 1
+ÛÛ0 1
 ||
-ÏÏ2 4
+ÛÛ2 4
 string
-ÏÏ5 ;
+ÛÛ5 ;
 .
-ÏÏ; < 
+ÛÛ; < 
 IsNullOrWhiteSpace
-ÏÏ< N
+ÛÛ< N
 (
-ÏÏN O
+ÛÛN O
 action
-ÏÏO U
+ÛÛO U
 )
-ÏÏU V
+ÛÛU V
 )
-ÏÏV W
+ÛÛV W
 return
-ĞĞ 
+ÜÜ 
 ;
-ĞĞ 
+ÜÜ 
 try
-ÒÒ 
+ŞŞ 
 {
-ÓÓ 
+ßß 
 _context
-ÔÔ 
+àà 
 .
-ÔÔ 
+àà 
 ActivityLogs
-ÔÔ %
+àà %
 .
-ÔÔ% &
+àà% &
 Add
-ÔÔ& )
+àà& )
 (
-ÔÔ) *
+àà) *
 new
-ÔÔ* -
+àà* -
 ActivityLog
-ÔÔ. 9
+àà. 9
 {
-ÕÕ 
+áá 
 UserID
-ÖÖ 
+ââ 
 =
-ÖÖ 
+ââ 
 userId
-ÖÖ #
+ââ #
 ,
-ÖÖ# $
+ââ# $
 Action
-×× 
+ãã 
 =
-×× 
+ãã 
 action
-×× #
+ãã #
 ,
-××# $
+ãã# $
 Type
-ØØ 
+ää 
 =
-ØØ 
+ää 
 string
-ØØ !
+ää !
 .
-ØØ! " 
+ää! " 
 IsNullOrWhiteSpace
-ØØ" 4
+ää" 4
 (
-ØØ4 5
+ää4 5
 type
-ØØ5 9
+ää5 9
 )
-ØØ9 :
+ää9 :
 ?
-ØØ; <
+ää; <
 $str
-ØØ= E
+ää= E
 :
-ØØF G
+ääF G
 type
-ØØH L
+ääH L
 ,
-ØØL M
+ääL M
 	IPAddress
-ÙÙ 
+åå 
 =
-ÙÙ 
+åå 
 HttpContext
-ÙÙ  +
+åå  +
 .
-ÙÙ+ ,
+åå+ ,
 
 Connection
-ÙÙ, 6
+åå, 6
 .
-ÙÙ6 7
+åå6 7
 RemoteIpAddress
-ÙÙ7 F
+åå7 F
 ?
-ÙÙF G
+ååF G
 .
-ÙÙG H
+ååG H
 ToString
-ÙÙH P
+ååH P
 (
-ÙÙP Q
+ååP Q
 )
-ÙÙQ R
+ååQ R
 ,
-ÙÙR S
+ååR S
 	Timestamp
-ÚÚ 
+ææ 
 =
-ÚÚ 
+ææ 
 DateTime
-ÚÚ  (
+ææ  (
 .
-ÚÚ( )
+ææ( )
 UtcNow
-ÚÚ) /
+ææ) /
 }
-ÛÛ 
+çç 
 )
-ÛÛ 
+çç 
 ;
-ÛÛ 
+çç 
 await
-İİ 
+éé 
 _context
-İİ 
+éé 
 .
-İİ 
+éé 
 SaveChangesAsync
-İİ /
+éé /
 (
-İİ/ 0
+éé/ 0
 )
-İİ0 1
+éé0 1
 ;
-İİ1 2
+éé1 2
 }
-ŞŞ 
+êê 
 catch
-ßß 
+ëë 
 {
-àà 
+ìì 
 }
-ââ 
+îî 
 }
-ãã 	
+ïï 	
 [
-åå 	
+ññ 	
 	Authorize
-åå	 
+ññ	 
 ]
-åå 
+ññ 
 [
-ææ 	&
+òò 	&
 RequireEmailVerification
-ææ	 !
+òò	 !
 ]
-ææ! "
+òò! "
 [
-çç 	
+óó 	
 HttpPost
-çç	 
+óó	 
 (
-çç 
+óó 
 $str
-çç '
+óó '
 )
-çç' (
+óó' (
 ]
-çç( )
+óó( )
 public
-èè 
+ôô 
 async
-èè 
+ôô 
 Task
-èè 
+ôô 
 <
-èè 
+ôô 
 IActionResult
-èè '
+ôô '
 >
-èè' (
+ôô' (
 SelectServiceType
-èè) :
+ôô) :
 (
-èè: ;
+ôô: ;
 [
-èè; <
+ôô; <
 FromBody
-èè< D
+ôô< D
 ]
-èèD E&
+ôôD E&
 SelectServiceTypeRequest
-èèF ^
+ôôF ^
 request
-èè_ f
+ôô_ f
 )
-èèf g
+ôôf g
 {
-éé 	
+õõ 	
 var
-êê 
+öö 
 userId
-êê 
+öö 
 =
-êê 
+öö 
 User
-êê 
+öö 
 .
-êê 
+öö 
 	FindFirst
-êê '
+öö '
 (
-êê' (
+öö' (
 System
-êê( .
+öö( .
 .
-êê. /
+öö. /
 Security
-êê/ 7
+öö/ 7
 .
-êê7 8
+öö7 8
 Claims
-êê8 >
+öö8 >
 .
-êê> ?
+öö> ?
 
 ClaimTypes
-êê? I
+öö? I
 .
-êêI J
+ööI J
 NameIdentifier
-êêJ X
+ööJ X
 )
-êêX Y
-?
-êêY Z
-.
-êêZ [
-Value
-êê[ `
-;
-êê` a
-var
-ëë 
-activeSubCount
-ëë 
-=
-ëë  
-await
-ëë! &
-_context
-ëë' /
-.
-ëë/ 0
-Subscriptions
-ëë0 =
-.
-ìì 
-
-CountAsync
-ìì 
-(
-ìì 
-s
-ìì 
-=>
-ìì  
-s
-ìì! "
-.
-ìì" #
-UserID
-ìì# )
-==
-ìì* ,
-userId
-ìì- 3
-&&
-ìì4 6
-s
-ìì7 8
-.
-ìì8 9
-Status
-ìì9 ?
-==
-ìì@ B
-$str
-ììC K
-)
-ììK L
-;
-ììL M
-var
-íí 
-activePrepCount
-íí 
-=
-íí  !
-await
-íí" '
-_context
-íí( 0
-.
-íí0 1
-Devices
-íí1 8
-.
-îî 
-Where
-îî 
-(
-îî 
-d
-îî 
-=>
-îî 
-d
-îî 
-.
-îî 
-UserID
-îî $
-==
-îî% '
-userId
-îî( .
-)
-îî. /
-.
-ïï 
-
-SelectMany
-ïï 
-(
-ïï 
-d
-ïï 
-=>
-ïï  
-d
-ïï! "
-.
-ïï" #
-ServiceAccounts
-ïï# 2
-)
-ïï2 3
-.
-ğğ 
-Where
-ğğ 
-(
-ğğ 
-sa
-ğğ 
-=>
-ğğ 
-sa
-ğğ 
-.
-ğğ  
-Status
-ğğ  &
-==
-ğğ' )
-$str
-ğğ* 2
-&&
-ğğ3 5
-sa
-ğğ6 8
-.
-ğğ8 9
-ServiceType
-ğğ9 D
-==
-ğğE G
-$str
-ğğH Q
-)
-ğğQ R
-.
-ññ 
-
-CountAsync
-ññ 
-(
-ññ 
-)
-ññ 
-;
-ññ 
-if
-óó 
-(
-óó 
-activeSubCount
-óó 
-+
-óó  
-activePrepCount
-óó! 0
->=
-óó1 3
-$num
-óó4 5
-)
-óó5 6
-return
-ôô 
-
-BadRequest
-ôô !
-(
-ôô! "
-new
-ôô" %
-{
-ôô& '
-message
-ôô( /
-=
-ôô0 1
-$str
-ôô2 l
-}
-ôôm n
-)
-ôôn o
-;
-ôôo p
-var
-öö 
-
-onboarding
-öö 
-=
-öö 
-await
-öö "
-_context
-öö# +
-.
-öö+ , 
-OnboardingStatuses
-öö, >
-.
-öö> ?!
-FirstOrDefaultAsync
-öö? R
-(
-ööR S
-o
-ööS T
-=>
-ööU W
-o
 ööX Y
+?
+ööY Z
 .
-ööY Z
-UserID
-ööZ `
-==
-ööa c
-userId
-ööd j
-)
-ööj k
+ööZ [
+Value
+öö[ `
 ;
-öök l
-if
-øø 
-(
-øø 
+öö` a
+var
+÷÷ 
+activeSubCount
+÷÷ 
+=
+÷÷  
+await
+÷÷! &
+_context
+÷÷' /
+.
+÷÷/ 0
+Subscriptions
+÷÷0 =
+.
+øø 
 
-onboarding
-øø 
-==
-øø 
-null
-øø "
-)
+CountAsync
+øø 
+(
+øø 
+s
+øø 
+=>
+øø  
+s
+øø! "
+.
 øø" #
-return
-ùù 
-NotFound
-ùù 
-(
-ùù  
-new
-ùù  #
-{
-ùù$ %
-message
-ùù& -
-=
-ùù. /
-$str
-ùù0 M
-}
-ùùN O
-)
-ùùO P
-;
-ùùP Q
-
-onboarding
-ûû 
-.
-ûû $
-HasSelectedServiceType
-ûû -
-=
-ûû. /
-true
-ûû0 4
-;
-ûû4 5
-await
-üü 
-_context
-üü 
-.
-üü 
-SaveChangesAsync
-üü +
-(
-üü+ ,
-)
-üü, -
-;
-üü- .
-return
-şş 
-Ok
-şş 
-(
-şş 
-new
-şş 
-{
-şş 
-message
-şş #
-=
-şş$ %
-$str
-şş& J
-}
-şşK L
-)
-şşL M
-;
-şşM N
-}
-ÿÿ 	
-[
- 	
-	Authorize
-	 
-]
- 
-[
-‚‚ 	&
-RequireEmailVerification
-‚‚	 !
-]
-‚‚! "
-[
-ƒƒ 	
-HttpGet
-ƒƒ	 
-(
-ƒƒ 
-$str
-ƒƒ $
-)
-ƒƒ$ %
-]
-ƒƒ% &
-public
-„„ 
-async
-„„ 
-Task
-„„ 
-<
-„„ 
-IActionResult
-„„ '
->
-„„' (!
-GetOnboardingStatus
-„„) <
-(
-„„< =
-)
-„„= >
-{
-…… 	
-var
-†† 
-userId
-†† 
-=
-†† 
-User
-†† 
-.
-†† 
-	FindFirst
-†† '
-(
-††' (
-System
-††( .
-.
-††. /
-Security
-††/ 7
-.
-††7 8
-Claims
-††8 >
-.
-††> ?
-
-ClaimTypes
-††? I
-.
-††I J
-NameIdentifier
-††J X
-)
-††X Y
-?
-††Y Z
-.
-††Z [
-Value
-††[ `
-;
-††` a
-var
-ˆˆ #
-hasActiveSubscription
-ˆˆ %
-=
-ˆˆ& '
-await
-ˆˆ( -
-_context
-ˆˆ. 6
-.
-ˆˆ6 7
-Subscriptions
-ˆˆ7 D
-.
-‰‰ 
-AnyAsync
-‰‰ 
-(
-‰‰ 
-s
-‰‰ 
-=>
-‰‰ 
-s
-‰‰  
-.
-‰‰  !
 UserID
-‰‰! '
+øø# )
 ==
-‰‰( *
+øø* ,
 userId
-‰‰+ 1
+øø- 3
 &&
-‰‰2 4
+øø4 6
 s
-‰‰5 6
+øø7 8
 .
-‰‰6 7
+øø8 9
 Status
-‰‰7 =
+øø9 ?
 ==
-‰‰> @
-$str
-‰‰A I
+øø@ B
+StatusActive
+øøC O
 )
-‰‰I J
+øøO P
 ;
-‰‰J K
+øøP Q
 var
-‹‹ 
-hasActivePrepaid
-‹‹  
+ùù 
+activePrepCount
+ùù 
 =
-‹‹! "
+ùù  !
 await
-‹‹# (
+ùù" '
 _context
-‹‹) 1
+ùù( 0
 .
-‹‹1 2
+ùù0 1
 Devices
-‹‹2 9
+ùù1 8
 .
-ŒŒ 
+úú 
 Where
-ŒŒ 
+úú 
 (
-ŒŒ 
+úú 
 d
-ŒŒ 
+úú 
 =>
-ŒŒ 
+úú 
 d
-ŒŒ 
+úú 
 .
-ŒŒ 
+úú 
 UserID
-ŒŒ $
+úú $
 ==
-ŒŒ% '
+úú% '
 userId
-ŒŒ( .
+úú( .
 )
-ŒŒ. /
+úú. /
 .
- 
+ûû 
 
 SelectMany
- 
+ûû 
 (
- 
+ûû 
 d
- 
+ûû 
 =>
-  
+ûû  
 d
-! "
+ûû! "
 .
-" #
+ûû" #
 ServiceAccounts
-# 2
+ûû# 2
 )
-2 3
+ûû2 3
 .
- 
+üü 
 Where
- 
+üü 
 (
- 
+üü 
 sa
- 
+üü 
 =>
- 
+üü 
 sa
- 
+üü 
 .
-  
+üü  
 Status
-  &
+üü  &
 ==
-' )
-$str
-* 2
-)
-2 3
-.
- 
-
-SelectMany
- 
-(
- 
+üü' )
+StatusActive
+üü* 6
+&&
+üü7 9
 sa
- 
-=>
- !
-sa
-" $
+üü: <
 .
-$ %
-PrepaidLoads
-% 1
-)
-1 2
-.
- 
-AnyAsync
- 
-(
- 
-)
- 
-;
- 
-var
-’’ 
-hasActivePlan
-’’ 
-=
-’’ #
-hasActiveSubscription
-’’  5
-||
-’’6 8
-hasActivePrepaid
-’’9 I
-;
-’’I J
-var
-”” 
-
-onboarding
-”” 
-=
-”” 
-await
-”” "
-_context
-””# +
-.
-””+ , 
-OnboardingStatuses
-””, >
-.
-””> ?!
-FirstOrDefaultAsync
-””? R
-(
-””R S
-o
-””S T
-=>
-””U W
-o
-””X Y
-.
-””Y Z
-UserID
-””Z `
-==
-””a c
-userId
-””d j
-)
-””j k
-;
-””k l
-if
-–– 
-(
-–– 
-
-onboarding
-–– 
-==
-–– 
-null
-–– "
-)
-––" #
-{
-—— 
-return
-˜˜ 
-Ok
-˜˜ 
-(
-˜˜ 
-new
-˜˜ 
-{
-™™ $
-hasSelectedServiceType
-šš *
-=
-šš+ ,
-false
-šš- 2
-,
-šš2 3!
-hasRegisteredDevice
-›› '
-=
-››( )
-false
-››* /
-,
-››/ 0"
-hasCompletedTutorial
-œœ (
-=
-œœ) *
-false
-œœ+ 0
-,
-œœ0 1
-hasActivePlan
- !
-}
- 
-)
- 
-;
- 
-}
-ŸŸ 
-return
-¡¡ 
-Ok
-¡¡ 
-(
-¡¡ 
-new
-¡¡ 
-{
-¢¢ $
-hasSelectedServiceType
-££ &
-=
-££' (
-
-onboarding
-££) 3
-.
-££3 4$
-HasSelectedServiceType
-££4 J
-,
-££J K!
-hasRegisteredDevice
-¤¤ #
-=
-¤¤$ %
-
-onboarding
-¤¤& 0
-.
-¤¤0 1!
-HasRegisteredDevice
-¤¤1 D
-,
-¤¤D E"
-hasCompletedTutorial
-¥¥ $
-=
-¥¥% &
-
-onboarding
-¥¥' 1
-.
-¥¥1 2"
-HasCompletedTutorial
-¥¥2 F
-,
-¥¥F G
-hasActivePlan
-¦¦ 
-}
-§§ 
-)
-§§ 
-;
-§§ 
-}
-¨¨ 	
-[
-ªª 	
-	Authorize
-ªª	 
-]
-ªª 
-[
-«« 	&
-RequireEmailVerification
-««	 !
-]
-««! "
-[
-¬¬ 	
-HttpPost
-¬¬	 
-(
-¬¬ 
-$str
-¬¬ #
-)
-¬¬# $
-]
-¬¬$ %
-public
-­­ 
-async
-­­ 
-Task
-­­ 
-<
-­­ 
-IActionResult
-­­ '
->
-­­' (
-RegisterDevice
-­­) 7
-(
-­­7 8
-[
-­­8 9
-FromBody
-­­9 A
-]
-­­A B#
-RegisterDeviceRequest
-­­C X
-request
-­­Y `
-)
-­­` a
-{
-®® 	
-try
-¯¯ 
-{
-°° 
-var
-±± 
-userId
-±± 
-=
-±± 
-User
-±± !
-.
-±±! "
-	FindFirst
-±±" +
-(
-±±+ ,
-System
-±±, 2
-.
-±±2 3
-Security
-±±3 ;
-.
-±±; <
-Claims
-±±< B
-.
-±±B C
-
-ClaimTypes
-±±C M
-.
-±±M N
-NameIdentifier
-±±N \
-)
-±±\ ]
-?
-±±] ^
-.
-±±^ _
-Value
-±±_ d
-;
-±±d e
-var
-³³ 
-limitResult
-³³ 
-=
-³³  !
-await
-³³" '&
-EnforceServiceLimitAsync
-³³( @
-(
-³³@ A
-userId
-³³A G
-)
-³³G H
-;
-³³H I
-if
-´´ 
-(
-´´ 
-limitResult
-´´ 
-!=
-´´  "
-null
-´´# '
-)
-´´' (
-return
-µµ 
-limitResult
-µµ &
-;
-µµ& '
-var
-·· 
-serviceType
-·· 
-=
-··  ! 
-ResolveServiceType
-··" 4
-(
-··4 5
-request
-··5 <
-.
-··< =
+üü< =
 ServiceType
-··= H
-)
-··H I
-;
-··I J
-var
-¸¸ 
-validationResult
-¸¸ $
-=
-¸¸% &$
-ValidatePrepaidRequest
-¸¸' =
-(
-¸¸= >
-serviceType
-¸¸> I
-,
-¸¸I J
-request
-¸¸K R
-.
-¸¸R S
-PhoneNumber
-¸¸S ^
-)
-¸¸^ _
-;
-¸¸_ `
-if
-¹¹ 
-(
-¹¹ 
-validationResult
-¹¹ $
-!=
-¹¹% '
-null
-¹¹( ,
-)
-¹¹, -
-return
-ºº 
-validationResult
-ºº +
-;
-ºº+ ,
-var
-¼¼ 
-
-macAddress
-¼¼ 
-=
-¼¼  
-ResolveMacAddress
-¼¼! 2
-(
-¼¼2 3
-serviceType
-¼¼3 >
-,
-¼¼> ?
-request
-¼¼@ G
-.
-¼¼G H
-
-MacAddress
-¼¼H R
-)
-¼¼R S
-;
-¼¼S T
-var
-¾¾ 
-device
-¾¾ 
-=
-¾¾ 
-await
-¾¾ "
-CreateDeviceAsync
-¾¾# 4
-(
-¾¾4 5
-userId
-¾¾5 ;
-!
-¾¾; <
-,
-¾¾< =
-
-macAddress
-¾¾> H
-)
-¾¾H I
-;
-¾¾I J
-var
-¿¿ 
-serviceAccount
-¿¿ "
-=
-¿¿# $
-await
-¿¿% *'
-CreateServiceAccountAsync
-¿¿+ D
-(
-¿¿D E
-device
-¿¿E K
-.
-¿¿K L
-DeviceID
-¿¿L T
-,
-¿¿T U
-serviceType
-¿¿V a
-)
-¿¿a b
-;
-¿¿b c
-if
-ÁÁ 
-(
-ÁÁ 
-serviceType
-ÁÁ 
+üü= H
 ==
-ÁÁ  "
-$str
-ÁÁ# ,
+üüI K
+ServicePrepaid
+üüL Z
 )
-ÁÁ, -
-{
-ÂÂ 
-await
-ÃÃ $
-CreatePrepaidLoadAsync
-ÃÃ 0
-(
-ÃÃ0 1
-serviceAccount
-ÃÃ1 ?
+üüZ [
 .
-ÃÃ? @
-ServiceAccountID
-ÃÃ@ P
-,
-ÃÃP Q
-request
-ÃÃR Y
-.
-ÃÃY Z
-PhoneNumber
-ÃÃZ e
-)
-ÃÃe f
-;
-ÃÃf g
-}
-ÄÄ 
-else
-ÅÅ 
-{
-ÆÆ 
-var
-ÇÇ 
-
-planResult
-ÇÇ "
-=
-ÇÇ# $
-await
-ÇÇ% * 
-ResolvePlanIdAsync
-ÇÇ+ =
-(
-ÇÇ= >
-request
-ÇÇ> E
-.
-ÇÇE F
-PlanID
-ÇÇF L
-,
-ÇÇL M
-request
-ÇÇN U
-.
-ÇÇU V
-
-MacAddress
-ÇÇV `
-)
-ÇÇ` a
-;
-ÇÇa b
-if
-ÈÈ 
-(
-ÈÈ 
-
-planResult
-ÈÈ "
-.
-ÈÈ" #
-Error
-ÈÈ# (
-!=
-ÈÈ) +
-null
-ÈÈ, 0
-)
-ÈÈ0 1
-return
-ÉÉ 
-
-planResult
-ÉÉ )
-.
-ÉÉ) *
-Error
-ÉÉ* /
-;
-ÉÉ/ 0
-await
-ËË %
-CreateSubscriptionAsync
-ËË 1
-(
-ËË1 2
-serviceAccount
-ËË2 @
-.
-ËË@ A
-ServiceAccountID
-ËËA Q
-,
-ËËQ R
-userId
-ËËS Y
-!
-ËËY Z
-,
-ËËZ [
-
-planResult
-ËË\ f
-.
-ËËf g
-PlanId
-ËËg m
-!
-ËËm n
-.
-ËËn o
-Value
-ËËo t
-)
-ËËt u
-;
-ËËu v
-}
-ÌÌ 
-await
-ÎÎ #
-UpdateOnboardingAsync
-ÎÎ +
-(
-ÎÎ+ ,
-userId
-ÎÎ, 2
-)
-ÎÎ2 3
-;
-ÎÎ3 4
-return
-ĞĞ 
-Ok
-ĞĞ 
-(
-ĞĞ 
-new
-ĞĞ 
-{
-ĞĞ 
-message
-ĞĞ  '
-=
-ĞĞ( )
-$str
-ĞĞ* J
-,
-ĞĞJ K
-deviceId
-ĞĞL T
-=
-ĞĞU V
-device
-ĞĞW ]
-.
-ĞĞ] ^
-DeviceID
-ĞĞ^ f
-,
-ĞĞf g
-serviceType
-ĞĞh s
-}
-ĞĞt u
-)
-ĞĞu v
-;
-ĞĞv w
-}
-ÑÑ 
-catch
-ÒÒ 
-(
-ÒÒ 
-	Exception
-ÒÒ 
-ex
-ÒÒ 
-)
-ÒÒ  
-{
-ÓÓ 
-return
-ÔÔ 
-
-BadRequest
-ÔÔ !
-(
-ÔÔ! "
-new
-ÔÔ" %
-{
-ÔÔ& '
-message
-ÔÔ( /
-=
-ÔÔ0 1
-$"
-ÔÔ2 4
-$str
-ÔÔ4 O
-{
-ÔÔO P
-ex
-ÔÔP R
-.
-ÔÔR S
-Message
-ÔÔS Z
-}
-ÔÔZ [
-"
-ÔÔ[ \
-}
-ÔÔ] ^
-)
-ÔÔ^ _
-;
-ÔÔ_ `
-}
-ÕÕ 
-}
-ÖÖ 	
-private
-ØØ 
-async
-ØØ 
-Task
-ØØ 
-<
-ØØ 
-IActionResult
-ØØ (
-?
-ØØ( )
->
-ØØ) *&
-EnforceServiceLimitAsync
-ØØ+ C
-(
-ØØC D
-string
-ØØD J
-?
-ØØJ K
-userId
-ØØL R
-)
-ØØR S
-{
-ÙÙ 	
-var
-ÚÚ %
-activeSubscriptionCount
-ÚÚ '
-=
-ÚÚ( )
-await
-ÚÚ* /
-_context
-ÚÚ0 8
-.
-ÚÚ8 9
-Subscriptions
-ÚÚ9 F
-.
-ÛÛ 
+ıı 
 
 CountAsync
-ÛÛ 
+ıı 
 (
-ÛÛ 
-s
-ÛÛ 
-=>
-ÛÛ  
-s
-ÛÛ! "
-.
-ÛÛ" #
-UserID
-ÛÛ# )
-==
-ÛÛ* ,
-userId
-ÛÛ- 3
-&&
-ÛÛ4 6
-s
-ÛÛ7 8
-.
-ÛÛ8 9
-Status
-ÛÛ9 ?
-==
-ÛÛ@ B
-$str
-ÛÛC K
+ıı 
 )
-ÛÛK L
+ıı 
 ;
-ÛÛL M
-var
-ÜÜ  
-activePrepaidCount
-ÜÜ "
-=
-ÜÜ# $
-await
-ÜÜ% *
-_context
-ÜÜ+ 3
-.
-ÜÜ3 4
-Devices
-ÜÜ4 ;
-.
-İİ 
-Where
-İİ 
-(
-İİ 
-d
-İİ 
-=>
-İİ 
-d
-İİ 
-.
-İİ 
-UserID
-İİ $
-==
-İİ% '
-userId
-İİ( .
-)
-İİ. /
-.
-ŞŞ 
-
-SelectMany
-ŞŞ 
-(
-ŞŞ 
-d
-ŞŞ 
-=>
-ŞŞ  
-d
-ŞŞ! "
-.
-ŞŞ" #
-ServiceAccounts
-ŞŞ# 2
-)
-ŞŞ2 3
-.
-ßß 
-Where
-ßß 
-(
-ßß 
-sa
-ßß 
-=>
-ßß 
-sa
-ßß 
-.
-ßß  
-Status
-ßß  &
-==
-ßß' )
-$str
-ßß* 2
-&&
-ßß3 5
-sa
-ßß6 8
-.
-ßß8 9
-ServiceType
-ßß9 D
-==
-ßßE G
-$str
-ßßH Q
-)
-ßßQ R
-.
-àà 
-
-CountAsync
-àà 
-(
-àà 
-)
-àà 
-;
-àà 
+ıı 
 if
-ââ 
+ÿÿ 
 (
-ââ %
-activeSubscriptionCount
-ââ '
+ÿÿ 
+activeSubCount
+ÿÿ 
 +
-ââ( ) 
-activePrepaidCount
-ââ* <
+ÿÿ  
+activePrepCount
+ÿÿ! 0
 >=
-ââ= ?
+ÿÿ1 3
 $num
-ââ@ A
+ÿÿ4 5
 )
-ââA B
+ÿÿ5 6
 return
-ãã 
+€€ 
 
 BadRequest
-ãã !
+€€ !
 (
-ãã! "
+€€! "
 new
-ãã" %
+€€" %
 {
-ãã& '
+€€& '
 message
-ãã( /
+€€( /
 =
-ãã0 1
+€€0 1
 $str
-ãã2 l
+€€2 l
 }
-ããm n
+€€m n
 )
-ããn o
+€€n o
 ;
-ãão p
-return
-åå 
-null
-åå 
-;
-åå 
-}
-ææ 	
-private
-èè 
-static
-èè 
-string
-èè  
-ResolveServiceType
-èè 0
-(
-èè0 1
-string
-èè1 7
-?
-èè7 8
-serviceType
-èè9 D
-)
-èèD E
-{
-éé 	
-return
-êê 
-string
-êê 
-.
-êê  
-IsNullOrWhiteSpace
-êê ,
-(
-êê, -
-serviceType
-êê- 8
-)
-êê8 9
-?
-êê: ;
-$str
-êê< J
-:
-êêK L
-serviceType
-êêM X
-;
-êêX Y
-}
-ëë 	
-private
-íí 
-IActionResult
-íí 
-?
-íí $
-ValidatePrepaidRequest
-íí 5
-(
-íí5 6
-string
-íí6 <
-serviceType
-íí= H
-,
-ííH I
-string
-ííJ P
-?
-ííP Q
-phoneNumber
-ííR ]
-)
-íí] ^
-{
-îî 	
-if
-ïï 
-(
-ïï 
-serviceType
-ïï 
-==
-ïï 
-$str
-ïï (
-&&
-ïï) +
-string
-ïï, 2
-.
-ïï2 3 
-IsNullOrWhiteSpace
-ïï3 E
-(
-ïïE F
-phoneNumber
-ïïF Q
-)
-ïïQ R
-)
-ïïR S
-return
-ğğ 
-
-BadRequest
-ğğ !
-(
-ğğ! "
-new
-ğğ" %
-{
-ğğ& '
-message
-ğğ( /
-=
-ğğ0 1
-$str
-ğğ2 e
-}
-ğğf g
-)
-ğğg h
-;
-ğğh i
-return
-òò 
-null
-òò 
-;
-òò 
-}
-óó 	
-private
-õõ 
-static
-õõ 
-string
-õõ 
-?
-õõ 
-ResolveMacAddress
-õõ 0
-(
-õõ0 1
-string
-õõ1 7
-serviceType
-õõ8 C
-,
-õõC D
-string
-õõE K
-?
-õõK L
-
-macAddress
-õõM W
-)
-õõW X
-{
-öö 	
-if
-÷÷ 
-(
-÷÷ 
-serviceType
-÷÷ 
-!=
-÷÷ 
-$str
-÷÷ (
-||
-÷÷) +
-!
-÷÷, -
-string
-÷÷- 3
-.
-÷÷3 4 
-IsNullOrWhiteSpace
-÷÷4 F
-(
-÷÷F G
-
-macAddress
-÷÷G Q
-)
-÷÷Q R
-)
-÷÷R S
-return
-øø 
-
-macAddress
-øø !
-;
-øø! "
-return
-úú 
-$"
-úú 
-$str
-úú 
-{
-úú 
-DateTime
-úú !
-.
-úú! "
-UtcNow
-úú" (
-:
-úú( )
-$str
-úú) /
-}
-úú/ 0
-$str
-úú0 1
-{
-úú1 2
-new
-úú2 5
-Random
-úú6 <
-(
-úú< =
-)
-úú= >
-.
-úú> ?
-Next
-úú? C
-(
-úúC D
-$num
-úúD H
-,
-úúH I
-$num
-úúJ N
-)
-úúN O
-:
-úúO P
-$str
-úúP R
-}
-úúR S
-$str
-úúS T
-{
-úúT U
-new
-úúU X
-Random
-úúY _
-(
-úú_ `
-)
-úú` a
-.
-úúa b
-Next
-úúb f
-(
-úúf g
-$num
-úúg k
-,
-úúk l
-$num
-úúm q
-)
-úúq r
-:
-úúr s
-$str
-úús u
-}
-úúu v
-$str
-úúv w
-{
-úúw x
-new
-úúx {
-Randomúú| ‚
-(úú‚ ƒ
-)úúƒ „
-.úú„ …
-Nextúú… ‰
-(úú‰ Š
-$numúúŠ 
-,úú 
-$numúú ”
-)úú” •
-:úú• –
-$strúú– ˜
-}úú˜ ™
-$strúú™ š
-{úúš ›
-newúú› 
-RandomúúŸ ¥
-(úú¥ ¦
-)úú¦ §
-.úú§ ¨
-Nextúú¨ ¬
-(úú¬ ­
-$numúú­ ±
-,úú± ²
-$numúú³ ·
-)úú· ¸
-:úú¸ ¹
-$strúú¹ »
-}úú» ¼
-"úú¼ ½
-;úú½ ¾
-}
-ûû 	
-private
-ıı 
-async
-ıı 
-Task
-ıı 
-<
-ıı 
-Device
-ıı !
->
-ıı! "
-CreateDeviceAsync
-ıı# 4
-(
-ıı4 5
-string
-ıı5 ;
-userId
-ıı< B
-,
-ııB C
-string
-ııD J
-?
-ııJ K
-
-macAddress
-ııL V
-)
-ııV W
-{
-şş 	
+€€o p
 var
-ÿÿ 
-device
-ÿÿ 
+‚‚ 
+
+onboarding
+‚‚ 
 =
-ÿÿ 
-new
-ÿÿ 
-Device
-ÿÿ #
-{
-€€ 
+‚‚ 
+await
+‚‚ "
+_context
+‚‚# +
+.
+‚‚+ , 
+OnboardingStatuses
+‚‚, >
+.
+‚‚> ?!
+FirstOrDefaultAsync
+‚‚? R
+(
+‚‚R S
+o
+‚‚S T
+=>
+‚‚U W
+o
+‚‚X Y
+.
+‚‚Y Z
 UserID
- 
-=
- 
+‚‚Z `
+==
+‚‚a c
 userId
- 
+‚‚d j
+)
+‚‚j k
+;
+‚‚k l
+if
+„„ 
+(
+„„ 
+
+onboarding
+„„ 
+==
+„„ 
+null
+„„ "
+)
+„„" #
+return
+…… 
+NotFound
+…… 
+(
+……  
+new
+……  #
+{
+……$ %
+message
+……& -
+=
+……. /
+$str
+……0 M
+}
+……N O
+)
+……O P
+;
+……P Q
+
+onboarding
+‡‡ 
+.
+‡‡ $
+HasSelectedServiceType
+‡‡ -
+=
+‡‡. /
+true
+‡‡0 4
+;
+‡‡4 5
+await
+ˆˆ 
+_context
+ˆˆ 
+.
+ˆˆ 
+SaveChangesAsync
+ˆˆ +
+(
+ˆˆ+ ,
+)
+ˆˆ, -
+;
+ˆˆ- .
+return
+ŠŠ 
+Ok
+ŠŠ 
+(
+ŠŠ 
+new
+ŠŠ 
+{
+ŠŠ 
+message
+ŠŠ #
+=
+ŠŠ$ %
+$str
+ŠŠ& J
+}
+ŠŠK L
+)
+ŠŠL M
+;
+ŠŠM N
+}
+‹‹ 	
+[
+ 	
+	Authorize
+	 
+]
+ 
+[
+ 	&
+RequireEmailVerification
+	 !
+]
+! "
+[
+ 	
+HttpGet
+	 
+(
+ 
+$str
+ $
+)
+$ %
+]
+% &
+public
+ 
+async
+ 
+Task
+ 
+<
+ 
+IActionResult
+ '
+>
+' (!
+GetOnboardingStatus
+) <
+(
+< =
+)
+= >
+{
+‘‘ 	
+var
+’’ 
+userId
+’’ 
+=
+’’ 
+User
+’’ 
+.
+’’ 
+	FindFirst
+’’ '
+(
+’’' (
+System
+’’( .
+.
+’’. /
+Security
+’’/ 7
+.
+’’7 8
+Claims
+’’8 >
+.
+’’> ?
+
+ClaimTypes
+’’? I
+.
+’’I J
+NameIdentifier
+’’J X
+)
+’’X Y
+?
+’’Y Z
+.
+’’Z [
+Value
+’’[ `
+;
+’’` a
+var
+”” #
+hasActiveSubscription
+”” %
+=
+””& '
+await
+””( -
+_context
+””. 6
+.
+””6 7
+Subscriptions
+””7 D
+.
+•• 
+AnyAsync
+•• 
+(
+•• 
+s
+•• 
+=>
+•• 
+s
+••  
+.
+••  !
+UserID
+••! '
+==
+••( *
+userId
+••+ 1
+&&
+••2 4
+s
+••5 6
+.
+••6 7
+Status
+••7 =
+==
+••> @
+StatusActive
+••A M
+)
+••M N
+;
+••N O
+var
+—— 
+hasActivePrepaid
+——  
+=
+——! "
+await
+——# (
+_context
+——) 1
+.
+——1 2
+Devices
+——2 9
+.
+˜˜ 
+Where
+˜˜ 
+(
+˜˜ 
+d
+˜˜ 
+=>
+˜˜ 
+d
+˜˜ 
+.
+˜˜ 
+UserID
+˜˜ $
+==
+˜˜% '
+userId
+˜˜( .
+)
+˜˜. /
+.
+™™ 
+
+SelectMany
+™™ 
+(
+™™ 
+d
+™™ 
+=>
+™™  
+d
+™™! "
+.
+™™" #
+ServiceAccounts
+™™# 2
+)
+™™2 3
+.
+šš 
+Where
+šš 
+(
+šš 
+sa
+šš 
+=>
+šš 
+sa
+šš 
+.
+šš  
+Status
+šš  &
+==
+šš' )
+StatusActive
+šš* 6
+)
+šš6 7
+.
+›› 
+
+SelectMany
+›› 
+(
+›› 
+sa
+›› 
+=>
+›› !
+sa
+››" $
+.
+››$ %
+PrepaidLoads
+››% 1
+)
+››1 2
+.
+œœ 
+AnyAsync
+œœ 
+(
+œœ 
+)
+œœ 
+;
+œœ 
+var
+ 
+hasActivePlan
+ 
+=
+ #
+hasActiveSubscription
+  5
+||
+6 8
+hasActivePrepaid
+9 I
+;
+I J
+var
+   
+
+onboarding
+   
+=
+   
+await
+   "
+_context
+  # +
+.
+  + , 
+OnboardingStatuses
+  , >
+.
+  > ?!
+FirstOrDefaultAsync
+  ? R
+(
+  R S
+o
+  S T
+=>
+  U W
+o
+  X Y
+.
+  Y Z
+UserID
+  Z `
+==
+  a c
+userId
+  d j
+)
+  j k
+;
+  k l
+if
+¢¢ 
+(
+¢¢ 
+
+onboarding
+¢¢ 
+==
+¢¢ 
+null
+¢¢ "
+)
+¢¢" #
+{
+££ 
+return
+¤¤ 
+Ok
+¤¤ 
+(
+¤¤ 
+new
+¤¤ 
+{
+¥¥ $
+hasSelectedServiceType
+¦¦ *
+=
+¦¦+ ,
+false
+¦¦- 2
 ,
-  
+¦¦2 3!
+hasRegisteredDevice
+§§ '
+=
+§§( )
+false
+§§* /
+,
+§§/ 0"
+hasCompletedTutorial
+¨¨ (
+=
+¨¨) *
+false
+¨¨+ 0
+,
+¨¨0 1
+hasActivePlan
+©© !
+}
+ªª 
+)
+ªª 
+;
+ªª 
+}
+«« 
+return
+­­ 
+Ok
+­­ 
+(
+­­ 
+new
+­­ 
+{
+®® $
+hasSelectedServiceType
+¯¯ &
+=
+¯¯' (
+
+onboarding
+¯¯) 3
+.
+¯¯3 4$
+HasSelectedServiceType
+¯¯4 J
+,
+¯¯J K!
+hasRegisteredDevice
+°° #
+=
+°°$ %
+
+onboarding
+°°& 0
+.
+°°0 1!
+HasRegisteredDevice
+°°1 D
+,
+°°D E"
+hasCompletedTutorial
+±± $
+=
+±±% &
+
+onboarding
+±±' 1
+.
+±±1 2"
+HasCompletedTutorial
+±±2 F
+,
+±±F G
+hasActivePlan
+²² 
+}
+³³ 
+)
+³³ 
+;
+³³ 
+}
+´´ 	
+[
+¶¶ 	
+	Authorize
+¶¶	 
+]
+¶¶ 
+[
+·· 	&
+RequireEmailVerification
+··	 !
+]
+··! "
+[
+¸¸ 	
+HttpPost
+¸¸	 
+(
+¸¸ 
+$str
+¸¸ #
+)
+¸¸# $
+]
+¸¸$ %
+public
+¹¹ 
+async
+¹¹ 
+Task
+¹¹ 
+<
+¹¹ 
+IActionResult
+¹¹ '
+>
+¹¹' (
+RegisterDevice
+¹¹) 7
+(
+¹¹7 8
+[
+¹¹8 9
+FromBody
+¹¹9 A
+]
+¹¹A B#
+RegisterDeviceRequest
+¹¹C X
+request
+¹¹Y `
+)
+¹¹` a
+{
+ºº 	
+try
+»» 
+{
+¼¼ 
+var
+½½ 
+userId
+½½ 
+=
+½½ 
+User
+½½ !
+.
+½½! "
+	FindFirst
+½½" +
+(
+½½+ ,
+System
+½½, 2
+.
+½½2 3
+Security
+½½3 ;
+.
+½½; <
+Claims
+½½< B
+.
+½½B C
+
+ClaimTypes
+½½C M
+.
+½½M N
+NameIdentifier
+½½N \
+)
+½½\ ]
+?
+½½] ^
+.
+½½^ _
+Value
+½½_ d
+;
+½½d e
+var
+¿¿ 
+limitResult
+¿¿ 
+=
+¿¿  !
+await
+¿¿" '&
+EnforceServiceLimitAsync
+¿¿( @
+(
+¿¿@ A
+userId
+¿¿A G
+)
+¿¿G H
+;
+¿¿H I
+if
+ÀÀ 
+(
+ÀÀ 
+limitResult
+ÀÀ 
+!=
+ÀÀ  "
+null
+ÀÀ# '
+)
+ÀÀ' (
+return
+ÁÁ 
+limitResult
+ÁÁ &
+;
+ÁÁ& '
+var
+ÃÃ 
+serviceType
+ÃÃ 
+=
+ÃÃ  ! 
+ResolveServiceType
+ÃÃ" 4
+(
+ÃÃ4 5
+request
+ÃÃ5 <
+.
+ÃÃ< =
+ServiceType
+ÃÃ= H
+)
+ÃÃH I
+;
+ÃÃI J
+var
+ÄÄ 
+validationResult
+ÄÄ $
+=
+ÄÄ% &$
+ValidatePrepaidRequest
+ÄÄ' =
+(
+ÄÄ= >
+serviceType
+ÄÄ> I
+,
+ÄÄI J
+request
+ÄÄK R
+.
+ÄÄR S
+PhoneNumber
+ÄÄS ^
+)
+ÄÄ^ _
+;
+ÄÄ_ `
+if
+ÅÅ 
+(
+ÅÅ 
+validationResult
+ÅÅ $
+!=
+ÅÅ% '
+null
+ÅÅ( ,
+)
+ÅÅ, -
+return
+ÆÆ 
+validationResult
+ÆÆ +
+;
+ÆÆ+ ,
+var
+ÈÈ 
+
+macAddress
+ÈÈ 
+=
+ÈÈ  
+ResolveMacAddress
+ÈÈ! 2
+(
+ÈÈ2 3
+serviceType
+ÈÈ3 >
+,
+ÈÈ> ?
+request
+ÈÈ@ G
+.
+ÈÈG H
+
+MacAddress
+ÈÈH R
+)
+ÈÈR S
+;
+ÈÈS T
+var
+ÊÊ 
+device
+ÊÊ 
+=
+ÊÊ 
+await
+ÊÊ "
+CreateDeviceAsync
+ÊÊ# 4
+(
+ÊÊ4 5
+userId
+ÊÊ5 ;
+!
+ÊÊ; <
+,
+ÊÊ< =
+
+macAddress
+ÊÊ> H
+)
+ÊÊH I
+;
+ÊÊI J
+var
+ËË 
+serviceAccount
+ËË "
+=
+ËË# $
+await
+ËË% *'
+CreateServiceAccountAsync
+ËË+ D
+(
+ËËD E
+device
+ËËE K
+.
+ËËK L
+DeviceID
+ËËL T
+,
+ËËT U
+serviceType
+ËËV a
+)
+ËËa b
+;
+ËËb c
+if
+ÍÍ 
+(
+ÍÍ 
+serviceType
+ÍÍ 
+==
+ÍÍ  "
+ServicePrepaid
+ÍÍ# 1
+)
+ÍÍ1 2
+{
+ÎÎ 
+await
+ÏÏ $
+CreatePrepaidLoadAsync
+ÏÏ 0
+(
+ÏÏ0 1
+serviceAccount
+ÏÏ1 ?
+.
+ÏÏ? @
+ServiceAccountID
+ÏÏ@ P
+,
+ÏÏP Q
+request
+ÏÏR Y
+.
+ÏÏY Z
+PhoneNumber
+ÏÏZ e
+)
+ÏÏe f
+;
+ÏÏf g
+}
+ĞĞ 
+else
+ÑÑ 
+{
+ÒÒ 
+var
+ÓÓ 
+
+planResult
+ÓÓ "
+=
+ÓÓ# $
+await
+ÓÓ% * 
+ResolvePlanIdAsync
+ÓÓ+ =
+(
+ÓÓ= >
+request
+ÓÓ> E
+.
+ÓÓE F
+PlanID
+ÓÓF L
+,
+ÓÓL M
+request
+ÓÓN U
+.
+ÓÓU V
+
+MacAddress
+ÓÓV `
+)
+ÓÓ` a
+;
+ÓÓa b
+if
+ÔÔ 
+(
+ÔÔ 
+
+planResult
+ÔÔ "
+.
+ÔÔ" #
+Error
+ÔÔ# (
+!=
+ÔÔ) +
+null
+ÔÔ, 0
+)
+ÔÔ0 1
+return
+ÕÕ 
+
+planResult
+ÕÕ )
+.
+ÕÕ) *
+Error
+ÕÕ* /
+;
+ÕÕ/ 0
+await
+×× %
+CreateSubscriptionAsync
+×× 1
+(
+××1 2
+serviceAccount
+××2 @
+.
+××@ A
+ServiceAccountID
+××A Q
+,
+××Q R
+userId
+××S Y
+!
+××Y Z
+,
+××Z [
+
+planResult
+××\ f
+.
+××f g
+PlanId
+××g m
+!
+××m n
+.
+××n o
+Value
+××o t
+)
+××t u
+;
+××u v
+}
+ØØ 
+await
+ÚÚ #
+UpdateOnboardingAsync
+ÚÚ +
+(
+ÚÚ+ ,
+userId
+ÚÚ, 2
+)
+ÚÚ2 3
+;
+ÚÚ3 4
+return
+ÜÜ 
+Ok
+ÜÜ 
+(
+ÜÜ 
+new
+ÜÜ 
+{
+ÜÜ 
+message
+ÜÜ  '
+=
+ÜÜ( )
+$str
+ÜÜ* J
+,
+ÜÜJ K
+deviceId
+ÜÜL T
+=
+ÜÜU V
+device
+ÜÜW ]
+.
+ÜÜ] ^
+DeviceID
+ÜÜ^ f
+,
+ÜÜf g
+serviceType
+ÜÜh s
+}
+ÜÜt u
+)
+ÜÜu v
+;
+ÜÜv w
+}
+İİ 
+catch
+ŞŞ 
+(
+ŞŞ 
+	Exception
+ŞŞ 
+ex
+ŞŞ 
+)
+ŞŞ  
+{
+ßß 
+return
+àà 
+
+BadRequest
+àà !
+(
+àà! "
+new
+àà" %
+{
+àà& '
+message
+àà( /
+=
+àà0 1
+$"
+àà2 4
+$str
+àà4 O
+{
+ààO P
+ex
+ààP R
+.
+ààR S
+Message
+ààS Z
+}
+ààZ [
+"
+àà[ \
+}
+àà] ^
+)
+àà^ _
+;
+àà_ `
+}
+áá 
+}
+ââ 	
+private
+ää 
+async
+ää 
+Task
+ää 
+<
+ää 
+IActionResult
+ää (
+?
+ää( )
+>
+ää) *&
+EnforceServiceLimitAsync
+ää+ C
+(
+ääC D
+string
+ääD J
+?
+ääJ K
+userId
+ääL R
+)
+ääR S
+{
+åå 	
+var
+ææ %
+activeSubscriptionCount
+ææ '
+=
+ææ( )
+await
+ææ* /
+_context
+ææ0 8
+.
+ææ8 9
+Subscriptions
+ææ9 F
+.
+çç 
+
+CountAsync
+çç 
+(
+çç 
+s
+çç 
+=>
+çç  
+s
+çç! "
+.
+çç" #
+UserID
+çç# )
+==
+çç* ,
+userId
+çç- 3
+&&
+çç4 6
+s
+çç7 8
+.
+çç8 9
+Status
+çç9 ?
+==
+çç@ B
+StatusActive
+ççC O
+)
+ççO P
+;
+ççP Q
+var
+èè  
+activePrepaidCount
+èè "
+=
+èè# $
+await
+èè% *
+_context
+èè+ 3
+.
+èè3 4
+Devices
+èè4 ;
+.
+éé 
+Where
+éé 
+(
+éé 
+d
+éé 
+=>
+éé 
+d
+éé 
+.
+éé 
+UserID
+éé $
+==
+éé% '
+userId
+éé( .
+)
+éé. /
+.
+êê 
+
+SelectMany
+êê 
+(
+êê 
+d
+êê 
+=>
+êê  
+d
+êê! "
+.
+êê" #
+ServiceAccounts
+êê# 2
+)
+êê2 3
+.
+ëë 
+Where
+ëë 
+(
+ëë 
+sa
+ëë 
+=>
+ëë 
+sa
+ëë 
+.
+ëë  
+Status
+ëë  &
+==
+ëë' )
+StatusActive
+ëë* 6
+&&
+ëë7 9
+sa
+ëë: <
+.
+ëë< =
+ServiceType
+ëë= H
+==
+ëëI K
+ServicePrepaid
+ëëL Z
+)
+ëëZ [
+.
+ìì 
+
+CountAsync
+ìì 
+(
+ìì 
+)
+ìì 
+;
+ìì 
+if
+îî 
+(
+îî %
+activeSubscriptionCount
+îî '
++
+îî( ) 
+activePrepaidCount
+îî* <
+>=
+îî= ?
+$num
+îî@ A
+)
+îîA B
+return
+ïï 
+
+BadRequest
+ïï !
+(
+ïï! "
+new
+ïï" %
+{
+ïï& '
+message
+ïï( /
+=
+ïï0 1
+$str
+ïï2 l
+}
+ïïm n
+)
+ïïn o
+;
+ïïo p
+return
+ññ 
+null
+ññ 
+;
+ññ 
+}
+òò 	
+private
+ôô 
+static
+ôô 
+string
+ôô  
+ResolveServiceType
+ôô 0
+(
+ôô0 1
+string
+ôô1 7
+?
+ôô7 8
+serviceType
+ôô9 D
+)
+ôôD E
+{
+õõ 	
+return
+öö 
+string
+öö 
+.
+öö  
+IsNullOrWhiteSpace
+öö ,
+(
+öö, -
+serviceType
+öö- 8
+)
+öö8 9
+?
+öö: ;!
+ServiceSubscription
+öö< O
+:
+ööP Q
+serviceType
+ööR ]
+;
+öö] ^
+}
+÷÷ 	
+private
+ùù $
+BadRequestObjectResult
+ùù &
+?
+ùù& '$
+ValidatePrepaidRequest
+ùù( >
+(
+ùù> ?
+string
+ùù? E
+serviceType
+ùùF Q
+,
+ùùQ R
+string
+ùùS Y
+?
+ùùY Z
+phoneNumber
+ùù[ f
+)
+ùùf g
+{
+úú 	
+if
+ûû 
+(
+ûû 
+serviceType
+ûû 
+==
+ûû 
+ServicePrepaid
+ûû -
+&&
+ûû. 0
+string
+ûû1 7
+.
+ûû7 8 
+IsNullOrWhiteSpace
+ûû8 J
+(
+ûûJ K
+phoneNumber
+ûûK V
+)
+ûûV W
+)
+ûûW X
+return
+üü 
+
+BadRequest
+üü !
+(
+üü! "
+new
+üü" %
+{
+üü& '
+message
+üü( /
+=
+üü0 1
+$str
+üü2 e
+}
+üüf g
+)
+üüg h
+;
+üüh i
+return
+şş 
+null
+şş 
+;
+şş 
+}
+ÿÿ 	
+private
+ 
+static
+ 
+string
+ 
+?
+ 
+ResolveMacAddress
+ 0
+(
+0 1
+string
+1 7
+serviceType
+8 C
+,
+C D
+string
+E K
+?
+K L
+
+macAddress
+M W
+)
+W X
+{
+‚‚ 	
+if
+ƒƒ 
+(
+ƒƒ 
+serviceType
+ƒƒ 
+!=
+ƒƒ 
+ServicePrepaid
+ƒƒ -
+||
+ƒƒ. 0
+!
+ƒƒ1 2
+string
+ƒƒ2 8
+.
+ƒƒ8 9 
+IsNullOrWhiteSpace
+ƒƒ9 K
+(
+ƒƒK L
+
+macAddress
+ƒƒL V
+)
+ƒƒV W
+)
+ƒƒW X
+return
+„„ 
+
+macAddress
+„„ !
+;
+„„! "
+return
+†† 
+$"
+†† 
+$str
+†† 
+{
+†† 
+DateTime
+†† !
+.
+††! "
+UtcNow
+††" (
+:
+††( )
+$str
+††) /
+}
+††/ 0
+$str
+††0 1
+{
+††1 2
+new
+††2 5
+Random
+††6 <
+(
+††< =
+)
+††= >
+.
+††> ?
+Next
+††? C
+(
+††C D
+$num
+††D H
+,
+††H I
+$num
+††J N
+)
+††N O
+:
+††O P
+$str
+††P R
+}
+††R S
+$str
+††S T
+{
+††T U
+new
+††U X
+Random
+††Y _
+(
+††_ `
+)
+††` a
+.
+††a b
+Next
+††b f
+(
+††f g
+$num
+††g k
+,
+††k l
+$num
+††m q
+)
+††q r
+:
+††r s
+$str
+††s u
+}
+††u v
+$str
+††v w
+{
+††w x
+new
+††x {
+Random††| ‚
+(††‚ ƒ
+)††ƒ „
+.††„ …
+Next††… ‰
+(††‰ Š
+$num††Š 
+,†† 
+$num†† ”
+)††” •
+:††• –
+$str††– ˜
+}††˜ ™
+$str††™ š
+{††š ›
+new††› 
+Random††Ÿ ¥
+(††¥ ¦
+)††¦ §
+.††§ ¨
+Next††¨ ¬
+(††¬ ­
+$num††­ ±
+,††± ²
+$num††³ ·
+)††· ¸
+:††¸ ¹
+$str††¹ »
+}††» ¼
+"††¼ ½
+;††½ ¾
+}
+‡‡ 	
+private
+‰‰ 
+async
+‰‰ 
+Task
+‰‰ 
+<
+‰‰ 
+Device
+‰‰ !
+>
+‰‰! "
+CreateDeviceAsync
+‰‰# 4
+(
+‰‰4 5
+string
+‰‰5 ;
+userId
+‰‰< B
+,
+‰‰B C
+string
+‰‰D J
+?
+‰‰J K
+
+macAddress
+‰‰L V
+)
+‰‰V W
+{
+ŠŠ 	
+var
+‹‹ 
+device
+‹‹ 
+=
+‹‹ 
+new
+‹‹ 
+Device
+‹‹ #
+{
+ŒŒ 
+UserID
+ 
+=
+ 
+userId
+ 
+,
+  
 
 MACAddress
-‚‚ 
+ 
 =
-‚‚ 
+ 
 
 macAddress
-‚‚ '
+ '
 ,
-‚‚' (
+' (
 Status
-ƒƒ 
+ 
 =
-ƒƒ 
-$str
-ƒƒ !
+ 
+StatusActive
+ %
 ,
-ƒƒ! "
+% &
 
 DeviceType
-„„ 
+ 
 =
-„„ 
-$str
-„„ #
+ 
+DeviceTypeWifi
+ +
 }
-…… 
+‘‘ 
 ;
-…… 
+‘‘ 
 _context
-†† 
+’’ 
 .
-†† 
+’’ 
 Devices
-†† 
+’’ 
 .
-†† 
+’’ 
 Add
-††  
+’’  
 (
-††  !
+’’  !
 device
-††! '
+’’! '
 )
-††' (
+’’' (
 ;
-††( )
+’’( )
 await
-‡‡ 
+““ 
 _context
-‡‡ 
+““ 
 .
-‡‡ 
+““ 
 SaveChangesAsync
-‡‡ +
+““ +
 (
-‡‡+ ,
+““+ ,
 )
-‡‡, -
+““, -
 ;
-‡‡- .
+““- .
 return
-ˆˆ 
+”” 
 device
-ˆˆ 
+”” 
 ;
-ˆˆ 
+”” 
 }
-‰‰ 	
+•• 	
 private
-‹‹ 
+—— 
 async
-‹‹ 
+—— 
 Task
-‹‹ 
+—— 
 <
-‹‹ 
+—— 
 ServiceAccount
-‹‹ )
+—— )
 >
-‹‹) *'
+——) *'
 CreateServiceAccountAsync
-‹‹+ D
+——+ D
 (
-‹‹D E
+——D E
 int
-‹‹E H
+——E H
 deviceId
-‹‹I Q
+——I Q
 ,
-‹‹Q R
+——Q R
 string
-‹‹S Y
+——S Y
 serviceType
-‹‹Z e
+——Z e
 )
-‹‹e f
+——e f
 {
-ŒŒ 	
+˜˜ 	
 var
- 
+™™ 
 serviceAccount
- 
+™™ 
 =
-  
+™™  
 new
-! $
+™™! $
 ServiceAccount
-% 3
+™™% 3
 {
- 
+šš 
 DeviceID
- 
+›› 
 =
- 
+›› 
 deviceId
- #
+›› #
 ,
-# $
+››# $
 ServiceType
- 
+œœ 
 =
- 
+œœ 
 serviceType
- )
+œœ )
 ,
-) *
+œœ) *
 Status
-‘‘ 
+ 
 =
-‘‘ 
-$str
-‘‘ !
+ 
+StatusActive
+ %
 }
-’’ 
+ 
 ;
-’’ 
+ 
 _context
-““ 
+ŸŸ 
 .
-““ 
+ŸŸ 
 ServiceAccounts
-““ $
+ŸŸ $
 .
-““$ %
+ŸŸ$ %
 Add
-““% (
+ŸŸ% (
 (
-““( )
+ŸŸ( )
 serviceAccount
-““) 7
+ŸŸ) 7
 )
-““7 8
+ŸŸ7 8
 ;
-““8 9
+ŸŸ8 9
 await
-”” 
+   
 _context
-”” 
+   
 .
-”” 
+   
 SaveChangesAsync
-”” +
+   +
 (
-””+ ,
+  + ,
 )
-””, -
+  , -
 ;
-””- .
+  - .
 return
-•• 
+¡¡ 
 serviceAccount
-•• !
+¡¡ !
 ;
-••! "
+¡¡! "
 }
-–– 	
+¢¢ 	
 private
-˜˜ 
+¤¤ 
 async
-˜˜ 
+¤¤ 
 Task
-˜˜ $
+¤¤ $
 CreatePrepaidLoadAsync
-˜˜ 1
+¤¤ 1
 (
-˜˜1 2
+¤¤1 2
 int
-˜˜2 5
+¤¤2 5
 serviceAccountId
-˜˜6 F
+¤¤6 F
 ,
-˜˜F G
+¤¤F G
 string
-˜˜H N
+¤¤H N
 ?
-˜˜N O
+¤¤N O
 phoneNumber
-˜˜P [
+¤¤P [
 )
-˜˜[ \
+¤¤[ \
 {
-™™ 	
+¥¥ 	
 var
-šš 
+¦¦ 
 prepaidLoad
-šš 
+¦¦ 
 =
-šš 
+¦¦ 
 new
-šš !
+¦¦ !
 PrepaidLoad
-šš" -
+¦¦" -
 {
-›› 
+§§ 
 ServiceAccountID
-œœ  
+¨¨  
 =
-œœ! "
+¨¨! "
 serviceAccountId
-œœ# 3
+¨¨# 3
 ,
-œœ3 4
+¨¨3 4
 PhoneNumber
- 
+©© 
 =
- 
+©© 
 phoneNumber
- )
+©© )
 ,
-) *
+©©) *
 
 LoadAmount
- 
+ªª 
 =
- 
+ªª 
 $num
- 
+ªª 
 ,
- 
+ªª 
 RemainingBalance
-ŸŸ  
+««  
 =
-ŸŸ! "
+««! "
 $num
-ŸŸ# $
+««# $
 }
-   
+¬¬ 
 ;
-   
+¬¬ 
 _context
-¡¡ 
+­­ 
 .
-¡¡ 
+­­ 
 PrepaidLoads
-¡¡ !
+­­ !
 .
-¡¡! "
+­­! "
 Add
-¡¡" %
+­­" %
 (
-¡¡% &
+­­% &
 prepaidLoad
-¡¡& 1
+­­& 1
 )
-¡¡1 2
+­­1 2
 ;
-¡¡2 3
+­­2 3
 await
-¢¢ 
+®® 
 _context
-¢¢ 
+®® 
 .
-¢¢ 
+®® 
 SaveChangesAsync
-¢¢ +
+®® +
 (
-¢¢+ ,
+®®+ ,
 )
-¢¢, -
+®®, -
 ;
-¢¢- .
+®®- .
 }
-££ 	
+¯¯ 	
 private
-¥¥ 
+±± 
 async
-¥¥ 
+±± 
 Task
-¥¥ 
+±± 
 <
-¥¥ 
+±± 
 (
-¥¥ 
+±± 
 int
-¥¥ 
+±± 
 ?
-¥¥  
+±±  
 PlanId
-¥¥! '
+±±! '
 ,
-¥¥' (
+±±' (
 IActionResult
-¥¥) 6
+±±) 6
 ?
-¥¥6 7
+±±6 7
 Error
-¥¥8 =
+±±8 =
 )
-¥¥= >
+±±= >
 >
-¥¥> ? 
+±±> ? 
 ResolvePlanIdAsync
-¥¥@ R
+±±@ R
 (
-¥¥R S
+±±R S
 int
-¥¥S V
+±±S V
 ?
-¥¥V W
+±±V W
 planId
-¥¥X ^
+±±X ^
 ,
-¥¥^ _
+±±^ _
 string
-¥¥` f
+±±` f
 ?
-¥¥f g
+±±f g
 
 macAddress
-¥¥h r
+±±h r
 )
-¥¥r s
+±±r s
 {
-¦¦ 	
+²² 	
 if
-§§ 
+³³ 
 (
-§§ 
+³³ 
 planId
-§§ 
+³³ 
 .
-§§ 
+³³ 
 HasValue
-§§ 
+³³ 
 )
-§§  
+³³  
 return
-¨¨ 
+´´ 
 (
-¨¨ 
+´´ 
 planId
-¨¨ 
+´´ 
 .
-¨¨ 
+´´ 
 Value
-¨¨ $
+´´ $
 ,
-¨¨$ %
+´´$ %
 null
-¨¨& *
+´´& *
 )
-¨¨* +
+´´* +
 ;
-¨¨+ ,
+´´+ ,
 if
-ªª 
+¶¶ 
 (
-ªª 
+¶¶ 
 string
-ªª 
+¶¶ 
 .
-ªª  
+¶¶  
 IsNullOrWhiteSpace
-ªª )
+¶¶ )
 (
-ªª) *
+¶¶) *
 
 macAddress
-ªª* 4
+¶¶* 4
 )
-ªª4 5
+¶¶4 5
 )
-ªª5 6
+¶¶5 6
 return
-«« 
+·· 
 (
-«« 
+·· 
 null
-«« 
+·· 
 ,
-«« 
+·· 
 
 BadRequest
-«« (
+·· (
 (
-««( )
+··( )
 new
-««) ,
+··) ,
 {
-««- .
+··- .
 message
-««/ 6
+··/ 6
 =
-««7 8
+··7 8
 $str
-««9 k
+··9 k
 }
-««l m
+··l m
 )
-««m n
+··m n
 )
-««n o
+··n o
 ;
-««o p
+··o p
 var
-­­ 
+¹¹ 
 
 normalized
-­­ 
+¹¹ 
 =
-­­ 
+¹¹ 
 
 macAddress
-­­ '
+¹¹ '
 .
-­­' (
+¹¹' (
 Replace
-­­( /
+¹¹( /
 (
-­­/ 0
+¹¹/ 0
 $str
-­­0 3
+¹¹0 3
 ,
-­­3 4
+¹¹3 4
 $str
-­­5 7
+¹¹5 7
 )
-­­7 8
+¹¹7 8
 .
-­­8 9
+¹¹8 9
 ToUpperInvariant
-­­9 I
+¹¹9 I
 (
-­­I J
+¹¹I J
 )
-­­J K
+¹¹J K
 ;
-­­K L
-var
-®® 
-	macSuffix
-®® 
-=
-®® 
-
-normalized
-®® &
-.
-®®& '
-	Substring
-®®' 0
+¹¹K L
+if
+ºº 
 (
-®®0 1
+ºº 
 
 normalized
-®®1 ;
+ºº 
 .
-®®; <
+ºº 
 Length
-®®< B
--
-®®C D
+ºº !
+<
+ºº" #
 $num
-®®E F
+ºº$ %
 )
-®®F G
-;
-®®G H
-var
-¯¯ 
-	speedMbps
-¯¯ 
+ºº% &
+return
+»» 
+(
+»» 
+null
+»» 
+,
+»» 
+
+BadRequest
+»» (
+(
+»»( )
+new
+»») ,
+{
+»»- .
+message
+»»/ 6
 =
-¯¯ 
+»»7 8
+$str
+»»9 N
+}
+»»O P
+)
+»»P Q
+)
+»»Q R
+;
+»»R S
+var
+¼¼ 
 	macSuffix
-¯¯ %
+¼¼ 
+=
+¼¼ 
+
+normalized
+¼¼ &
+.
+¼¼& '
+	Substring
+¼¼' 0
+(
+¼¼0 1
+
+normalized
+¼¼1 ;
+.
+¼¼; <
+Length
+¼¼< B
+-
+¼¼C D
+$num
+¼¼E F
+)
+¼¼F G
+;
+¼¼G H
+var
+½½ 
+	speedMbps
+½½ 
+=
+½½ 
+	macSuffix
+½½ %
 switch
-¯¯& ,
+½½& ,
 {
-°° 
+¾¾ 
 $str
-±± 
+¿¿ 
 =>
-±± 
+¿¿ 
 $num
-±± 
+¿¿ 
 ,
-±± 
+¿¿ 
 $str
-²² 
-=>
-²² 
-$num
-²² 
-,
-²² 
-$str
-³³ 
-=>
-³³ 
-$num
-³³ 
-,
-³³ 
-$str
-´´ 
-=>
-´´ 
-$num
-´´ 
-,
-´´ 
-_
-µµ 
-=>
-µµ 
-$num
-µµ 
-}
-¶¶ 
-;
-¶¶ 
-if
-¸¸ 
-(
-¸¸ 
-	speedMbps
-¸¸ 
-==
-¸¸ 
-$num
-¸¸ 
-)
-¸¸ 
-return
-¹¹ 
-(
-¹¹ 
-null
-¹¹ 
-,
-¹¹ 
-
-BadRequest
-¹¹ (
-(
-¹¹( )
-new
-¹¹) ,
-{
-¹¹- .
-message
-¹¹/ 6
-=
-¹¹7 8
-$str¹¹9 ‘
-}¹¹’ “
-)¹¹“ ”
-)¹¹” •
-;¹¹• –
-var
-»» 
-plan
-»» 
-=
-»» 
-await
-»» 
-_context
-»» %
-.
-»»% &
-SubscriptionPlans
-»»& 7
-.
-¼¼ 
-AsNoTracking
-¼¼ 
-(
-¼¼ 
-)
-¼¼ 
-.
-½½ 
-Where
-½½ 
-(
-½½ 
-p
-½½ 
-=>
-½½ 
-p
-½½ 
-.
-½½ 
-	SpeedMbps
-½½ '
-==
-½½( *
-	speedMbps
-½½+ 4
-)
-½½4 5
-.
-¾¾ 
-Select
-¾¾ 
-(
-¾¾ 
-p
-¾¾ 
-=>
-¾¾ 
-new
-¾¾  
-{
-¾¾! "
-p
-¾¾# $
-.
-¾¾$ %
-PlanID
-¾¾% +
-}
-¾¾, -
-)
-¾¾- .
-.
-¿¿ !
-FirstOrDefaultAsync
-¿¿ $
-(
-¿¿$ %
-)
-¿¿% &
-;
-¿¿& '
-if
-ÀÀ 
-(
-ÀÀ 
-plan
 ÀÀ 
-==
+=>
 ÀÀ 
-null
-ÀÀ 
-)
-ÀÀ 
-return
-ÁÁ 
-(
-ÁÁ 
-null
-ÁÁ 
+$num
+ÀÀ 
 ,
-ÁÁ 
+ÀÀ 
+$str
+ÁÁ 
+=>
+ÁÁ 
+$num
+ÁÁ 
+,
+ÁÁ 
+$str
+ÂÂ 
+=>
+ÂÂ 
+$num
+ÂÂ 
+,
+ÂÂ 
+_
+ÃÃ 
+=>
+ÃÃ 
+$num
+ÃÃ 
+}
+ÄÄ 
+;
+ÄÄ 
+if
+ÆÆ 
+(
+ÆÆ 
+	speedMbps
+ÆÆ 
+==
+ÆÆ 
+$num
+ÆÆ 
+)
+ÆÆ 
+return
+ÇÇ 
+(
+ÇÇ 
+null
+ÇÇ 
+,
+ÇÇ 
 
 BadRequest
-ÁÁ (
+ÇÇ (
 (
-ÁÁ( )
+ÇÇ( )
 new
-ÁÁ) ,
+ÇÇ) ,
 {
-ÁÁ- .
+ÇÇ- .
 message
-ÁÁ/ 6
+ÇÇ/ 6
 =
-ÁÁ7 8
-$strÁÁ9 …
-}ÁÁ† ‡
-)ÁÁ‡ ˆ
-)ÁÁˆ ‰
-;ÁÁ‰ Š
-return
-ÃÃ 
-(
-ÃÃ 
-plan
-ÃÃ 
-.
-ÃÃ 
-PlanID
-ÃÃ 
-,
-ÃÃ  
-null
-ÃÃ! %
-)
-ÃÃ% &
-;
-ÃÃ& '
-}
-ÄÄ 	
-private
-ÆÆ 
-async
-ÆÆ 
-Task
-ÆÆ %
-CreateSubscriptionAsync
-ÆÆ 2
-(
-ÆÆ2 3
-int
-ÆÆ3 6
-serviceAccountId
-ÆÆ7 G
-,
-ÆÆG H
-string
-ÆÆI O
-userId
-ÆÆP V
-,
-ÆÆV W
-int
-ÆÆX [
-planId
-ÆÆ\ b
-)
-ÆÆb c
-{
-ÇÇ 	
+ÇÇ7 8
+$strÇÇ9 ‘
+}ÇÇ’ “
+)ÇÇ“ ”
+)ÇÇ” •
+;ÇÇ• –
 var
-ÈÈ 
-subscription
-ÈÈ 
+ÉÉ 
+plan
+ÉÉ 
 =
-ÈÈ 
-new
-ÈÈ "
-Subscription
-ÈÈ# /
-{
-ÉÉ 
-ServiceAccountID
-ÊÊ  
-=
-ÊÊ! "
-serviceAccountId
-ÊÊ# 3
-,
-ÊÊ3 4
-PlanID
-ËË 
-=
-ËË 
-planId
-ËË 
-,
-ËË  
-UserID
-ÌÌ 
-=
-ÌÌ 
-userId
-ÌÌ 
-,
-ÌÌ  
-	StartDate
-ÍÍ 
-=
-ÍÍ 
-DateTime
-ÍÍ $
-.
-ÍÍ$ %
-UtcNow
-ÍÍ% +
-,
-ÍÍ+ ,
-Status
-ÎÎ 
-=
-ÎÎ 
-$str
-ÎÎ !
-}
-ÏÏ 
-;
-ÏÏ 
-_context
-ĞĞ 
-.
-ĞĞ 
-Subscriptions
-ĞĞ "
-.
-ĞĞ" #
-Add
-ĞĞ# &
-(
-ĞĞ& '
-subscription
-ĞĞ' 3
-)
-ĞĞ3 4
-;
-ĞĞ4 5
+ÉÉ 
 await
-ÑÑ 
+ÉÉ 
 _context
-ÑÑ 
+ÉÉ %
 .
-ÑÑ 
-SaveChangesAsync
-ÑÑ +
+ÉÉ% &
+SubscriptionPlans
+ÉÉ& 7
+.
+ÊÊ 
+AsNoTracking
+ÊÊ 
 (
-ÑÑ+ ,
+ÊÊ 
 )
-ÑÑ, -
+ÊÊ 
+.
+ËË 
+Where
+ËË 
+(
+ËË 
+p
+ËË 
+=>
+ËË 
+p
+ËË 
+.
+ËË 
+	SpeedMbps
+ËË '
+==
+ËË( *
+	speedMbps
+ËË+ 4
+)
+ËË4 5
+.
+ÌÌ 
+Select
+ÌÌ 
+(
+ÌÌ 
+p
+ÌÌ 
+=>
+ÌÌ 
+new
+ÌÌ  
+{
+ÌÌ! "
+p
+ÌÌ# $
+.
+ÌÌ$ %
+PlanID
+ÌÌ% +
+}
+ÌÌ, -
+)
+ÌÌ- .
+.
+ÍÍ !
+FirstOrDefaultAsync
+ÍÍ $
+(
+ÍÍ$ %
+)
+ÍÍ% &
 ;
-ÑÑ- .
+ÍÍ& '
+if
+ÎÎ 
+(
+ÎÎ 
+plan
+ÎÎ 
+==
+ÎÎ 
+null
+ÎÎ 
+)
+ÎÎ 
+return
+ÏÏ 
+(
+ÏÏ 
+null
+ÏÏ 
+,
+ÏÏ 
+
+BadRequest
+ÏÏ (
+(
+ÏÏ( )
+new
+ÏÏ) ,
+{
+ÏÏ- .
+message
+ÏÏ/ 6
+=
+ÏÏ7 8
+$strÏÏ9 …
+}ÏÏ† ‡
+)ÏÏ‡ ˆ
+)ÏÏˆ ‰
+;ÏÏ‰ Š
+return
+ÑÑ 
+(
+ÑÑ 
+plan
+ÑÑ 
+.
+ÑÑ 
+PlanID
+ÑÑ 
+,
+ÑÑ  
+null
+ÑÑ! %
+)
+ÑÑ% &
+;
+ÑÑ& '
 }
 ÒÒ 	
 private
@@ -64710,1589 +64852,1720 @@ BadRequest
 async
 ÔÔ 
 Task
-ÔÔ #
-UpdateOnboardingAsync
-ÔÔ 0
+ÔÔ %
+CreateSubscriptionAsync
+ÔÔ 2
 (
-ÔÔ0 1
+ÔÔ2 3
+int
+ÔÔ3 6
+serviceAccountId
+ÔÔ7 G
+,
+ÔÔG H
 string
-ÔÔ1 7
-?
-ÔÔ7 8
+ÔÔI O
 userId
-ÔÔ9 ?
+ÔÔP V
+,
+ÔÔV W
+int
+ÔÔX [
+planId
+ÔÔ\ b
 )
-ÔÔ? @
+ÔÔb c
 {
 ÕÕ 	
 var
-ÖÖ 
-
-onboarding
-ÖÖ 
+ÖÖ 
+subscription
+ÖÖ 
 =
-ÖÖ 
-await
-ÖÖ "
-_context
-ÖÖ# +
-.
-ÖÖ+ , 
-OnboardingStatuses
-ÖÖ, >
-.
-ÖÖ> ?!
-FirstOrDefaultAsync
-ÖÖ? R
-(
-ÖÖR S
-o
-ÖÖS T
-=>
-ÖÖU W
-o
-ÖÖX Y
-.
-ÖÖY Z
-UserID
-ÖÖZ `
-==
-ÖÖa c
-userId
-ÖÖd j
-)
-ÖÖj k
-;
-ÖÖk l
-if
-×× 
-(
-×× 
-
-onboarding
-×× 
-!=
-×× 
-null
-×× "
-)
-××" #
-
-onboarding
-ØØ 
-.
-ØØ !
-HasRegisteredDevice
-ØØ .
-=
-ØØ/ 0
-true
-ØØ1 5
-;
-ØØ5 6
-await
-ÚÚ 
-_context
-ÚÚ 
-.
-ÚÚ 
-SaveChangesAsync
-ÚÚ +
-(
-ÚÚ+ ,
-)
-ÚÚ, -
-;
-ÚÚ- .
-}
-ÛÛ 	
-[
-İİ 	
-	Authorize
-İİ	 
-]
-İİ 
-[
-ŞŞ 	&
-RequireEmailVerification
-ŞŞ	 !
-]
-ŞŞ! "
-[
-ßß 	
-HttpPost
-ßß	 
-(
-ßß 
-$str
-ßß %
-)
-ßß% &
-]
-ßß& '
-public
-àà 
-async
-àà 
-Task
-àà 
-<
-àà 
-IActionResult
-àà '
->
-àà' (
-CompleteTutorial
-àà) 9
-(
-àà9 :
-)
-àà: ;
+ÖÖ 
+new
+ÖÖ "
+Subscription
+ÖÖ# /
 {
-áá 	
-var
-ââ 
-userId
-ââ 
+×× 
+ServiceAccountID
+ØØ  
 =
-ââ 
-User
-ââ 
+ØØ! "
+serviceAccountId
+ØØ# 3
+,
+ØØ3 4
+PlanID
+ÙÙ 
+=
+ÙÙ 
+planId
+ÙÙ 
+,
+ÙÙ  
+UserID
+ÚÚ 
+=
+ÚÚ 
+userId
+ÚÚ 
+,
+ÚÚ  
+	StartDate
+ÛÛ 
+=
+ÛÛ 
+DateTime
+ÛÛ $
 .
-ââ 
-	FindFirst
-ââ '
+ÛÛ$ %
+UtcNow
+ÛÛ% +
+,
+ÛÛ+ ,
+Status
+ÜÜ 
+=
+ÜÜ 
+StatusActive
+ÜÜ %
+}
+İİ 
+;
+İİ 
+_context
+ŞŞ 
+.
+ŞŞ 
+Subscriptions
+ŞŞ "
+.
+ŞŞ" #
+Add
+ŞŞ# &
 (
-ââ' (
-System
-ââ( .
+ŞŞ& '
+subscription
+ŞŞ' 3
+)
+ŞŞ3 4
+;
+ŞŞ4 5
+await
+ßß 
+_context
+ßß 
 .
-ââ. /
-Security
-ââ/ 7
-.
+ßß 
+SaveChangesAsync
+ßß +
+(
+ßß+ ,
+)
+ßß, -
+;
+ßß- .
+}
+àà 	
+private
+ââ 
+async
+ââ 
+Task
+ââ #
+UpdateOnboardingAsync
+ââ 0
+(
+ââ0 1
+string
+ââ1 7
+?
 ââ7 8
-Claims
-ââ8 >
+userId
+ââ9 ?
+)
+ââ? @
+{
+ãã 	
+var
+ää 
+
+onboarding
+ää 
+=
+ää 
+await
+ää "
+_context
+ää# +
 .
-ââ> ?
+ää+ , 
+OnboardingStatuses
+ää, >
+.
+ää> ?!
+FirstOrDefaultAsync
+ää? R
+(
+ääR S
+o
+ääS T
+=>
+ääU W
+o
+ääX Y
+.
+ääY Z
+UserID
+ääZ `
+==
+ääa c
+userId
+ääd j
+)
+ääj k
+;
+ääk l
+if
+åå 
+(
+åå 
+
+onboarding
+åå 
+!=
+åå 
+null
+åå "
+)
+åå" #
+
+onboarding
+ææ 
+.
+ææ !
+HasRegisteredDevice
+ææ .
+=
+ææ/ 0
+true
+ææ1 5
+;
+ææ5 6
+await
+èè 
+_context
+èè 
+.
+èè 
+SaveChangesAsync
+èè +
+(
+èè+ ,
+)
+èè, -
+;
+èè- .
+}
+éé 	
+[
+ëë 	
+	Authorize
+ëë	 
+]
+ëë 
+[
+ìì 	&
+RequireEmailVerification
+ìì	 !
+]
+ìì! "
+[
+íí 	
+HttpPost
+íí	 
+(
+íí 
+$str
+íí %
+)
+íí% &
+]
+íí& '
+public
+îî 
+async
+îî 
+Task
+îî 
+<
+îî 
+IActionResult
+îî '
+>
+îî' (
+CompleteTutorial
+îî) 9
+(
+îî9 :
+)
+îî: ;
+{
+ïï 	
+var
+ğğ 
+userId
+ğğ 
+=
+ğğ 
+User
+ğğ 
+.
+ğğ 
+	FindFirst
+ğğ '
+(
+ğğ' (
+System
+ğğ( .
+.
+ğğ. /
+Security
+ğğ/ 7
+.
+ğğ7 8
+Claims
+ğğ8 >
+.
+ğğ> ?
 
 ClaimTypes
-ââ? I
+ğğ? I
 .
-ââI J
+ğğI J
 NameIdentifier
-ââJ X
+ğğJ X
 )
-ââX Y
+ğğX Y
 ?
-ââY Z
+ğğY Z
 .
-ââZ [
+ğğZ [
 Value
-ââ[ `
+ğğ[ `
 ;
-ââ` a
+ğğ` a
 var
-ãã 
+ññ 
 activeSubCount
-ãã 
+ññ 
 =
-ãã  
+ññ  
 await
-ãã! &
+ññ! &
 _context
-ãã' /
+ññ' /
 .
-ãã/ 0
+ññ/ 0
 Subscriptions
-ãã0 =
+ññ0 =
 .
-ää 
+òò 
 
 CountAsync
-ää 
+òò 
 (
-ää 
+òò 
 s
-ää 
+òò 
 =>
-ää  
+òò  
 s
-ää! "
+òò! "
 .
-ää" #
+òò" #
 UserID
-ää# )
+òò# )
 ==
-ää* ,
+òò* ,
 userId
-ää- 3
+òò- 3
 &&
-ää4 6
+òò4 6
 s
-ää7 8
+òò7 8
 .
-ää8 9
+òò8 9
 Status
-ää9 ?
+òò9 ?
 ==
-ää@ B
-$str
-ääC K
+òò@ B
+StatusActive
+òòC O
 )
-ääK L
+òòO P
 ;
-ääL M
+òòP Q
 var
-åå 
+óó 
 activePrepCount
-åå 
+óó 
 =
-åå  !
+óó  !
 await
-åå" '
+óó" '
 _context
-åå( 0
+óó( 0
 .
-åå0 1
+óó0 1
 Devices
-åå1 8
+óó1 8
 .
-ææ 
+ôô 
 Where
-ææ 
+ôô 
 (
-ææ 
+ôô 
 d
-ææ 
+ôô 
 =>
-ææ 
+ôô 
 d
-ææ 
+ôô 
 .
-ææ 
+ôô 
 UserID
-ææ $
+ôô $
 ==
-ææ% '
+ôô% '
 userId
-ææ( .
+ôô( .
 )
-ææ. /
+ôô. /
 .
-çç 
+õõ 
 
 SelectMany
-çç 
+õõ 
 (
-çç 
+õõ 
 d
-çç 
+õõ 
 =>
-çç  
+õõ  
 d
-çç! "
+õõ! "
 .
-çç" #
+õõ" #
 ServiceAccounts
-çç# 2
+õõ# 2
 )
-çç2 3
+õõ2 3
 .
-èè 
+öö 
 Where
-èè 
+öö 
 (
-èè 
+öö 
 sa
-èè 
+öö 
 =>
-èè 
+öö 
 sa
-èè 
+öö 
 .
-èè  
+öö  
 Status
-èè  &
+öö  &
 ==
-èè' )
-$str
-èè* 2
+öö' )
+StatusActive
+öö* 6
 &&
-èè3 5
+öö7 9
 sa
-èè6 8
+öö: <
 .
-èè8 9
+öö< =
 ServiceType
-èè9 D
+öö= H
 ==
-èèE G
-$str
-èèH Q
+ööI K
+ServicePrepaid
+ööL Z
 )
-èèQ R
+ööZ [
 .
-éé 
+÷÷ 
 
 CountAsync
-éé 
+÷÷ 
 (
-éé 
+÷÷ 
 )
-éé 
+÷÷ 
 ;
-éé 
+÷÷ 
 if
-ëë 
+ùù 
 (
-ëë 
+ùù 
 activeSubCount
-ëë 
+ùù 
 +
-ëë  
+ùù  
 activePrepCount
-ëë! 0
+ùù! 0
 >=
-ëë1 3
+ùù1 3
 $num
-ëë4 5
+ùù4 5
 )
-ëë5 6
+ùù5 6
 return
-ìì 
+úú 
 
 BadRequest
-ìì !
+úú !
 (
-ìì! "
+úú! "
 new
-ìì" %
+úú" %
 {
-ìì& '
+úú& '
 message
-ìì( /
+úú( /
 =
-ìì0 1
+úú0 1
 $str
-ìì2 l
+úú2 l
 }
-ììm n
+úúm n
 )
-ììn o
+úún o
 ;
-ììo p
+úúo p
 var
-îî 
+üü 
 
 onboarding
-îî 
+üü 
 =
-îî 
+üü 
 await
-îî "
+üü "
 _context
-îî# +
+üü# +
 .
-îî+ , 
+üü+ , 
 OnboardingStatuses
-îî, >
+üü, >
 .
-îî> ?!
+üü> ?!
 FirstOrDefaultAsync
-îî? R
+üü? R
 (
-îîR S
+üüR S
 o
-îîS T
+üüS T
 =>
-îîU W
+üüU W
 o
-îîX Y
+üüX Y
 .
-îîY Z
+üüY Z
 UserID
-îîZ `
+üüZ `
 ==
-îîa c
+üüa c
 userId
-îîd j
+üüd j
 )
-îîj k
+üüj k
 ;
-îîk l
+üük l
 if
-ïï 
+ıı 
 (
-ïï 
+ıı 
 
 onboarding
-ïï 
+ıı 
 ==
-ïï 
+ıı 
 null
-ïï "
+ıı "
 )
-ïï" #
+ıı" #
 return
-ğğ 
+şş 
 NotFound
-ğğ 
+şş 
 (
-ğğ  
+şş  
 new
-ğğ  #
+şş  #
 {
-ğğ$ %
+şş$ %
 message
-ğğ& -
+şş& -
 =
-ğğ. /
+şş. /
 $str
-ğğ0 M
+şş0 M
 }
-ğğN O
+şşN O
 )
-ğğO P
+şşO P
 ;
-ğğP Q
+şşP Q
 
 onboarding
-òò 
+€€ 
 .
-òò "
+€€ "
 HasCompletedTutorial
-òò +
+€€ +
 =
-òò, -
+€€, -
 true
-òò. 2
+€€. 2
 ;
-òò2 3
+€€2 3
 await
-óó 
+ 
 _context
-óó 
+ 
 .
-óó 
+ 
 SaveChangesAsync
-óó +
+ +
 (
-óó+ ,
++ ,
 )
-óó, -
+, -
 ;
-óó- .
+- .
 return
-õõ 
+ƒƒ 
 Ok
-õõ 
+ƒƒ 
 (
-õõ 
+ƒƒ 
 new
-õõ 
+ƒƒ 
 {
-õõ 
+ƒƒ 
 message
-õõ #
+ƒƒ #
 =
-õõ$ %
+ƒƒ$ %
 $str
-õõ& G
+ƒƒ& G
 }
-õõH I
+ƒƒH I
 )
-õõI J
+ƒƒI J
 ;
-õõJ K
+ƒƒJ K
 }
-öö 	
+„„ 	
 [
-øø 	
+†† 	
 HttpPost
-øø	 
+††	 
 (
-øø 
+†† 
 $str
-øø #
+†† #
 )
-øø# $
+††# $
 ]
-øø$ %
+††$ %
 public
-ùù 
+‡‡ 
 async
-ùù 
+‡‡ 
 Task
-ùù 
+‡‡ 
 <
-ùù 
+‡‡ 
 IActionResult
-ùù '
+‡‡ '
 >
-ùù' (
+‡‡' (
 ForgotPassword
-ùù) 7
+‡‡) 7
 (
-ùù7 8
+‡‡7 8
 [
-ùù8 9
+‡‡8 9
 FromBody
-ùù9 A
+‡‡9 A
 ]
-ùùA B 
+‡‡A B 
 VerifyEmailRequest
-ùùC U
+‡‡C U
 request
-ùùV ]
+‡‡V ]
 )
-ùù] ^
+‡‡] ^
 {
-úú 	
+ˆˆ 	
 var
-ûû 
+‰‰ 
 user
-ûû 
+‰‰ 
 =
-ûû 
+‰‰ 
 await
-ûû 
+‰‰ 
 _userManager
-ûû )
+‰‰ )
 .
-ûû) *
+‰‰) *
 FindByEmailAsync
-ûû* :
+‰‰* :
 (
-ûû: ;
+‰‰: ;
 request
-ûû; B
+‰‰; B
 .
-ûûB C
+‰‰B C
 Email
-ûûC H
+‰‰C H
 )
-ûûH I
+‰‰H I
 ;
-ûûI J
+‰‰I J
 if
-üü 
+ŠŠ 
 (
-üü 
+ŠŠ 
 user
-üü 
+ŠŠ 
 ==
-üü 
+ŠŠ 
 null
-üü 
+ŠŠ 
 )
-üü 
+ŠŠ 
 return
-ıı 
+‹‹ 
 Ok
-ıı 
+‹‹ 
 (
-ıı 
+‹‹ 
 new
-ıı 
+‹‹ 
 {
-ıı 
+‹‹ 
 message
-ıı  '
+‹‹  '
 =
-ıı( )
+‹‹( )
 $str
-ıı* [
+‹‹* [
 }
-ıı\ ]
+‹‹\ ]
 )
-ıı] ^
+‹‹] ^
 ;
-ıı^ _
+‹‹^ _
 var
-ÿÿ 
+ 
 code
-ÿÿ 
+ 
 =
-ÿÿ 
+ 
 new
-ÿÿ 
+ 
 Random
-ÿÿ !
+ !
 (
-ÿÿ! "
+! "
 )
-ÿÿ" #
+" #
 .
-ÿÿ# $
+# $
 Next
-ÿÿ$ (
+$ (
 (
-ÿÿ( )
+( )
 $num
-ÿÿ) /
+) /
 ,
-ÿÿ/ 0
+/ 0
 $num
-ÿÿ1 7
+1 7
 )
-ÿÿ7 8
+7 8
 .
-ÿÿ8 9
+8 9
 ToString
-ÿÿ9 A
+9 A
 (
-ÿÿA B
+A B
 )
-ÿÿB C
+B C
 ;
-ÿÿC D
+C D
 _context
-€€ 
+ 
 .
-€€ 
+ 
 VerificationCodes
-€€ &
+ &
 .
-€€& '
+& '
 Add
-€€' *
+' *
 (
-€€* +
+* +
 new
-€€+ .
++ .
 VerificationCode
-€€/ ?
+/ ?
 {
- 
+ 
 Email
-‚‚ 
+ 
 =
-‚‚ 
+ 
 request
-‚‚ 
+ 
 .
-‚‚  
+  
 Email
-‚‚  %
+  %
 ,
-‚‚% &
+% &
 Code
-ƒƒ 
+‘‘ 
 =
-ƒƒ 
+‘‘ 
 code
-ƒƒ 
+‘‘ 
 ,
-ƒƒ 
+‘‘ 
 	ExpiresAt
-„„ 
+’’ 
 =
-„„ 
+’’ 
 DateTime
-„„ $
+’’ $
 .
-„„$ %
+’’$ %
 UtcNow
-„„% +
+’’% +
 .
-„„+ ,
+’’+ ,
 
 AddMinutes
-„„, 6
+’’, 6
 (
-„„6 7
+’’6 7
 $num
-„„7 9
+’’7 9
 )
-„„9 :
+’’9 :
 }
-…… 
+““ 
 )
-…… 
+““ 
 ;
-…… 
+““ 
 await
-†† 
+”” 
 _context
-†† 
+”” 
 .
-†† 
+”” 
 SaveChangesAsync
-†† +
+”” +
 (
-††+ ,
+””+ ,
 )
-††, -
+””, -
 ;
-††- .
+””- .
 await
-‡‡ 
+•• 
 _emailService
-‡‡ 
+•• 
 .
-‡‡  '
+••  '
 SendVerificationCodeAsync
-‡‡  9
+••  9
 (
-‡‡9 :
+••9 :
 request
-‡‡: A
+••: A
 .
-‡‡A B
+••A B
 Email
-‡‡B G
+••B G
 ,
-‡‡G H
+••G H
 code
-‡‡I M
+••I M
 )
-‡‡M N
+••M N
 ;
-‡‡N O
+••N O
 return
-‰‰ 
+—— 
 Ok
-‰‰ 
+—— 
 (
-‰‰ 
+—— 
 new
-‰‰ 
+—— 
 {
-‰‰ 
+—— 
 message
-‰‰ #
+—— #
 =
-‰‰$ %
+——$ %
 $str
-‰‰& E
+——& E
 }
-‰‰F G
+——F G
 )
-‰‰G H
+——G H
 ;
-‰‰H I
+——H I
 }
-ŠŠ 	
+˜˜ 	
 [
-ŒŒ 	
+šš 	
 HttpPost
-ŒŒ	 
+šš	 
 (
-ŒŒ 
+šš 
 $str
-ŒŒ "
+šš "
 )
-ŒŒ" #
+šš" #
 ]
-ŒŒ# $
+šš# $
 public
- 
+›› 
 async
- 
+›› 
 Task
- 
+›› 
 <
- 
+›› 
 IActionResult
- '
+›› '
 >
-' (
+››' (
 ResetPassword
-) 6
+››) 6
 (
-6 7
+››6 7
 [
-7 8
+››7 8
 FromBody
-8 @
+››8 @
 ]
-@ A"
+››@ A"
 ResetPasswordRequest
-B V
+››B V
 request
-W ^
-)
-^ _
-{
- 	
-var
- 
-	userAgent
- 
-=
- 
-Request
- #
-.
-# $
-Headers
-$ +
+››W ^
+,
+››^ _
 [
-+ ,
-$str
-, 8
-]
-8 9
-.
-9 :
-ToString
-: B
+››` a
+
+FromHeader
+››a k
 (
-B C
-)
-C D
-;
-D E
-var
- 
-	ipAddress
- 
+››k l
+Name
+››l p
 =
- 
-HttpContext
- '
+››q r
+$str
+››s 
+)›› €
+]››€ 
+string››‚ ˆ
+?››ˆ ‰
+	userAgent››Š “
+)››“ ”
+{
+œœ 	
+var
+ 
+userAgentValue
+ 
+=
+  
+	userAgent
+! *
+??
++ -
+string
+. 4
 .
-' (
+4 5
+Empty
+5 :
+;
+: ;
+var
+ 
+	ipAddress
+ 
+=
+ 
+HttpContext
+ '
+.
+' (
 
 Connection
-( 2
+( 2
 .
-2 3
+2 3
 RemoteIpAddress
-3 B
+3 B
 ?
-B C
+B C
 .
-C D
+C D
 ToString
-D L
+D L
 (
-L M
+L M
 )
-M N
+M N
 ;
-N O
+N O
 if
-‘‘ 
+ŸŸ 
 (
-‘‘ (
+ŸŸ (
 _ipDeviceReputationService
-‘‘ *
+ŸŸ *
 .
-‘‘* +
+ŸŸ* +
 	IsBlocked
-‘‘+ 4
+ŸŸ+ 4
 (
-‘‘4 5
+ŸŸ4 5
 	ipAddress
-‘‘5 >
+ŸŸ5 >
 ,
-‘‘> ?
-	userAgent
-‘‘@ I
+ŸŸ> ?
+userAgentValue
+ŸŸ@ N
 ,
-‘‘I J
+ŸŸN O
 out
-‘‘K N
+ŸŸP S
 var
-‘‘O R
+ŸŸT W
 blockReason
-‘‘S ^
+ŸŸX c
 )
-‘‘^ _
+ŸŸc d
 )
-‘‘_ `
+ŸŸd e
 return
-’’ 
+   
 
 StatusCode
-’’ !
+   !
 (
-’’! "
+  ! "
 $num
-’’" %
+  " %
 ,
-’’% &
+  % &
 new
-’’' *
+  ' *
 {
-’’+ ,
+  + ,
 message
-’’- 4
+  - 4
 =
-’’5 6
+  5 6
 $"
-’’7 9
+  7 9
 $str
-’’9 I
+  9 I
 {
-’’I J
+  I J
 blockReason
-’’J U
+  J U
 }
-’’U V
+  U V
 $str
-’’V o
+  V o
 "
-’’o p
+  o p
 }
-’’q r
+  q r
 )
-’’r s
+  r s
 ;
-’’s t
+  s t
 var
-”” 
+¢¢ 
 verification
-”” 
+¢¢ 
 =
-”” 
+¢¢ 
 await
-”” $
+¢¢ $
 _context
-””% -
+¢¢% -
 .
-””- .
+¢¢- .
 VerificationCodes
-””. ?
+¢¢. ?
 .
-•• !
+££ !
 FirstOrDefaultAsync
-•• $
+££ $
 (
-••$ %
+££$ %
 v
-••% &
+££% &
 =>
-••' )
+££' )
 v
-••* +
+££* +
 .
-••+ ,
+££+ ,
 Email
-••, 1
+££, 1
 ==
-••2 4
+££2 4
 request
-••5 <
+££5 <
 .
-••< =
+££< =
 Email
-••= B
+££= B
 &&
-••C E
+££C E
 v
-••F G
+££F G
 .
-••G H
+££G H
 Code
-••H L
+££H L
 ==
-••M O
+££M O
 request
-••P W
+££P W
 .
-••W X
+££W X
 Code
-••X \
+££X \
 &&
-••] _
+££] _
 !
-••` a
+££` a
 v
-••a b
+££a b
 .
-••b c
+££b c
 IsUsed
-••c i
+££c i
 &&
-••j l
+££j l
 v
-••m n
+££m n
 .
-••n o
+££n o
 	ExpiresAt
-••o x
+££o x
 >
-••y z
-DateTime••{ ƒ
-.••ƒ „
-UtcNow••„ Š
-)••Š ‹
-;••‹ Œ
+££y z
+DateTime££{ ƒ
+.££ƒ „
+UtcNow££„ Š
+)££Š ‹
+;££‹ Œ
 if
-—— 
+¥¥ 
 (
-—— 
+¥¥ 
 verification
-—— 
+¥¥ 
 ==
-—— 
+¥¥ 
 null
-——  $
+¥¥  $
 )
-——$ %
+¥¥$ %
 {
-˜˜ (
+¦¦ (
 _ipDeviceReputationService
-™™ *
+§§ *
 .
-™™* +
+§§* +
 RegisterFailure
-™™+ :
+§§+ :
 (
-™™: ;
+§§: ;
 	ipAddress
-™™; D
+§§; D
 ,
-™™D E
-	userAgent
-™™F O
+§§D E
+userAgentValue
+§§F T
 )
-™™O P
+§§T U
 ;
-™™P Q
+§§U V
 return
-šš 
+¨¨ 
 
 BadRequest
-šš !
+¨¨ !
 (
-šš! "
+¨¨! "
 new
-šš" %
+¨¨" %
 {
-šš& '
+¨¨& '
 message
-šš( /
+¨¨( /
 =
-šš0 1
+¨¨0 1
 $str
-šš2 Q
+¨¨2 Q
 }
-ššR S
+¨¨R S
 )
-ššS T
+¨¨S T
 ;
-ššT U
+¨¨T U
 }
-›› 
+©© 
 var
- 
+«« 
 user
- 
+«« 
 =
- 
+«« 
 await
- 
+«« 
 _userManager
- )
+«« )
 .
-) *
+««) *
 FindByEmailAsync
-* :
+««* :
 (
-: ;
+««: ;
 request
-; B
+««; B
 .
-B C
+««B C
 Email
-C H
+««C H
 )
-H I
+««H I
 ;
-I J
+««I J
 if
- 
+¬¬ 
 (
- 
+¬¬ 
 user
- 
+¬¬ 
 ==
- 
+¬¬ 
 null
- 
+¬¬ 
 )
- 
+¬¬ 
 {
-ŸŸ (
+­­ (
 _ipDeviceReputationService
-   *
+®® *
 .
-  * +
+®®* +
 RegisterFailure
-  + :
+®®+ :
 (
-  : ;
+®®: ;
 	ipAddress
-  ; D
+®®; D
 ,
-  D E
-	userAgent
-  F O
+®®D E
+userAgentValue
+®®F T
 )
-  O P
+®®T U
 ;
-  P Q
+®®U V
 return
-¡¡ 
+¯¯ 
 NotFound
-¡¡ 
+¯¯ 
 (
-¡¡  
+¯¯  
 new
-¡¡  #
+¯¯  #
 {
-¡¡$ %
+¯¯$ %
 message
-¡¡& -
+¯¯& -
 =
-¡¡. /
-$str
-¡¡0 @
+¯¯. /!
+MessageUserNotFound
+¯¯0 C
 }
-¡¡A B
+¯¯D E
 )
-¡¡B C
+¯¯E F
 ;
-¡¡C D
+¯¯F G
 }
-¢¢ 
+°° 
 if
-¤¤ 
+²² 
 (
-¤¤ 
+²² 
 await
-¤¤ $
+²² $
 _passwordBreachService
-¤¤ ,
+²² ,
 .
-¤¤, -
+²², -
 IsBreachedAsync
-¤¤- <
+²²- <
 (
-¤¤< =
+²²< =
 request
-¤¤= D
+²²= D
 .
-¤¤D E
+²²D E
 NewPassword
-¤¤E P
+²²E P
 )
-¤¤P Q
+²²P Q
 )
-¤¤Q R
+²²Q R
 return
-¥¥ 
+³³ 
 
 BadRequest
-¥¥ !
+³³ !
 (
-¥¥! "
+³³! "
 new
-¥¥" %
+³³" %
 {
-¥¥& '
+³³& '
 message
-¥¥( /
+³³( /
 =
-¥¥0 1
-$str¥¥2 €
-}¥¥ ‚
-)¥¥‚ ƒ
-;¥¥ƒ „
+³³0 1
+$str³³2 €
+}³³ ‚
+)³³‚ ƒ
+;³³ƒ „
 var
-§§ 
+µµ 
 token
-§§ 
+µµ 
 =
-§§ 
+µµ 
 await
-§§ 
+µµ 
 _userManager
-§§ *
+µµ *
 .
-§§* +-
+µµ* +-
 GeneratePasswordResetTokenAsync
-§§+ J
+µµ+ J
 (
-§§J K
+µµJ K
 user
-§§K O
+µµK O
 )
-§§O P
+µµO P
 ;
-§§P Q
+µµP Q
 var
-¨¨ 
+¶¶ 
 result
-¨¨ 
+¶¶ 
 =
-¨¨ 
+¶¶ 
 await
-¨¨ 
+¶¶ 
 _userManager
-¨¨ +
+¶¶ +
 .
-¨¨+ , 
+¶¶+ , 
 ResetPasswordAsync
-¨¨, >
+¶¶, >
 (
-¨¨> ?
+¶¶> ?
 user
-¨¨? C
+¶¶? C
 ,
-¨¨C D
+¶¶C D
 token
-¨¨E J
+¶¶E J
 ,
-¨¨J K
+¶¶J K
 request
-¨¨L S
+¶¶L S
 .
-¨¨S T
+¶¶S T
 NewPassword
-¨¨T _
+¶¶T _
 )
-¨¨_ `
+¶¶_ `
 ;
-¨¨` a
+¶¶` a
 if
-ªª 
+¸¸ 
 (
-ªª 
+¸¸ 
 !
-ªª 
+¸¸ 
 result
-ªª 
+¸¸ 
 .
-ªª 
+¸¸ 
 	Succeeded
-ªª !
+¸¸ !
 )
-ªª! "
+¸¸! "
 {
-«« (
+¹¹ (
 _ipDeviceReputationService
-¬¬ *
+ºº *
 .
-¬¬* +
+ºº* +
 RegisterFailure
-¬¬+ :
+ºº+ :
 (
-¬¬: ;
+ºº: ;
 	ipAddress
-¬¬; D
+ºº; D
 ,
-¬¬D E
-	userAgent
-¬¬F O
+ººD E
+userAgentValue
+ººF T
 )
-¬¬O P
+ººT U
 ;
-¬¬P Q
+ººU V
 return
-­­ 
+»» 
 
 BadRequest
-­­ !
+»» !
 (
-­­! "
+»»! "
 new
-­­" %
+»»" %
 {
-­­& '
+»»& '
 message
-­­( /
+»»( /
 =
-­­0 1
+»»0 1
 string
-­­2 8
+»»2 8
 .
-­­8 9
+»»8 9
 Join
-­­9 =
+»»9 =
 (
-­­= >
+»»= >
 $str
-­­> B
+»»> B
 ,
-­­B C
+»»B C
 result
-­­D J
+»»D J
 .
-­­J K
+»»J K
 Errors
-­­K Q
+»»K Q
 .
-­­Q R
+»»Q R
 Select
-­­R X
+»»R X
 (
-­­X Y
+»»X Y
 e
-­­Y Z
+»»Y Z
 =>
-­­[ ]
+»»[ ]
 e
-­­^ _
+»»^ _
 .
-­­_ `
+»»_ `
 Description
-­­` k
+»»` k
 )
-­­k l
+»»k l
 )
-­­l m
+»»l m
 }
-­­n o
+»»n o
 )
-­­o p
+»»o p
 ;
-­­p q
+»»p q
 }
-®® 
+¼¼ 
 verification
-°° 
+¾¾ 
 .
-°° 
+¾¾ 
 IsUsed
-°° 
+¾¾ 
 =
-°°  !
+¾¾  !
 true
-°°" &
+¾¾" &
 ;
-°°& '
+¾¾& '
 await
-±± 
+¿¿ 
 _context
-±± 
+¿¿ 
 .
-±± 
+¿¿ 
 SaveChangesAsync
-±± +
+¿¿ +
 (
-±±+ ,
+¿¿+ ,
 )
-±±, -
+¿¿, -
 ;
-±±- .(
+¿¿- .(
 _ipDeviceReputationService
-³³ &
+ÁÁ &
 .
-³³& '
+ÁÁ& '
 RegisterSuccess
-³³' 6
+ÁÁ' 6
 (
-³³6 7
+ÁÁ6 7
 	ipAddress
-³³7 @
+ÁÁ7 @
 ,
-³³@ A
-	userAgent
-³³B K
+ÁÁ@ A
+userAgentValue
+ÁÁB P
 )
-³³K L
+ÁÁP Q
 ;
-³³L M
+ÁÁQ R
 return
-µµ 
+ÃÃ 
 Ok
-µµ 
+ÃÃ 
 (
-µµ 
+ÃÃ 
 new
-µµ 
+ÃÃ 
 {
-µµ 
+ÃÃ 
 message
-µµ #
+ÃÃ #
 =
-µµ$ %
+ÃÃ$ %
 $str
-µµ& C
+ÃÃ& C
 }
-µµD E
+ÃÃD E
 )
-µµE F
+ÃÃE F
 ;
-µµF G
+ÃÃF G
 }
-¶¶ 	
+ÄÄ 	
 }
-·· 
+ÅÅ 
 public
-¹¹ 
+ÇÇ 
 
 class
-¹¹ #
+ÇÇ #
 RegisterDeviceRequest
-¹¹ &
+ÇÇ &
 {
-ºº 
+ÈÈ 
 public
-»» 
+ÉÉ 
 string
-»» 
+ÉÉ 
 ?
-»» 
+ÉÉ 
 
 MacAddress
-»» !
+ÉÉ !
 {
-»»" #
+ÉÉ" #
 get
-»»$ '
+ÉÉ$ '
 ;
-»»' (
+ÉÉ' (
 set
-»») ,
+ÉÉ) ,
 ;
-»», -
+ÉÉ, -
 }
-»». /
+ÉÉ. /
 public
-¼¼ 
+ÊÊ 
 string
-¼¼ 
+ÊÊ 
 ServiceType
-¼¼ !
+ÊÊ !
 {
-¼¼" #
+ÊÊ" #
 get
-¼¼$ '
+ÊÊ$ '
 ;
-¼¼' (
+ÊÊ' (
 set
-¼¼) ,
+ÊÊ) ,
 ;
-¼¼, -
+ÊÊ, -
 }
-¼¼. /
+ÊÊ. /
 =
-¼¼0 1
+ÊÊ0 1
 string
-¼¼2 8
+ÊÊ2 8
 .
-¼¼8 9
+ÊÊ8 9
 Empty
-¼¼9 >
+ÊÊ9 >
 ;
-¼¼> ?
+ÊÊ> ?
 public
-½½ 
+ËË 
 int
-½½ 
+ËË 
 ?
-½½ 
+ËË 
 PlanID
-½½ 
+ËË 
 {
-½½ 
+ËË 
 get
-½½  
+ËË  
 ;
-½½  !
+ËË  !
 set
-½½" %
+ËË" %
 ;
-½½% &
+ËË% &
 }
-½½' (
+ËË' (
 public
-¾¾ 
+ÌÌ 
 string
-¾¾ 
+ÌÌ 
 ?
-¾¾ 
+ÌÌ 
 PhoneNumber
-¾¾ "
+ÌÌ "
 {
-¾¾# $
+ÌÌ# $
 get
-¾¾% (
+ÌÌ% (
 ;
-¾¾( )
+ÌÌ( )
 set
-¾¾* -
+ÌÌ* -
 ;
-¾¾- .
+ÌÌ- .
 }
-¾¾/ 0
+ÌÌ/ 0
 }
-¿¿ 
+ÍÍ 
 public
-ÁÁ 
+ÏÏ 
 
 class
-ÁÁ #
+ÏÏ #
 Verify2FALoginRequest
-ÁÁ &
+ÏÏ &
 {
-ÂÂ 
+ĞĞ 
 public
-ÃÃ 
+ÑÑ 
 string
-ÃÃ 
+ÑÑ 
 Email
-ÃÃ 
+ÑÑ 
 {
-ÃÃ 
+ÑÑ 
 get
-ÃÃ !
+ÑÑ !
 ;
-ÃÃ! "
+ÑÑ! "
 set
-ÃÃ# &
+ÑÑ# &
 ;
-ÃÃ& '
+ÑÑ& '
 }
-ÃÃ( )
+ÑÑ( )
 =
-ÃÃ* +
+ÑÑ* +
 string
-ÃÃ, 2
+ÑÑ, 2
 .
-ÃÃ2 3
+ÑÑ2 3
 Empty
-ÃÃ3 8
+ÑÑ3 8
 ;
-ÃÃ8 9
+ÑÑ8 9
 public
-ÄÄ 
+ÒÒ 
 string
-ÄÄ 
+ÒÒ 
 Code
-ÄÄ 
+ÒÒ 
 {
-ÄÄ 
+ÒÒ 
 get
-ÄÄ  
+ÒÒ  
 ;
-ÄÄ  !
+ÒÒ  !
 set
-ÄÄ" %
+ÒÒ" %
 ;
-ÄÄ% &
+ÒÒ% &
 }
-ÄÄ' (
+ÒÒ' (
 =
-ÄÄ) *
+ÒÒ) *
 string
-ÄÄ+ 1
+ÒÒ+ 1
 .
-ÄÄ1 2
+ÒÒ1 2
 Empty
-ÄÄ2 7
+ÒÒ2 7
 ;
-ÄÄ7 8
+ÒÒ7 8
 }
-ÅÅ 
-}ÆÆ æ¼
+ÓÓ 
+}ÔÔ æ¼
 VE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Controllers\AdminController.cs
 	namespace 	"
 TayoKonnektado_project
