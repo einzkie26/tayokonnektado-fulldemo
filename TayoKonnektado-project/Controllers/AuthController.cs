@@ -384,16 +384,26 @@ namespace TayoKonnektado_project.Controllers
 
         private string GetDeviceFromUserAgent(string userAgent)
         {
-            if (string.IsNullOrEmpty(userAgent)) return "Unknown Device";
-            
-            if (userAgent.Contains("Chrome") && userAgent.Contains("Windows")) return "Chrome on Windows";
-            if (userAgent.Contains("Chrome") && userAgent.Contains("Mac")) return "Chrome on Mac";
-            if (userAgent.Contains("Chrome") && userAgent.Contains("Android")) return "Chrome on Android";
-            if (userAgent.Contains("Safari") && userAgent.Contains("iPhone")) return "Safari on iPhone";
-            if (userAgent.Contains("Safari") && userAgent.Contains("iPad")) return "Safari on iPad";
-            if (userAgent.Contains("Firefox")) return "Firefox Browser";
-            if (userAgent.Contains("Edge")) return "Microsoft Edge";
-            
+            if (string.IsNullOrEmpty(userAgent))
+                return "Unknown Device";
+
+            var rules = new (string[] MustContain, string Result)[]
+            {
+                (new[] { "Chrome", "Windows" }, "Chrome on Windows"),
+                (new[] { "Chrome", "Mac" }, "Chrome on Mac"),
+                (new[] { "Chrome", "Android" }, "Chrome on Android"),
+                (new[] { "Safari", "iPhone" }, "Safari on iPhone"),
+                (new[] { "Safari", "iPad" }, "Safari on iPad"),
+                (new[] { "Firefox" }, "Firefox Browser"),
+                (new[] { "Edge" }, "Microsoft Edge")
+            };
+
+            foreach (var rule in rules)
+            {
+                if (rule.MustContain.All(token => userAgent.Contains(token, StringComparison.OrdinalIgnoreCase)))
+                    return rule.Result;
+            }
+
             return "Unknown Device";
         }
 

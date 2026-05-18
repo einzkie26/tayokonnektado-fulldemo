@@ -24,6 +24,9 @@
   </Settings>
   <Rules>
     <Rule>
+      <Key>S3877</Key>
+    </Rule>
+    <Rule>
       <Key>S4456</Key>
     </Rule>
     <Rule>
@@ -561,9 +564,6 @@
     </Rule>
     <Rule>
       <Key>S3878</Key>
-    </Rule>
-    <Rule>
-      <Key>S3877</Key>
     </Rule>
     <Rule>
       <Key>S3875</Key>

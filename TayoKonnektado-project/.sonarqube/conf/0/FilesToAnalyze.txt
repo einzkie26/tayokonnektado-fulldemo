@@ -1,4 +1,5 @@
 ﻿E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Attributes\RequireEmailVerificationAttribute.cs
+E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Controllers\ActivityController.cs
 E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Controllers\AdminController.cs
 E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Controllers\AuthController.cs
 E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Controllers\CustomerController.cs
@@ -52,6 +53,12 @@ E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Migrations\2026031012042
 E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Migrations\20260310120423_AddPromoOffers.Designer.cs
 E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Migrations\20260310131151_AddIsHiddenByCustomerToTickets.cs
 E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Migrations\20260310131151_AddIsHiddenByCustomerToTickets.Designer.cs
+E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Migrations\20260428092534_AddRolePermissions.cs
+E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Migrations\20260428092534_AddRolePermissions.Designer.cs
+E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Migrations\20260428142721_AddSystemSettings.cs
+E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Migrations\20260428142721_AddSystemSettings.Designer.cs
+E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Migrations\20260428145859_AddLoginAttemptTracking.cs
+E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Migrations\20260428145859_AddLoginAttemptTracking.Designer.cs
 E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Migrations\AddPhoneNumberToPrepaidLoad.cs
 E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Migrations\ApplicationDbContextModelSnapshot.cs
 E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Models\ApplicationUser.cs
@@ -60,7 +67,9 @@ E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Models\Entities.cs
 E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Models\OnboardingModels.cs
 E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Models\PaymentRequest.cs
 E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Models\SavedPaymentMethod.cs
+E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Models\SecuritySettings.cs
 E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Program.cs
+E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Services\ActivityLoggingMiddleware.cs
 E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Services\AdminSeeder.cs
 E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Services\Admin\CustomerManagementService.cs
 E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Services\Admin\DashboardService.cs
@@ -71,9 +80,12 @@ E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Services\Admin\StaffMana
 E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Services\Admin\SubscriptionManagementService.cs
 E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Services\Admin\TicketManagementService.cs
 E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Services\EmailService.cs
+E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Services\LoginAttemptService.cs
 E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Services\PayMongoService.cs
 E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Services\PlanSeeder.cs
 E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Services\PrepaidUsageService.cs
+E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Services\Security\IpDeviceReputationService.cs
+E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Services\Security\PasswordBreachService.cs
 E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Services\SubscriptionEndDateService.cs
 E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Services\TokenService.cs
 E:\projects\sharp_tayokonnektado\TayoKonnektado-project\obj\Debug\net8.0\TayoKonnektado-project.GlobalUsings.g.cs
@@ -163,6 +175,8 @@ E:\projects\sharp_tayokonnektado\TayoKonnektado-project\publish\TayoKonnektado-p
 E:\projects\sharp_tayokonnektado\TayoKonnektado-project\publish\TayoKonnektado-project.staticwebassets.endpoints.json
 E:\projects\sharp_tayokonnektado\TayoKonnektado-project\.gitignore
 E:\projects\sharp_tayokonnektado\TayoKonnektado-project\backend.log
+E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Controllers\AdminController_GetRoles.txt
+E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Controllers\AdminController_RoleMethods.txt
 E:\projects\sharp_tayokonnektado\TayoKonnektado-project\logs\stdout_20260308100444_12268.log
 E:\projects\sharp_tayokonnektado\TayoKonnektado-project\publish\Azure.Core.dll
 E:\projects\sharp_tayokonnektado\TayoKonnektado-project\publish\Azure.Identity.dll

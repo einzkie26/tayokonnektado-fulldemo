@@ -1,11 +1,12 @@
 ﻿E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\.env
+E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\.env.local
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\.gitignore
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\CHANGELOG.md
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\dist\assets\clouds-DI_eZpxk.png
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\dist\assets\html2canvas.esm-DXEQVQnt.js
-E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\dist\assets\index-BjrqFjER.css
-E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\dist\assets\index-DSXWtf1c.js
-E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\dist\assets\index.es-CLQIyDGf.js
+E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\dist\assets\index-D6mQV3pH.js
+E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\dist\assets\index-Dr-Z6P7m.css
+E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\dist\assets\index.es-1--2yj7L.js
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\dist\assets\login_right_side-photo-BvyWz3jT.png
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\dist\assets\logo-thA9IqaP.png
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\dist\assets\purify.es-C0_7NiBM.js
@@ -41,6 +42,7 @@ E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\components\Dash
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\components\figma\ImageWithFallback.tsx
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\components\Footer.tsx
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\components\FreezeAccountGuard.tsx
+E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\components\GlobalActivityTracker.tsx
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\components\Header.tsx
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\components\InactiveAccountGuard.tsx
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\components\Layout.tsx
@@ -49,6 +51,7 @@ E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\components\Perm
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\components\ProtectedRoute.tsx
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\components\ScrollFade.tsx
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\components\ScrollToTop.tsx
+E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\components\SessionTimeoutWarning.tsx
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\components\StaffLayout.tsx
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\components\ThemeToggle.tsx
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\components\TwoFactorModal.tsx
@@ -104,6 +107,7 @@ E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\context\GlowCon
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\context\ServiceContext.tsx
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\context\ThemeContext.tsx
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\hooks\useFreezeCheck.ts
+E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\hooks\useSessionTimeout.ts
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\pages\account\Billing.tsx
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\pages\account\Notifications.tsx
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\pages\account\Profile.tsx
@@ -126,10 +130,12 @@ E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\pages\admin\Adm
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\pages\admin\AdminRolesPermissions.tsx
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\pages\admin\AdminServicePlans.tsx
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\pages\admin\AdminServiceReports.tsx
+E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\pages\admin\AdminSettings.tsx
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\pages\admin\AdminStaff.tsx
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\pages\admin\AdminStaffAccounts.tsx
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\pages\admin\AdminSubscriptions.tsx
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\pages\admin\AdminSupportTickets.tsx
+E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\pages\admin\LockedAccounts.tsx
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\pages\Dashboard.tsx
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\pages\ForgotPassword.tsx
 E:\projects\sharp_tayokonnektado\tayoKonnektado.frontEnd\src\app\pages\Home.tsx

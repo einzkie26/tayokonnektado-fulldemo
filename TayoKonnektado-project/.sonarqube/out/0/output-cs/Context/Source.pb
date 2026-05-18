@@ -35,8 +35,63 @@ namespace TayoKonnektado_project.Attributes
             }
         }
     }
-}ParseOptions.0.jsonÒ∫
-VE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Controllers\AdminController.csÄ∫using Microsoft.AspNetCore.Authorization;
+}ParseOptions.0.json›
+YE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Controllers\ActivityController.csÍusing Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using TayoKonnektado_project.Data;
+using TayoKonnektado_project.Models;
+
+namespace TayoKonnektado_project.Controllers
+{
+    [Authorize]
+    [ApiController]
+    [Route("api/[controller]")]
+    public class ActivityController : ControllerBase
+    {
+        private readonly ApplicationDbContext _context;
+
+        public ActivityController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
+        [HttpPost("log")]
+        public async Task<IActionResult> Log([FromBody] ActivityLogRequest request)
+        {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId))
+                return Unauthorized();
+
+            if (string.IsNullOrWhiteSpace(request.Action))
+                return BadRequest(new { message = "Action is required" });
+
+            var finalAction = string.IsNullOrWhiteSpace(request.Details)
+                ? request.Action.Trim()
+                : $"{request.Action.Trim()} | {request.Details.Trim()}";
+
+            _context.ActivityLogs.Add(new ActivityLog
+            {
+                UserID = userId,
+                Action = finalAction,
+                Type = string.IsNullOrWhiteSpace(request.Type) ? "Interaction" : request.Type.Trim(),
+                IPAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
+                Timestamp = DateTime.UtcNow
+            });
+
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Activity logged" });
+        }
+    }
+
+    public class ActivityLogRequest
+    {
+        public string Action { get; set; } = string.Empty;
+        public string Type { get; set; } = "Interaction";
+        public string? Details { get; set; }
+    }
+}
+ParseOptions.0.jsonâ±
+VE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Controllers\AdminController.csò∞using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TayoKonnektado_project.Data;
@@ -247,7 +302,54 @@ namespace TayoKonnektado_project.Controllers
 
         [Authorize(Roles = "SuperAdmin,Admin")]
         [HttpGet("activity-logs")]
-        public async Task<IActionResult> GetActivityLogs() => Ok(await _dashboardService.GetActivityLogsAsync());
+        public async Task<IActionResult> GetActivityLogs([FromQuery] DateTime? since = null)
+        {
+            Response.Headers.CacheControl = "no-store, no-cache, must-revalidate";
+            Response.Headers.Pragma = "no-cache";
+            Response.Headers.Expires = "0";
+
+            return Ok(await _dashboardService.GetActivityLogsAsync(since));
+        }
+
+        [Authorize(Roles = "SuperAdmin,Admin")]
+        [HttpDelete("activity-logs/{id}")]
+        public async Task<IActionResult> DeleteActivityLog(int id)
+        {
+            var log = await _context.ActivityLogs.FindAsync(id);
+            if (log == null) return NotFound();
+            _context.ActivityLogs.Remove(log);
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Activity log deleted" });
+        }
+
+        [HttpPost("activity-logs")]
+        public async Task<IActionResult> CreateActivityLog([FromBody] CreateActivityLogRequest request)
+        {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId))
+                return Unauthorized();
+
+            var actionText = !string.IsNullOrWhiteSpace(request.Action)
+                ? request.Action
+                : request.Description;
+
+            if (string.IsNullOrWhiteSpace(actionText))
+                return BadRequest(new { message = "Action or description is required" });
+
+            var activityLog = new ActivityLog
+            {
+                UserID = userId,
+                Action = actionText,
+                Type = string.IsNullOrWhiteSpace(request.Type) ? "Update" : request.Type,
+                IPAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
+                Timestamp = DateTime.UtcNow
+            };
+
+            _context.ActivityLogs.Add(activityLog);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Activity logged successfully" });
+        }
 
         // Plan Management
         [HttpGet("plans")]
@@ -294,13 +396,101 @@ namespace TayoKonnektado_project.Controllers
         [HttpDelete("staff/{id}")]
         public async Task<IActionResult> DeleteStaff(string id)
         {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null) return NotFound(new { message = "Staff not found" });
+
+            if (user.Role == "SuperAdmin")
+            {
+                var superAdminCount = await _context.Users.CountAsync(u => u.Role == "SuperAdmin");
+                if (superAdminCount <= 2)
+                    return BadRequest(new { message = "Cannot delete SuperAdmin. Minimum 2 SuperAdmins required." });
+            }
+
             var success = await _staffService.DeleteStaffAsync(id);
             return success ? Ok(new { message = "Staff deleted successfully" }) : NotFound();
         }
 
         [Authorize(Roles = "SuperAdmin")]
+        [HttpPut("roles/{roleName}")]
+        public async Task<IActionResult> UpdateRole(string roleName, [FromBody] UpdateRoleRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(roleName) || request?.Permissions == null)
+                return BadRequest(new { message = "Invalid role or permissions" });
+
+            try
+            {
+                var existingPermissions = await _context.RolePermissions
+                    .Where(rp => rp.RoleName == roleName)
+                    .ToListAsync();
+
+                _context.RolePermissions.RemoveRange(existingPermissions);
+
+                var newPermissions = request.Permissions.Select(p => new RolePermission
+                {
+                    RoleName = roleName,
+                    PermissionName = p,
+                    CreatedAt = DateTime.UtcNow
+                }).ToList();
+
+                _context.RolePermissions.AddRange(newPermissions);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = "Role permissions updated successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [Authorize(Roles = "SuperAdmin,Admin,Staff")]
         [HttpGet("roles")]
-        public IActionResult GetRoles() => Ok(new List<object>());
+        public async Task<IActionResult> GetRoles()
+        {
+            var adminUsers = await _context.Users
+                .Where(u => u.Role == "Admin")
+                .Select(u => new { id = u.Id, name = $"{u.FirstName} {u.LastName}", email = u.Email })
+                .ToListAsync();
+
+            var staffUsers = await _context.Users
+                .Where(u => u.Role == "Staff")
+                .Select(u => new { id = u.Id, name = $"{u.FirstName} {u.LastName}", email = u.Email })
+                .ToListAsync();
+
+            var adminPermissions = await _context.RolePermissions
+                .Where(rp => rp.RoleName == "Admin")
+                .Select(rp => rp.PermissionName)
+                .ToListAsync();
+
+            var staffPermissions = await _context.RolePermissions
+                .Where(rp => rp.RoleName == "Staff")
+                .Select(rp => rp.PermissionName)
+                .ToListAsync();
+
+            var roles = new object[]
+            {
+                new
+                {
+                    id = 1,
+                    name = "Admin",
+                    users = adminUsers.Count,
+                    members = adminUsers,
+                    permissions = adminPermissions.Count > 0 ? adminPermissions : new List<string>(),
+                    color = "red"
+                },
+                new
+                {
+                    id = 2,
+                    name = "Staff",
+                    users = staffUsers.Count,
+                    members = staffUsers,
+                    permissions = staffPermissions.Count > 0 ? staffPermissions : new List<string>(),
+                    color = "blue"
+                }
+            };
+
+            return Ok(roles);
+        }
 
         // FAQ Management
         [HttpGet("faqs")]
@@ -500,13 +690,206 @@ namespace TayoKonnektado_project.Controllers
 
         // Notifications (placeholder)
         [HttpGet("notifications")]
-        public IActionResult GetNotifications() => Ok(new List<object>());
+        public async Task<IActionResult> GetNotifications()
+        {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) return Unauthorized();
+
+            var notifications = await _context.Notifications
+                .Where(n => n.UserID == userId)
+                .OrderByDescending(n => n.SentAt)
+                .ToListAsync();
+            return Ok(notifications);
+        }
+
+        [HttpPost("notifications")]
+        public async Task<IActionResult> CreateNotification([FromBody] CreateNotificationRequest request)
+        {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) return Unauthorized();
+
+            var notification = new Notification
+            {
+                UserID = userId,
+                Message = request.Message,
+                Type = request.Type ?? "info",
+                Status = "unread",
+                SentAt = DateTime.UtcNow
+            };
+
+            _context.Notifications.Add(notification);
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Notification created", notificationID = notification.NotificationID });
+        }
 
         [HttpPost("notifications/mark-all-read")]
-        public IActionResult MarkAllNotificationsRead() => Ok(new { message = "All notifications marked as read" });
+        public async Task<IActionResult> MarkAllNotificationsRead()
+        {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) return Unauthorized();
+
+            var notifications = await _context.Notifications
+                .Where(n => n.UserID == userId && n.Status == "unread")
+                .ToListAsync();
+
+            foreach (var notification in notifications)
+            {
+                notification.Status = "read";
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "All notifications marked as read" });
+        }
 
         [HttpDelete("notifications/{id}")]
-        public IActionResult DeleteNotification(int id) => Ok(new { message = "Notification deleted" });
+        public async Task<IActionResult> DeleteNotification(int id)
+        {
+            var notification = await _context.Notifications.FindAsync(id);
+            if (notification == null) return NotFound();
+
+            _context.Notifications.Remove(notification);
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Notification deleted" });
+        }
+
+        // System Settings
+        [HttpGet("settings")]
+        public async Task<IActionResult> GetSettings()
+        {
+            var settings = await _context.SystemSettings.FirstOrDefaultAsync();
+            if (settings == null)
+            {
+                settings = new SystemSettings();
+                _context.SystemSettings.Add(settings);
+                await _context.SaveChangesAsync();
+            }
+            return Ok(settings);
+        }
+
+        [HttpPut("settings")]
+        public async Task<IActionResult> UpdateSettings([FromBody] UpdateSystemSettingsRequest request)
+        {
+            var settings = await _context.SystemSettings.FirstOrDefaultAsync();
+            if (settings == null)
+            {
+                settings = new SystemSettings();
+                _context.SystemSettings.Add(settings);
+            }
+
+            settings.SiteName = request.SiteName ?? settings.SiteName;
+            settings.SiteEmail = request.SiteEmail ?? settings.SiteEmail;
+            settings.MaintenanceMode = request.MaintenanceMode ?? settings.MaintenanceMode;
+            settings.MaxLoginAttempts = request.MaxLoginAttempts ?? settings.MaxLoginAttempts;
+            settings.SessionTimeout = request.SessionTimeout ?? settings.SessionTimeout;
+            settings.EnableTwoFactor = request.EnableTwoFactor ?? settings.EnableTwoFactor;
+            settings.EnableAuditLogs = request.EnableAuditLogs ?? settings.EnableAuditLogs;
+            settings.NotificationEmail = request.NotificationEmail ?? settings.NotificationEmail;
+            settings.EmailOnNewTickets = request.EmailOnNewTickets ?? settings.EmailOnNewTickets;
+            settings.EmailOnPaymentReceived = request.EmailOnPaymentReceived ?? settings.EmailOnPaymentReceived;
+            settings.EmailOnSystemErrors = request.EmailOnSystemErrors ?? settings.EmailOnSystemErrors;
+            settings.EmailOnSecurityAlerts = request.EmailOnSecurityAlerts ?? settings.EmailOnSecurityAlerts;
+            settings.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Settings updated successfully", settings });
+        }
+
+        [Authorize(Roles = "SuperAdmin")]
+        [HttpGet("superadmin-count")]
+        public async Task<IActionResult> GetSuperAdminCount()
+        {
+            var superAdminRoleId = await _context.Roles
+                .Where(r => r.Name == "SuperAdmin")
+                .Select(r => r.Id)
+                .FirstOrDefaultAsync();
+
+            var count = 0;
+            if (!string.IsNullOrEmpty(superAdminRoleId))
+            {
+                count = await _context.UserRoles
+                    .CountAsync(ur => ur.RoleId == superAdminRoleId);
+            }
+
+            var canCreate = Math.Max(0, 2 - count);
+            return Ok(new { count, canCreate });
+        }
+
+        [Authorize(Roles = "SuperAdmin")]
+        [HttpGet("suspended-users")]
+        public async Task<IActionResult> GetSuspendedUsers()
+        {
+            var suspendedUsers = await _context.LoginAttempts
+                .Where(la => la.LockedUntil.HasValue && la.LockedUntil > DateTime.UtcNow)
+                .Include(la => la.User)
+                .OrderByDescending(la => la.LockedUntil)
+                .Select(la => new
+                {
+                    la.LoginAttemptID,
+                    la.UserID,
+                    UserName = la.User.FirstName + " " + la.User.LastName,
+                    Email = la.User.Email,
+                    FailedAttempts = la.FailedAttempts,
+                    LockReason = la.LockReason,
+                    LockedUntil = la.LockedUntil,
+                    RemainingMinutes = (int)Math.Ceiling((la.LockedUntil.Value - DateTime.UtcNow).TotalMinutes)
+                })
+                .ToListAsync();
+
+            return Ok(suspendedUsers);
+        }
+
+        [Authorize(Roles = "SuperAdmin")]
+        [HttpPost("unlock-user/{userId}")]
+        public async Task<IActionResult> UnlockUser(string userId)
+        {
+            var attempt = await _context.LoginAttempts.FirstOrDefaultAsync(la => la.UserID == userId);
+            if (attempt == null)
+                return NotFound(new { message = "User not found" });
+
+            attempt.FailedAttempts = 0;
+            attempt.LockedUntil = null;
+            attempt.LockReason = null;
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "User unlocked successfully" });
+        }
+
+        [Authorize(Roles = "SuperAdmin")]
+        [HttpPost("create-superadmin")]
+        public async Task<IActionResult> CreateSuperAdmin([FromBody] CreateSuperAdminRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
+                return BadRequest(new { message = "Email and password are required" });
+
+            if (request.Password.Length < 6)
+                return BadRequest(new { message = "Password must be at least 6 characters" });
+
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+            if (existingUser != null)
+                return BadRequest(new { message = "Email already exists" });
+
+            var newUser = new ApplicationUser
+            {
+                UserName = request.Email,
+                Email = request.Email,
+                FirstName = request.FirstName ?? string.Empty,
+                LastName = request.LastName ?? string.Empty,
+                Role = "SuperAdmin",
+                EmailConfirmed = true,
+                Status = "Active"
+            };
+
+            var userManager = HttpContext.RequestServices.GetService(typeof(Microsoft.AspNetCore.Identity.UserManager<ApplicationUser>)) as Microsoft.AspNetCore.Identity.UserManager<ApplicationUser>;
+            if (userManager == null) return BadRequest(new { message = "User manager not available" });
+
+            var result = await userManager.CreateAsync(newUser, request.Password);
+            if (!result.Succeeded)
+                return BadRequest(new { message = string.Join(", ", result.Errors.Select(e => e.Description)) });
+
+            await userManager.AddToRoleAsync(newUser, "SuperAdmin");
+
+            return Ok(new { message = "SuperAdmin created successfully", userId = newUser.Id });
+        }
     }
 
     // Request Models
@@ -603,6 +986,13 @@ namespace TayoKonnektado_project.Controllers
         public string? Color { get; set; }
     }
 
+    public class CreateActivityLogRequest
+    {
+        public string Action { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string Type { get; set; } = string.Empty;
+    }
+
     public class UpdatePromoOfferRequest
     {
         public string Title { get; set; } = string.Empty;
@@ -614,19 +1004,59 @@ namespace TayoKonnektado_project.Controllers
         public string? Color { get; set; }
         public bool IsActive { get; set; } = true;
     }
+
+    public class UpdateRoleRequest
+    {
+        public string[]? Permissions { get; set; }
+    }
+
+    public class CreateNotificationRequest
+    {
+        public string Message { get; set; } = string.Empty;
+        public string? Type { get; set; } = "info";
+    }
+
+    public class UpdateSystemSettingsRequest
+    {
+        public string? SiteName { get; set; }
+        public string? SiteEmail { get; set; }
+        public bool? MaintenanceMode { get; set; }
+        public int? MaxLoginAttempts { get; set; }
+        public int? SessionTimeout { get; set; }
+        public bool? EnableTwoFactor { get; set; }
+        public bool? EnableAuditLogs { get; set; }
+        public string? NotificationEmail { get; set; }
+        public bool? EmailOnNewTickets { get; set; }
+        public bool? EmailOnPaymentReceived { get; set; }
+        public bool? EmailOnSystemErrors { get; set; }
+        public bool? EmailOnSecurityAlerts { get; set; }
+    }
+
+    public class CreateSuperAdminRequest
+    {
+        public string Email { get; set; } = string.Empty;
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
 }
-ParseOptions.0.json‚…
-UE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Controllers\AuthController.csÚ»using Microsoft.AspNetCore.Authorization;
+ParseOptions.0.jsonÏà
+UE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Controllers\AuthController.cs¸áusing Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using TayoKonnektado_project.Data;
 using TayoKonnektado_project.Models;
 using TayoKonnektado_project.Services;
+using TayoKonnektado_project.Services.Security;
 using TayoKonnektado_project.Attributes;
 
 namespace TayoKonnektado_project.Controllers
 {
+    [EnableRateLimiting("auth")]
     [ApiController]
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
@@ -635,13 +1065,32 @@ namespace TayoKonnektado_project.Controllers
         private readonly TokenService _tokenService;
         private readonly EmailService _emailService;
         private readonly ApplicationDbContext _context;
+        private readonly IConfiguration _configuration;
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly LoginAttemptService _loginAttemptService;
+        private readonly IpDeviceReputationService _ipDeviceReputationService;
+        private readonly PasswordBreachService _passwordBreachService;
 
-        public AuthController(UserManager<ApplicationUser> userManager, TokenService tokenService, EmailService emailService, ApplicationDbContext context)
+        public AuthController(
+            UserManager<ApplicationUser> userManager,
+            TokenService tokenService,
+            EmailService emailService,
+            ApplicationDbContext context,
+            IConfiguration configuration,
+            IHttpClientFactory httpClientFactory,
+            LoginAttemptService loginAttemptService,
+            IpDeviceReputationService ipDeviceReputationService,
+            PasswordBreachService passwordBreachService)
         {
             _userManager = userManager;
             _tokenService = tokenService;
             _emailService = emailService;
             _context = context;
+            _configuration = configuration;
+            _httpClientFactory = httpClientFactory;
+            _loginAttemptService = loginAttemptService;
+            _ipDeviceReputationService = ipDeviceReputationService;
+            _passwordBreachService = passwordBreachService;
         }
 
         [HttpPost("register")]
@@ -649,8 +1098,19 @@ namespace TayoKonnektado_project.Controllers
         {
             try
             {
+                var userAgent = Request.Headers["User-Agent"].ToString();
+                var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+                if (_ipDeviceReputationService.IsBlocked(ipAddress, userAgent, out var blockReason))
+                    return StatusCode(429, new { message = $"Access blocked: {blockReason}. Please try again later." });
+
+                if (!await VerifyReCaptchaAsync(request.CaptchaToken))
+                    return BadRequest(new { message = "Captcha verification failed" });
+
                 if (!request.Email.EndsWith("@gmail.com", StringComparison.OrdinalIgnoreCase))
                     return BadRequest(new { message = "Only Gmail addresses are allowed" });
+
+                if (await _passwordBreachService.IsBreachedAsync(request.Password))
+                    return BadRequest(new { message = "Password has been found in a breach. Please choose a different password." });
 
                 var existingUser = await _userManager.FindByEmailAsync(request.Email);
                 if (existingUser != null)
@@ -689,6 +1149,10 @@ namespace TayoKonnektado_project.Controllers
 
                 await _context.SaveChangesAsync();
                 await _emailService.SendVerificationCodeAsync(request.Email, code);
+
+                await LogActivityAsync(user.Id, "Registered account", "Create");
+
+                _ipDeviceReputationService.RegisterSuccess(ipAddress, userAgent);
 
                 return Ok(new { message = "Registration successful. Please check your email for verification code." });
             }
@@ -745,12 +1209,33 @@ namespace TayoKonnektado_project.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
+            var userAgent = Request.Headers["User-Agent"].ToString();
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+            if (_ipDeviceReputationService.IsBlocked(ipAddress, userAgent, out var blockReason))
+                return StatusCode(429, new { message = $"Access blocked: {blockReason}. Please try again later." });
+
+            if (!await VerifyReCaptchaAsync(request.CaptchaToken))
+                return BadRequest(new { message = "Captcha verification failed" });
+
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
+            {
+                _ipDeviceReputationService.RegisterFailure(ipAddress, userAgent);
                 return Unauthorized(new { message = "Invalid credentials" });
+            }
+
+            // Check if user is locked due to failed login attempts
+            var lockoutCheck = await _loginAttemptService.CheckLoginAttemptAsync(user.Id);
+            if (lockoutCheck.isLocked)
+                return Unauthorized(new { message = $"Account locked due to too many failed login attempts. Try again in {lockoutCheck.message}" });
 
             if (!await _userManager.CheckPasswordAsync(user, request.Password))
+            {
+                // Record failed attempt
+                await _loginAttemptService.RecordFailedAttemptAsync(user.Id);
+                _ipDeviceReputationService.RegisterFailure(ipAddress, userAgent);
                 return Unauthorized(new { message = "Invalid credentials" });
+            }
 
             if (!user.EmailConfirmed)
             {
@@ -798,8 +1283,6 @@ namespace TayoKonnektado_project.Controllers
                 return Ok(new { requiresTwoFactor = true, email = user.Email, message = "Verification code sent to your email" });
             }
 
-            var userAgent = Request.Headers["User-Agent"].ToString();
-            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
             var device = GetDeviceFromUserAgent(userAgent);
             var location = "Philippines";
 
@@ -830,20 +1313,74 @@ namespace TayoKonnektado_project.Controllers
                 }
             }
 
-            var token = _tokenService.GenerateToken(user.Email!, user.Id, role);
+            // Reset login attempts on successful login
+            await _loginAttemptService.ResetAttemptsAsync(user.Id);
+            _ipDeviceReputationService.RegisterSuccess(ipAddress, userAgent);
+
+            var token = await _tokenService.GenerateTokenAsync(user.Email!, user.Id, role);
+
+            var settings = await _context.SystemSettings.FirstOrDefaultAsync();
+            var sessionTimeoutMinutes = settings?.SessionTimeout ?? 30;
+
+            await LogActivityAsync(user.Id, "Logged in", "Login");
 
             return Ok(new AuthResponse
             {
                 Token = token,
                 Email = user.Email!,
                 Role = role,
-                Expiration = DateTime.UtcNow.AddHours(24)
+                Expiration = DateTime.UtcNow.AddMinutes(sessionTimeoutMinutes)
             });
+        }
+
+        private async Task<bool> VerifyReCaptchaAsync(string? captchaToken)
+        {
+            if (string.IsNullOrWhiteSpace(captchaToken))
+                return false;
+
+            var secretKey = _configuration["ReCaptcha:SecretKey"];
+            var verifyUrl = _configuration["ReCaptcha:VerifyUrl"] ?? "https://www.google.com/recaptcha/api/siteverify";
+
+            if (string.IsNullOrWhiteSpace(secretKey))
+                return false;
+
+            var httpClient = _httpClientFactory.CreateClient();
+            var content = new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                ["secret"] = secretKey,
+                ["response"] = captchaToken,
+                ["remoteip"] = HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty
+            });
+
+            var response = await httpClient.PostAsync(verifyUrl, content);
+            if (!response.IsSuccessStatusCode)
+                return false;
+
+            var responseJson = await response.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<ReCaptchaVerificationResponse>(responseJson, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            return result?.Success == true;
+        }
+
+        private sealed class ReCaptchaVerificationResponse
+        {
+            public bool Success { get; set; }
+
+            [JsonPropertyName("error-codes")]
+            public string[]? ErrorCodes { get; set; }
         }
 
         [HttpPost("verify-2fa-login")]
         public async Task<IActionResult> Verify2FALogin([FromBody] Verify2FALoginRequest request)
         {
+            var userAgent = Request.Headers["User-Agent"].ToString();
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+            if (_ipDeviceReputationService.IsBlocked(ipAddress, userAgent, out var blockReason))
+                return StatusCode(429, new { message = $"Access blocked: {blockReason}. Please try again later." });
+
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null) return Unauthorized(new { message = "User not found" });
 
@@ -853,8 +1390,6 @@ namespace TayoKonnektado_project.Controllers
 
             verification.IsUsed = true;
             
-            var userAgent = Request.Headers["User-Agent"].ToString();
-            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
             var device = GetDeviceFromUserAgent(userAgent);
             var location = "Philippines";
 
@@ -868,31 +1403,50 @@ namespace TayoKonnektado_project.Controllers
             });
             await _context.SaveChangesAsync();
 
+            // Reset login attempts on successful 2FA verification
+            await _loginAttemptService.ResetAttemptsAsync(user.Id);
+            _ipDeviceReputationService.RegisterSuccess(ipAddress, userAgent);
+
             var roles = await _userManager.GetRolesAsync(user);
             var role = roles.FirstOrDefault() ?? user.Role;
-            var token = _tokenService.GenerateToken(user.Email!, user.Id, role);
+            var token = await _tokenService.GenerateTokenAsync(user.Email!, user.Id, role);
+
+            var settings = await _context.SystemSettings.FirstOrDefaultAsync();
+            var sessionTimeoutMinutes = settings?.SessionTimeout ?? 30;
+
+            await LogActivityAsync(user.Id, "Completed two-factor login", "Login");
 
             return Ok(new AuthResponse
             {
                 Token = token,
                 Email = user.Email!,
                 Role = role,
-                Expiration = DateTime.UtcNow.AddHours(24)
+                Expiration = DateTime.UtcNow.AddMinutes(sessionTimeoutMinutes)
             });
         }
 
         private string GetDeviceFromUserAgent(string userAgent)
         {
-            if (string.IsNullOrEmpty(userAgent)) return "Unknown Device";
-            
-            if (userAgent.Contains("Chrome") && userAgent.Contains("Windows")) return "Chrome on Windows";
-            if (userAgent.Contains("Chrome") && userAgent.Contains("Mac")) return "Chrome on Mac";
-            if (userAgent.Contains("Chrome") && userAgent.Contains("Android")) return "Chrome on Android";
-            if (userAgent.Contains("Safari") && userAgent.Contains("iPhone")) return "Safari on iPhone";
-            if (userAgent.Contains("Safari") && userAgent.Contains("iPad")) return "Safari on iPad";
-            if (userAgent.Contains("Firefox")) return "Firefox Browser";
-            if (userAgent.Contains("Edge")) return "Microsoft Edge";
-            
+            if (string.IsNullOrEmpty(userAgent))
+                return "Unknown Device";
+
+            var rules = new (string[] MustContain, string Result)[]
+            {
+                (new[] { "Chrome", "Windows" }, "Chrome on Windows"),
+                (new[] { "Chrome", "Mac" }, "Chrome on Mac"),
+                (new[] { "Chrome", "Android" }, "Chrome on Android"),
+                (new[] { "Safari", "iPhone" }, "Safari on iPhone"),
+                (new[] { "Safari", "iPad" }, "Safari on iPad"),
+                (new[] { "Firefox" }, "Firefox Browser"),
+                (new[] { "Edge" }, "Microsoft Edge")
+            };
+
+            foreach (var rule in rules)
+            {
+                if (rule.MustContain.All(token => userAgent.Contains(token, StringComparison.OrdinalIgnoreCase)))
+                    return rule.Result;
+            }
+
             return "Unknown Device";
         }
 
@@ -925,18 +1479,50 @@ namespace TayoKonnektado_project.Controllers
                 await _context.SaveChangesAsync();
             }
 
+            // Reset login attempts on successful Google login
+            await _loginAttemptService.ResetAttemptsAsync(user.Id);
+
             var roles = await _userManager.GetRolesAsync(user);
             var role = roles.FirstOrDefault() ?? user.Role;
 
-            var token = _tokenService.GenerateToken(user.Email!, user.Id, role);
+            var token = await _tokenService.GenerateTokenAsync(user.Email!, user.Id, role);
+
+            var settings = await _context.SystemSettings.FirstOrDefaultAsync();
+            var sessionTimeoutMinutes = settings?.SessionTimeout ?? 30;
+
+            await LogActivityAsync(user.Id, "Logged in with Google", "Login");
 
             return Ok(new AuthResponse
             {
                 Token = token,
                 Email = user.Email!,
                 Role = role,
-                Expiration = DateTime.UtcNow.AddHours(24)
+                Expiration = DateTime.UtcNow.AddMinutes(sessionTimeoutMinutes)
             });
+        }
+
+        private async Task LogActivityAsync(string userId, string action, string type)
+        {
+            if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(action))
+                return;
+
+            try
+            {
+                _context.ActivityLogs.Add(new ActivityLog
+                {
+                    UserID = userId,
+                    Action = action,
+                    Type = string.IsNullOrWhiteSpace(type) ? "Update" : type,
+                    IPAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
+                    Timestamp = DateTime.UtcNow
+                });
+
+                await _context.SaveChangesAsync();
+            }
+            catch
+            {
+                // Avoid blocking auth flows when activity logging fails.
+            }
         }
 
         [Authorize]
@@ -1179,24 +1765,43 @@ namespace TayoKonnektado_project.Controllers
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
         {
+            var userAgent = Request.Headers["User-Agent"].ToString();
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+            if (_ipDeviceReputationService.IsBlocked(ipAddress, userAgent, out var blockReason))
+                return StatusCode(429, new { message = $"Access blocked: {blockReason}. Please try again later." });
+
             var verification = await _context.VerificationCodes
                 .FirstOrDefaultAsync(v => v.Email == request.Email && v.Code == request.Code && !v.IsUsed && v.ExpiresAt > DateTime.UtcNow);
 
             if (verification == null)
+            {
+                _ipDeviceReputationService.RegisterFailure(ipAddress, userAgent);
                 return BadRequest(new { message = "Invalid or expired reset code" });
+            }
 
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
+            {
+                _ipDeviceReputationService.RegisterFailure(ipAddress, userAgent);
                 return NotFound(new { message = "User not found" });
+            }
+
+            if (await _passwordBreachService.IsBreachedAsync(request.NewPassword))
+                return BadRequest(new { message = "New password has been found in a breach. Please choose a different password." });
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
             var result = await _userManager.ResetPasswordAsync(user, token, request.NewPassword);
 
             if (!result.Succeeded)
+            {
+                _ipDeviceReputationService.RegisterFailure(ipAddress, userAgent);
                 return BadRequest(new { message = string.Join(", ", result.Errors.Select(e => e.Description)) });
+            }
 
             verification.IsUsed = true;
             await _context.SaveChangesAsync();
+
+            _ipDeviceReputationService.RegisterSuccess(ipAddress, userAgent);
 
             return Ok(new { message = "Password reset successfully" });
         }
@@ -2798,8 +3403,8 @@ namespace TayoKonnektado_project.Controllers
         }
     }
 }
-ParseOptions.0.jsonå
-TE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Data\ApplicationDbContext.csûusing Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+ParseOptions.0.jsonœ 
+TE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Data\ApplicationDbContext.cs·using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using TayoKonnektado_project.Models;
 
@@ -2830,6 +3435,9 @@ namespace TayoKonnektado_project.Data
         public DbSet<LoginHistory> LoginHistory { get; set; }
         public DbSet<NotificationPreference> NotificationPreferences { get; set; }
         public DbSet<PromoOffer> PromoOffers { get; set; }
+        public DbSet<RolePermission> RolePermissions { get; set; }
+        public DbSet<SystemSettings> SystemSettings { get; set; }
+        public DbSet<LoginAttempt> LoginAttempts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -2884,6 +3492,13 @@ namespace TayoKonnektado_project.Data
                 .WithMany()
                 .HasForeignKey(pp => pp.UserID)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<RolePermission>()
+                .HasKey(rp => rp.RolePermissionID);
+
+            modelBuilder.Entity<RolePermission>()
+                .HasIndex(rp => new { rp.RoleName, rp.PermissionName })
+                .IsUnique();
         }
     }
 }
@@ -29823,38 +30438,58 @@ namespace TayoKonnektado_project.Migrations
         }
     }
 }
-ParseOptions.0.json≠
-aE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Migrations\AddPhoneNumberToPrepaidLoad.cs≤using Microsoft.EntityFrameworkCore.Migrations;
+ParseOptions.0.jsonë
+gE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Migrations\20260428092534_AddRolePermissions.csêusing System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace TayoKonnektado_project.Migrations
 {
-    public partial class AddPhoneNumberToPrepaidLoad : Migration
+    /// <inheritdoc />
+    public partial class AddRolePermissions : Migration
     {
+        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "PhoneNumber",
-                table: "PrepaidLoads",
-                type: "nvarchar(max)",
-                nullable: true);
+            migrationBuilder.CreateTable(
+                name: "RolePermissions",
+                columns: table => new
+                {
+                    RolePermissionID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RoleName = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    PermissionName = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RolePermissions", x => x.RolePermissionID);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RolePermissions_RoleName_PermissionName",
+                table: "RolePermissions",
+                columns: new[] { "RoleName", "PermissionName" },
+                unique: true);
         }
 
+        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "PhoneNumber",
-                table: "PrepaidLoads");
+            migrationBuilder.DropTable(
+                name: "RolePermissions");
         }
     }
 }
-ParseOptions.0.jsonÛä
-gE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Migrations\ApplicationDbContextModelSnapshot.csÒâ// <auto-generated />
+ParseOptions.0.json∂î
+pE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Migrations\20260428092534_AddRolePermissions.Designer.cs´ì// <auto-generated />
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TayoKonnektado_project.Data;
 
@@ -29863,9 +30498,11 @@ using TayoKonnektado_project.Data;
 namespace TayoKonnektado_project.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260428092534_AddRolePermissions")]
+    partial class AddRolePermissions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30005,6 +30642,36 @@ namespace TayoKonnektado_project.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("RolePermission", b =>
+                {
+                    b.Property<int>("RolePermissionID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RolePermissionID"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PermissionName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RoleName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("RolePermissionID");
+
+                    b.HasIndex("RoleName", "PermissionName")
+                        .IsUnique();
+
+                    b.ToTable("RolePermissions");
                 });
 
             modelBuilder.Entity("TayoKonnektado_project.Models.ActivityLog", b =>
@@ -31200,6 +31867,4546 @@ namespace TayoKonnektado_project.Migrations
         }
     }
 }
+ParseOptions.0.jsonî
+fE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Migrations\20260428142721_AddSystemSettings.csîusing System;
+using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
+
+namespace TayoKonnektado_project.Migrations
+{
+    /// <inheritdoc />
+    public partial class AddSystemSettings : Migration
+    {
+        /// <inheritdoc />
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.CreateTable(
+                name: "SystemSettings",
+                columns: table => new
+                {
+                    SettingID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SiteName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SiteEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MaintenanceMode = table.Column<bool>(type: "bit", nullable: false),
+                    MaxLoginAttempts = table.Column<int>(type: "int", nullable: false),
+                    SessionTimeout = table.Column<int>(type: "int", nullable: false),
+                    EnableTwoFactor = table.Column<bool>(type: "bit", nullable: false),
+                    EnableAuditLogs = table.Column<bool>(type: "bit", nullable: false),
+                    NotificationEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EmailOnNewTickets = table.Column<bool>(type: "bit", nullable: false),
+                    EmailOnPaymentReceived = table.Column<bool>(type: "bit", nullable: false),
+                    EmailOnSystemErrors = table.Column<bool>(type: "bit", nullable: false),
+                    EmailOnSecurityAlerts = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SystemSettings", x => x.SettingID);
+                });
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropTable(
+                name: "SystemSettings");
+        }
+    }
+}
+ParseOptions.0.jsonı§
+oE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Migrations\20260428142721_AddSystemSettings.Designer.csÎ£// <auto-generated />
+using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using TayoKonnektado_project.Data;
+
+#nullable disable
+
+namespace TayoKonnektado_project.Migrations
+{
+    [DbContext(typeof(ApplicationDbContext))]
+    [Migration("20260428142721_AddSystemSettings")]
+    partial class AddSystemSettings
+    {
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        {
+#pragma warning disable 612, 618
+            modelBuilder
+                .HasAnnotation("ProductVersion", "8.0.11")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex")
+                        .HasFilter("[NormalizedName] IS NOT NULL");
+
+                    b.ToTable("AspNetRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RoleId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetRoleClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderKey")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderDisplayName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("LoginProvider", "ProviderKey");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserLogins", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RoleId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("RolePermission", b =>
+                {
+                    b.Property<int>("RolePermissionID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RolePermissionID"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PermissionName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RoleName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("RolePermissionID");
+
+                    b.HasIndex("RoleName", "PermissionName")
+                        .IsUnique();
+
+                    b.ToTable("RolePermissions");
+                });
+
+            modelBuilder.Entity("SystemSettings", b =>
+                {
+                    b.Property<int>("SettingID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SettingID"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("EmailOnNewTickets")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("EmailOnPaymentReceived")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("EmailOnSecurityAlerts")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("EmailOnSystemErrors")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("EnableAuditLogs")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("EnableTwoFactor")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("MaintenanceMode")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("MaxLoginAttempts")
+                        .HasColumnType("int");
+
+                    b.Property<string>("NotificationEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SessionTimeout")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SiteEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SiteName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("SettingID");
+
+                    b.ToTable("SystemSettings");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.ActivityLog", b =>
+                {
+                    b.Property<int>("LogID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LogID"));
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IPAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("LogID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("ActivityLogs");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Addon", b =>
+                {
+                    b.Property<int>("AddonID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AddonID"));
+
+                    b.Property<string>("BillingType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Features")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Icon")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("AddonID");
+
+                    b.ToTable("Addons");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.ApplicationUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("Birthday")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("PinProtectionEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ProfilePictureUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Role")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SecurityPin")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Device", b =>
+                {
+                    b.Property<int>("DeviceID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DeviceID"));
+
+                    b.Property<string>("DeviceType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MACAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OPCCodeToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("RegisteredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("UserID");
+
+                    b.HasKey("DeviceID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("Devices");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.FAQ", b =>
+                {
+                    b.Property<int>("FAQID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FAQID"));
+
+                    b.Property<string>("Answer")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Question")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Views")
+                        .HasColumnType("int");
+
+                    b.HasKey("FAQID");
+
+                    b.ToTable("FAQs");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Invoice", b =>
+                {
+                    b.Property<int>("InvoiceID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("InvoiceID"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("PrepaidLoadID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("SubscriptionID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("InvoiceID");
+
+                    b.HasIndex("PrepaidLoadID");
+
+                    b.HasIndex("SubscriptionID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("Invoices");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.LoginHistory", b =>
+                {
+                    b.Property<int>("LoginHistoryID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LoginHistoryID"));
+
+                    b.Property<string>("Device")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IPAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Location")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LoginTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("LoginHistoryID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("LoginHistory");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Notification", b =>
+                {
+                    b.Property<int>("NotificationID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NotificationID"));
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("NotificationID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("Notifications");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.NotificationPreference", b =>
+                {
+                    b.Property<int>("PreferenceID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PreferenceID"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("EmailEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("NotificationType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("PreferenceID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("NotificationPreferences");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.OnboardingStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("HasCompletedTutorial")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasRegisteredDevice")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasSelectedServiceType")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsEmailVerified")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OnboardingStatuses");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Payment", b =>
+                {
+                    b.Property<int>("PaymentID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PaymentID"));
+
+                    b.Property<decimal>("AmountPaid")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("InvoiceID")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PaymentMethod")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReferenceNum")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("PaymentID");
+
+                    b.HasIndex("InvoiceID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("Payments");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.PrepaidLoad", b =>
+                {
+                    b.Property<int>("PrepaidLoadID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PrepaidLoadID"));
+
+                    b.Property<DateTime?>("LastReloadBalance")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("LoadAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("RemainingBalance")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ServiceAccountID")
+                        .HasColumnType("int");
+
+                    b.HasKey("PrepaidLoadID");
+
+                    b.HasIndex("ServiceAccountID");
+
+                    b.ToTable("PrepaidLoads");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.PrepaidPromo", b =>
+                {
+                    b.Property<int>("PrepaidPromoID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PrepaidPromoID"));
+
+                    b.Property<DateTime>("ActivatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PrepaidLoadID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PromoTitle")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("RemainingDataMB")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("TotalDataMB")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("ValidityDays")
+                        .HasColumnType("int");
+
+                    b.HasKey("PrepaidPromoID");
+
+                    b.HasIndex("PrepaidLoadID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("PrepaidPromos");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.PromoOffer", b =>
+                {
+                    b.Property<int>("PromoOfferID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PromoOfferID"));
+
+                    b.Property<string>("Badge")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Data")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Validity")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("PromoOfferID");
+
+                    b.ToTable("PromoOffers");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.SavedPaymentMethod", b =>
+                {
+                    b.Property<int>("PaymentMethodID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PaymentMethodID"));
+
+                    b.Property<string>("Brand")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ExpMonth")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ExpYear")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDefault")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Last4")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PayMongoPaymentMethodId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("PaymentMethodID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("SavedPaymentMethods");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.ServiceAccount", b =>
+                {
+                    b.Property<int>("ServiceAccountID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ServiceAccountID"));
+
+                    b.Property<DateTime>("ActivatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DeviceID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ServiceType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ServiceAccountID");
+
+                    b.HasIndex("DeviceID");
+
+                    b.ToTable("ServiceAccounts");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Subscription", b =>
+                {
+                    b.Property<int>("SubscriptionID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SubscriptionID"));
+
+                    b.Property<string>("DeviceName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PlanID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ServiceAccountID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("UserID");
+
+                    b.HasKey("SubscriptionID");
+
+                    b.HasIndex("PlanID");
+
+                    b.HasIndex("ServiceAccountID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("Subscriptions");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.SubscriptionPlan", b =>
+                {
+                    b.Property<int>("PlanID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PlanID"));
+
+                    b.Property<string>("PlanName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("SpeedMbps")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("PlanID");
+
+                    b.ToTable("SubscriptionPlans");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.SupportTicket", b =>
+                {
+                    b.Property<int>("TicketID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TicketID"));
+
+                    b.Property<string>("AssignedStaffID")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AttachmentUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Category")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("DeviceID")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsHiddenByCustomer")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Priority")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("TicketID");
+
+                    b.HasIndex("DeviceID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("SupportTickets");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.TicketReply", b =>
+                {
+                    b.Property<int>("ReplyID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReplyID"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsAdminReply")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TicketID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("ReplyID");
+
+                    b.HasIndex("TicketID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("TicketReplies");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.UserAddon", b =>
+                {
+                    b.Property<int>("UserAddonID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserAddonID"));
+
+                    b.Property<DateTime>("ActivatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("AddonID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("NextBillingDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("UserAddonID");
+
+                    b.HasIndex("AddonID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("UserAddons");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.VerificationCode", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("VerificationCodes");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.ActivityLog", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Device", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany("Devices")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Invoice", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.PrepaidLoad", "PrepaidLoad")
+                        .WithMany()
+                        .HasForeignKey("PrepaidLoadID")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("TayoKonnektado_project.Models.Subscription", "Subscription")
+                        .WithMany("Invoices")
+                        .HasForeignKey("SubscriptionID")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany("Invoices")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PrepaidLoad");
+
+                    b.Navigation("Subscription");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.LoginHistory", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Notification", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany("Notifications")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.NotificationPreference", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Payment", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.Invoice", "Invoice")
+                        .WithMany("Payments")
+                        .HasForeignKey("InvoiceID")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany("Payments")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Invoice");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.PrepaidLoad", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.ServiceAccount", "ServiceAccount")
+                        .WithMany("PrepaidLoads")
+                        .HasForeignKey("ServiceAccountID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ServiceAccount");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.PrepaidPromo", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.PrepaidLoad", "PrepaidLoad")
+                        .WithMany()
+                        .HasForeignKey("PrepaidLoadID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("PrepaidLoad");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.SavedPaymentMethod", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.ServiceAccount", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.Device", "Device")
+                        .WithMany("ServiceAccounts")
+                        .HasForeignKey("DeviceID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Device");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Subscription", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.SubscriptionPlan", "Plan")
+                        .WithMany("Subscriptions")
+                        .HasForeignKey("PlanID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("TayoKonnektado_project.Models.ServiceAccount", "ServiceAccount")
+                        .WithMany("Subscriptions")
+                        .HasForeignKey("ServiceAccountID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany("Subscriptions")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Plan");
+
+                    b.Navigation("ServiceAccount");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.SupportTicket", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.Device", "Device")
+                        .WithMany("SupportTickets")
+                        .HasForeignKey("DeviceID");
+
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany("SupportTickets")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Device");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.TicketReply", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.SupportTicket", "Ticket")
+                        .WithMany("Replies")
+                        .HasForeignKey("TicketID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ticket");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.UserAddon", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.Addon", "Addon")
+                        .WithMany("UserAddons")
+                        .HasForeignKey("AddonID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Addon");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Addon", b =>
+                {
+                    b.Navigation("UserAddons");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.ApplicationUser", b =>
+                {
+                    b.Navigation("Devices");
+
+                    b.Navigation("Invoices");
+
+                    b.Navigation("Notifications");
+
+                    b.Navigation("Payments");
+
+                    b.Navigation("Subscriptions");
+
+                    b.Navigation("SupportTickets");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Device", b =>
+                {
+                    b.Navigation("ServiceAccounts");
+
+                    b.Navigation("SupportTickets");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Invoice", b =>
+                {
+                    b.Navigation("Payments");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.ServiceAccount", b =>
+                {
+                    b.Navigation("PrepaidLoads");
+
+                    b.Navigation("Subscriptions");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Subscription", b =>
+                {
+                    b.Navigation("Invoices");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.SubscriptionPlan", b =>
+                {
+                    b.Navigation("Subscriptions");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.SupportTicket", b =>
+                {
+                    b.Navigation("Replies");
+                });
+#pragma warning restore 612, 618
+        }
+    }
+}
+ParseOptions.0.jsonµ
+lE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Migrations\20260428145859_AddLoginAttemptTracking.csØusing System;
+using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
+
+namespace TayoKonnektado_project.Migrations
+{
+    /// <inheritdoc />
+    public partial class AddLoginAttemptTracking : Migration
+    {
+        /// <inheritdoc />
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.CreateTable(
+                name: "LoginAttempts",
+                columns: table => new
+                {
+                    LoginAttemptID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserID = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    FailedAttempts = table.Column<int>(type: "int", nullable: false),
+                    LockedUntil = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    LockReason = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastAttemptAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LoginAttempts", x => x.LoginAttemptID);
+                    table.ForeignKey(
+                        name: "FK_LoginAttempts_AspNetUsers_UserID",
+                        column: x => x.UserID,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LoginAttempts_UserID",
+                table: "LoginAttempts",
+                column: "UserID");
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropTable(
+                name: "LoginAttempts");
+        }
+    }
+}
+ParseOptions.0.json€≤
+uE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Migrations\20260428145859_AddLoginAttemptTracking.Designer.csÀ±// <auto-generated />
+using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using TayoKonnektado_project.Data;
+
+#nullable disable
+
+namespace TayoKonnektado_project.Migrations
+{
+    [DbContext(typeof(ApplicationDbContext))]
+    [Migration("20260428145859_AddLoginAttemptTracking")]
+    partial class AddLoginAttemptTracking
+    {
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        {
+#pragma warning disable 612, 618
+            modelBuilder
+                .HasAnnotation("ProductVersion", "8.0.11")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex")
+                        .HasFilter("[NormalizedName] IS NOT NULL");
+
+                    b.ToTable("AspNetRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RoleId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetRoleClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderKey")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderDisplayName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("LoginProvider", "ProviderKey");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserLogins", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RoleId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.ActivityLog", b =>
+                {
+                    b.Property<int>("LogID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LogID"));
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IPAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("LogID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("ActivityLogs");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Addon", b =>
+                {
+                    b.Property<int>("AddonID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AddonID"));
+
+                    b.Property<string>("BillingType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Features")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Icon")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("AddonID");
+
+                    b.ToTable("Addons");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.ApplicationUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("Birthday")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("PinProtectionEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ProfilePictureUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Role")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SecurityPin")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Device", b =>
+                {
+                    b.Property<int>("DeviceID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DeviceID"));
+
+                    b.Property<string>("DeviceType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MACAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OPCCodeToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("RegisteredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("UserID");
+
+                    b.HasKey("DeviceID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("Devices");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.FAQ", b =>
+                {
+                    b.Property<int>("FAQID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FAQID"));
+
+                    b.Property<string>("Answer")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Question")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Views")
+                        .HasColumnType("int");
+
+                    b.HasKey("FAQID");
+
+                    b.ToTable("FAQs");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Invoice", b =>
+                {
+                    b.Property<int>("InvoiceID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("InvoiceID"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("PrepaidLoadID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("SubscriptionID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("InvoiceID");
+
+                    b.HasIndex("PrepaidLoadID");
+
+                    b.HasIndex("SubscriptionID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("Invoices");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.LoginAttempt", b =>
+                {
+                    b.Property<int>("LoginAttemptID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LoginAttemptID"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("FailedAttempts")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("LastAttemptAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LockReason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LockedUntil")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("LoginAttemptID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("LoginAttempts");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.LoginHistory", b =>
+                {
+                    b.Property<int>("LoginHistoryID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LoginHistoryID"));
+
+                    b.Property<string>("Device")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IPAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Location")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LoginTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("LoginHistoryID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("LoginHistory");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Notification", b =>
+                {
+                    b.Property<int>("NotificationID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NotificationID"));
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("NotificationID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("Notifications");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.NotificationPreference", b =>
+                {
+                    b.Property<int>("PreferenceID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PreferenceID"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("EmailEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("NotificationType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("PreferenceID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("NotificationPreferences");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.OnboardingStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("HasCompletedTutorial")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasRegisteredDevice")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasSelectedServiceType")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsEmailVerified")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OnboardingStatuses");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Payment", b =>
+                {
+                    b.Property<int>("PaymentID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PaymentID"));
+
+                    b.Property<decimal>("AmountPaid")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("InvoiceID")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PaymentMethod")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReferenceNum")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("PaymentID");
+
+                    b.HasIndex("InvoiceID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("Payments");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.PrepaidLoad", b =>
+                {
+                    b.Property<int>("PrepaidLoadID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PrepaidLoadID"));
+
+                    b.Property<DateTime?>("LastReloadBalance")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("LoadAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("RemainingBalance")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ServiceAccountID")
+                        .HasColumnType("int");
+
+                    b.HasKey("PrepaidLoadID");
+
+                    b.HasIndex("ServiceAccountID");
+
+                    b.ToTable("PrepaidLoads");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.PrepaidPromo", b =>
+                {
+                    b.Property<int>("PrepaidPromoID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PrepaidPromoID"));
+
+                    b.Property<DateTime>("ActivatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PrepaidLoadID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PromoTitle")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("RemainingDataMB")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("TotalDataMB")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("ValidityDays")
+                        .HasColumnType("int");
+
+                    b.HasKey("PrepaidPromoID");
+
+                    b.HasIndex("PrepaidLoadID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("PrepaidPromos");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.PromoOffer", b =>
+                {
+                    b.Property<int>("PromoOfferID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PromoOfferID"));
+
+                    b.Property<string>("Badge")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Data")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Validity")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("PromoOfferID");
+
+                    b.ToTable("PromoOffers");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.RolePermission", b =>
+                {
+                    b.Property<int>("RolePermissionID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RolePermissionID"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PermissionName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RoleName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("RolePermissionID");
+
+                    b.HasIndex("RoleName", "PermissionName")
+                        .IsUnique();
+
+                    b.ToTable("RolePermissions");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.SavedPaymentMethod", b =>
+                {
+                    b.Property<int>("PaymentMethodID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PaymentMethodID"));
+
+                    b.Property<string>("Brand")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ExpMonth")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ExpYear")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDefault")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Last4")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PayMongoPaymentMethodId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("PaymentMethodID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("SavedPaymentMethods");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.ServiceAccount", b =>
+                {
+                    b.Property<int>("ServiceAccountID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ServiceAccountID"));
+
+                    b.Property<DateTime>("ActivatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DeviceID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ServiceType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ServiceAccountID");
+
+                    b.HasIndex("DeviceID");
+
+                    b.ToTable("ServiceAccounts");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Subscription", b =>
+                {
+                    b.Property<int>("SubscriptionID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SubscriptionID"));
+
+                    b.Property<string>("DeviceName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PlanID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ServiceAccountID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("UserID");
+
+                    b.HasKey("SubscriptionID");
+
+                    b.HasIndex("PlanID");
+
+                    b.HasIndex("ServiceAccountID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("Subscriptions");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.SubscriptionPlan", b =>
+                {
+                    b.Property<int>("PlanID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PlanID"));
+
+                    b.Property<string>("PlanName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("SpeedMbps")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("PlanID");
+
+                    b.ToTable("SubscriptionPlans");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.SupportTicket", b =>
+                {
+                    b.Property<int>("TicketID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TicketID"));
+
+                    b.Property<string>("AssignedStaffID")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AttachmentUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Category")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("DeviceID")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsHiddenByCustomer")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Priority")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("TicketID");
+
+                    b.HasIndex("DeviceID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("SupportTickets");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.SystemSettings", b =>
+                {
+                    b.Property<int>("SettingID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SettingID"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("EmailOnNewTickets")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("EmailOnPaymentReceived")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("EmailOnSecurityAlerts")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("EmailOnSystemErrors")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("EnableAuditLogs")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("EnableTwoFactor")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("MaintenanceMode")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("MaxLoginAttempts")
+                        .HasColumnType("int");
+
+                    b.Property<string>("NotificationEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SessionTimeout")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SiteEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SiteName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("SettingID");
+
+                    b.ToTable("SystemSettings");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.TicketReply", b =>
+                {
+                    b.Property<int>("ReplyID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReplyID"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsAdminReply")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TicketID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("ReplyID");
+
+                    b.HasIndex("TicketID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("TicketReplies");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.UserAddon", b =>
+                {
+                    b.Property<int>("UserAddonID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserAddonID"));
+
+                    b.Property<DateTime>("ActivatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("AddonID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("NextBillingDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("UserAddonID");
+
+                    b.HasIndex("AddonID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("UserAddons");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.VerificationCode", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("VerificationCodes");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.ActivityLog", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Device", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany("Devices")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Invoice", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.PrepaidLoad", "PrepaidLoad")
+                        .WithMany()
+                        .HasForeignKey("PrepaidLoadID")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("TayoKonnektado_project.Models.Subscription", "Subscription")
+                        .WithMany("Invoices")
+                        .HasForeignKey("SubscriptionID")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany("Invoices")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PrepaidLoad");
+
+                    b.Navigation("Subscription");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.LoginAttempt", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.LoginHistory", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Notification", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany("Notifications")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.NotificationPreference", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Payment", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.Invoice", "Invoice")
+                        .WithMany("Payments")
+                        .HasForeignKey("InvoiceID")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany("Payments")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Invoice");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.PrepaidLoad", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.ServiceAccount", "ServiceAccount")
+                        .WithMany("PrepaidLoads")
+                        .HasForeignKey("ServiceAccountID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ServiceAccount");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.PrepaidPromo", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.PrepaidLoad", "PrepaidLoad")
+                        .WithMany()
+                        .HasForeignKey("PrepaidLoadID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("PrepaidLoad");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.SavedPaymentMethod", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.ServiceAccount", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.Device", "Device")
+                        .WithMany("ServiceAccounts")
+                        .HasForeignKey("DeviceID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Device");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Subscription", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.SubscriptionPlan", "Plan")
+                        .WithMany("Subscriptions")
+                        .HasForeignKey("PlanID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("TayoKonnektado_project.Models.ServiceAccount", "ServiceAccount")
+                        .WithMany("Subscriptions")
+                        .HasForeignKey("ServiceAccountID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany("Subscriptions")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Plan");
+
+                    b.Navigation("ServiceAccount");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.SupportTicket", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.Device", "Device")
+                        .WithMany("SupportTickets")
+                        .HasForeignKey("DeviceID");
+
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany("SupportTickets")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Device");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.TicketReply", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.SupportTicket", "Ticket")
+                        .WithMany("Replies")
+                        .HasForeignKey("TicketID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ticket");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.UserAddon", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.Addon", "Addon")
+                        .WithMany("UserAddons")
+                        .HasForeignKey("AddonID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Addon");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Addon", b =>
+                {
+                    b.Navigation("UserAddons");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.ApplicationUser", b =>
+                {
+                    b.Navigation("Devices");
+
+                    b.Navigation("Invoices");
+
+                    b.Navigation("Notifications");
+
+                    b.Navigation("Payments");
+
+                    b.Navigation("Subscriptions");
+
+                    b.Navigation("SupportTickets");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Device", b =>
+                {
+                    b.Navigation("ServiceAccounts");
+
+                    b.Navigation("SupportTickets");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Invoice", b =>
+                {
+                    b.Navigation("Payments");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.ServiceAccount", b =>
+                {
+                    b.Navigation("PrepaidLoads");
+
+                    b.Navigation("Subscriptions");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Subscription", b =>
+                {
+                    b.Navigation("Invoices");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.SubscriptionPlan", b =>
+                {
+                    b.Navigation("Subscriptions");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.SupportTicket", b =>
+                {
+                    b.Navigation("Replies");
+                });
+#pragma warning restore 612, 618
+        }
+    }
+}
+ParseOptions.0.json≠
+aE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Migrations\AddPhoneNumberToPrepaidLoad.cs≤using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
+
+namespace TayoKonnektado_project.Migrations
+{
+    public partial class AddPhoneNumberToPrepaidLoad : Migration
+    {
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.AddColumn<string>(
+                name: "PhoneNumber",
+                table: "PrepaidLoads",
+                type: "nvarchar(max)",
+                nullable: true);
+        }
+
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropColumn(
+                name: "PhoneNumber",
+                table: "PrepaidLoads");
+        }
+    }
+}
+ParseOptions.0.jsonŸ±
+gE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Migrations\ApplicationDbContextModelSnapshot.cs◊∞// <auto-generated />
+using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using TayoKonnektado_project.Data;
+
+#nullable disable
+
+namespace TayoKonnektado_project.Migrations
+{
+    [DbContext(typeof(ApplicationDbContext))]
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    {
+        protected override void BuildModel(ModelBuilder modelBuilder)
+        {
+#pragma warning disable 612, 618
+            modelBuilder
+                .HasAnnotation("ProductVersion", "8.0.11")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex")
+                        .HasFilter("[NormalizedName] IS NOT NULL");
+
+                    b.ToTable("AspNetRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RoleId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetRoleClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderKey")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderDisplayName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("LoginProvider", "ProviderKey");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserLogins", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RoleId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.ActivityLog", b =>
+                {
+                    b.Property<int>("LogID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LogID"));
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IPAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("LogID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("ActivityLogs");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Addon", b =>
+                {
+                    b.Property<int>("AddonID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AddonID"));
+
+                    b.Property<string>("BillingType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Features")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Icon")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("AddonID");
+
+                    b.ToTable("Addons");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.ApplicationUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("Birthday")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("PinProtectionEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ProfilePictureUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Role")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SecurityPin")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Device", b =>
+                {
+                    b.Property<int>("DeviceID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DeviceID"));
+
+                    b.Property<string>("DeviceType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MACAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OPCCodeToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("RegisteredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("UserID");
+
+                    b.HasKey("DeviceID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("Devices");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.FAQ", b =>
+                {
+                    b.Property<int>("FAQID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FAQID"));
+
+                    b.Property<string>("Answer")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Question")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Views")
+                        .HasColumnType("int");
+
+                    b.HasKey("FAQID");
+
+                    b.ToTable("FAQs");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Invoice", b =>
+                {
+                    b.Property<int>("InvoiceID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("InvoiceID"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("PrepaidLoadID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("SubscriptionID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("InvoiceID");
+
+                    b.HasIndex("PrepaidLoadID");
+
+                    b.HasIndex("SubscriptionID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("Invoices");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.LoginAttempt", b =>
+                {
+                    b.Property<int>("LoginAttemptID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LoginAttemptID"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("FailedAttempts")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("LastAttemptAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LockReason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LockedUntil")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("LoginAttemptID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("LoginAttempts");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.LoginHistory", b =>
+                {
+                    b.Property<int>("LoginHistoryID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LoginHistoryID"));
+
+                    b.Property<string>("Device")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IPAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Location")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LoginTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("LoginHistoryID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("LoginHistory");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Notification", b =>
+                {
+                    b.Property<int>("NotificationID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NotificationID"));
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("NotificationID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("Notifications");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.NotificationPreference", b =>
+                {
+                    b.Property<int>("PreferenceID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PreferenceID"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("EmailEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("NotificationType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("PreferenceID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("NotificationPreferences");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.OnboardingStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("HasCompletedTutorial")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasRegisteredDevice")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasSelectedServiceType")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsEmailVerified")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OnboardingStatuses");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Payment", b =>
+                {
+                    b.Property<int>("PaymentID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PaymentID"));
+
+                    b.Property<decimal>("AmountPaid")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("InvoiceID")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PaymentMethod")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReferenceNum")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("PaymentID");
+
+                    b.HasIndex("InvoiceID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("Payments");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.PrepaidLoad", b =>
+                {
+                    b.Property<int>("PrepaidLoadID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PrepaidLoadID"));
+
+                    b.Property<DateTime?>("LastReloadBalance")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("LoadAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("RemainingBalance")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ServiceAccountID")
+                        .HasColumnType("int");
+
+                    b.HasKey("PrepaidLoadID");
+
+                    b.HasIndex("ServiceAccountID");
+
+                    b.ToTable("PrepaidLoads");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.PrepaidPromo", b =>
+                {
+                    b.Property<int>("PrepaidPromoID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PrepaidPromoID"));
+
+                    b.Property<DateTime>("ActivatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PrepaidLoadID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PromoTitle")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("RemainingDataMB")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("TotalDataMB")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("ValidityDays")
+                        .HasColumnType("int");
+
+                    b.HasKey("PrepaidPromoID");
+
+                    b.HasIndex("PrepaidLoadID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("PrepaidPromos");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.PromoOffer", b =>
+                {
+                    b.Property<int>("PromoOfferID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PromoOfferID"));
+
+                    b.Property<string>("Badge")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Data")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Validity")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("PromoOfferID");
+
+                    b.ToTable("PromoOffers");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.RolePermission", b =>
+                {
+                    b.Property<int>("RolePermissionID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RolePermissionID"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PermissionName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RoleName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("RolePermissionID");
+
+                    b.HasIndex("RoleName", "PermissionName")
+                        .IsUnique();
+
+                    b.ToTable("RolePermissions");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.SavedPaymentMethod", b =>
+                {
+                    b.Property<int>("PaymentMethodID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PaymentMethodID"));
+
+                    b.Property<string>("Brand")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ExpMonth")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ExpYear")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDefault")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Last4")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PayMongoPaymentMethodId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("PaymentMethodID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("SavedPaymentMethods");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.ServiceAccount", b =>
+                {
+                    b.Property<int>("ServiceAccountID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ServiceAccountID"));
+
+                    b.Property<DateTime>("ActivatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DeviceID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ServiceType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ServiceAccountID");
+
+                    b.HasIndex("DeviceID");
+
+                    b.ToTable("ServiceAccounts");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Subscription", b =>
+                {
+                    b.Property<int>("SubscriptionID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SubscriptionID"));
+
+                    b.Property<string>("DeviceName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PlanID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ServiceAccountID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("UserID");
+
+                    b.HasKey("SubscriptionID");
+
+                    b.HasIndex("PlanID");
+
+                    b.HasIndex("ServiceAccountID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("Subscriptions");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.SubscriptionPlan", b =>
+                {
+                    b.Property<int>("PlanID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PlanID"));
+
+                    b.Property<string>("PlanName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("SpeedMbps")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("PlanID");
+
+                    b.ToTable("SubscriptionPlans");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.SupportTicket", b =>
+                {
+                    b.Property<int>("TicketID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TicketID"));
+
+                    b.Property<string>("AssignedStaffID")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AttachmentUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Category")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("DeviceID")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsHiddenByCustomer")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Priority")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("TicketID");
+
+                    b.HasIndex("DeviceID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("SupportTickets");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.SystemSettings", b =>
+                {
+                    b.Property<int>("SettingID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SettingID"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("EmailOnNewTickets")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("EmailOnPaymentReceived")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("EmailOnSecurityAlerts")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("EmailOnSystemErrors")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("EnableAuditLogs")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("EnableTwoFactor")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("MaintenanceMode")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("MaxLoginAttempts")
+                        .HasColumnType("int");
+
+                    b.Property<string>("NotificationEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SessionTimeout")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SiteEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SiteName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("SettingID");
+
+                    b.ToTable("SystemSettings");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.TicketReply", b =>
+                {
+                    b.Property<int>("ReplyID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReplyID"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsAdminReply")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TicketID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("ReplyID");
+
+                    b.HasIndex("TicketID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("TicketReplies");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.UserAddon", b =>
+                {
+                    b.Property<int>("UserAddonID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserAddonID"));
+
+                    b.Property<DateTime>("ActivatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("AddonID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("NextBillingDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("UserAddonID");
+
+                    b.HasIndex("AddonID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("UserAddons");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.VerificationCode", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("VerificationCodes");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.ActivityLog", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Device", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany("Devices")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Invoice", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.PrepaidLoad", "PrepaidLoad")
+                        .WithMany()
+                        .HasForeignKey("PrepaidLoadID")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("TayoKonnektado_project.Models.Subscription", "Subscription")
+                        .WithMany("Invoices")
+                        .HasForeignKey("SubscriptionID")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany("Invoices")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PrepaidLoad");
+
+                    b.Navigation("Subscription");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.LoginAttempt", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.LoginHistory", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Notification", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany("Notifications")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.NotificationPreference", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Payment", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.Invoice", "Invoice")
+                        .WithMany("Payments")
+                        .HasForeignKey("InvoiceID")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany("Payments")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Invoice");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.PrepaidLoad", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.ServiceAccount", "ServiceAccount")
+                        .WithMany("PrepaidLoads")
+                        .HasForeignKey("ServiceAccountID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ServiceAccount");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.PrepaidPromo", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.PrepaidLoad", "PrepaidLoad")
+                        .WithMany()
+                        .HasForeignKey("PrepaidLoadID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("PrepaidLoad");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.SavedPaymentMethod", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.ServiceAccount", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.Device", "Device")
+                        .WithMany("ServiceAccounts")
+                        .HasForeignKey("DeviceID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Device");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Subscription", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.SubscriptionPlan", "Plan")
+                        .WithMany("Subscriptions")
+                        .HasForeignKey("PlanID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("TayoKonnektado_project.Models.ServiceAccount", "ServiceAccount")
+                        .WithMany("Subscriptions")
+                        .HasForeignKey("ServiceAccountID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany("Subscriptions")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Plan");
+
+                    b.Navigation("ServiceAccount");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.SupportTicket", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.Device", "Device")
+                        .WithMany("SupportTickets")
+                        .HasForeignKey("DeviceID");
+
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany("SupportTickets")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Device");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.TicketReply", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.SupportTicket", "Ticket")
+                        .WithMany("Replies")
+                        .HasForeignKey("TicketID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ticket");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.UserAddon", b =>
+                {
+                    b.HasOne("TayoKonnektado_project.Models.Addon", "Addon")
+                        .WithMany("UserAddons")
+                        .HasForeignKey("AddonID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TayoKonnektado_project.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Addon");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Addon", b =>
+                {
+                    b.Navigation("UserAddons");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.ApplicationUser", b =>
+                {
+                    b.Navigation("Devices");
+
+                    b.Navigation("Invoices");
+
+                    b.Navigation("Notifications");
+
+                    b.Navigation("Payments");
+
+                    b.Navigation("Subscriptions");
+
+                    b.Navigation("SupportTickets");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Device", b =>
+                {
+                    b.Navigation("ServiceAccounts");
+
+                    b.Navigation("SupportTickets");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Invoice", b =>
+                {
+                    b.Navigation("Payments");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.ServiceAccount", b =>
+                {
+                    b.Navigation("PrepaidLoads");
+
+                    b.Navigation("Subscriptions");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.Subscription", b =>
+                {
+                    b.Navigation("Invoices");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.SubscriptionPlan", b =>
+                {
+                    b.Navigation("Subscriptions");
+                });
+
+            modelBuilder.Entity("TayoKonnektado_project.Models.SupportTicket", b =>
+                {
+                    b.Navigation("Replies");
+                });
+#pragma warning restore 612, 618
+        }
+    }
+}
 ParseOptions.0.jsonË
 
 QE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Models\ApplicationUser.cs˝	using Microsoft.AspNetCore.Identity;
@@ -31228,17 +36435,27 @@ namespace TayoKonnektado_project.Models
         public ICollection<Payment> Payments { get; set; } = new List<Payment>();
     }
 }
-ParseOptions.0.jsonœ
-LE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Models\AuthModels.csÈnamespace TayoKonnektado_project.Models
+ParseOptions.0.json›
+LE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Models\AuthModels.cs˜using System.ComponentModel.DataAnnotations;
+
+namespace TayoKonnektado_project.Models
 {
     public class RegisterRequest
     {
+        [Required]
+        [EmailAddress]
         public string Email { get; set; } = string.Empty;
+        [Required]
+        [MinLength(12)]
         public string Password { get; set; } = string.Empty;
+        [Required]
         public string FirstName { get; set; } = string.Empty;
+        [Required]
         public string LastName { get; set; } = string.Empty;
         public DateTime? Birthday { get; set; }
         public string? Address { get; set; }
+        [Required]
+        public string CaptchaToken { get; set; } = string.Empty;
     }
 
     public class VerifyEmailRequest
@@ -31262,8 +36479,13 @@ LE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Models\AuthModels.csÈ
 
     public class LoginRequest
     {
+        [Required]
+        [EmailAddress]
         public string Email { get; set; } = string.Empty;
+        [Required]
         public string Password { get; set; } = string.Empty;
+        [Required]
+        public string CaptchaToken { get; set; } = string.Empty;
     }
 
     public class GoogleLoginRequest
@@ -31289,8 +36511,8 @@ LE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Models\AuthModels.csÈ
         public DateTime Expiration { get; set; }
     }
 }
-ParseOptions.0.jsonåW
-JE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Models\Entities.cs®Vusing System.ComponentModel.DataAnnotations;
+ParseOptions.0.jsonèf
+JE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Models\Entities.cs´eusing System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TayoKonnektado_project.Models
@@ -31584,6 +36806,51 @@ namespace TayoKonnektado_project.Models
         [ForeignKey("UserID")]
         public ApplicationUser User { get; set; } = null!;
     }
+
+    public class RolePermission
+    {
+        [Key]
+        public int RolePermissionID { get; set; }
+        public string RoleName { get; set; } = string.Empty; // "Admin" or "Staff"
+        public string PermissionName { get; set; } = string.Empty;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? UpdatedAt { get; set; }
+    }
+
+    public class SystemSettings
+    {
+        [Key]
+        public int SettingID { get; set; }
+        public string SiteName { get; set; } = "TayoKonnektado";
+        public string SiteEmail { get; set; } = string.Empty;
+        public bool MaintenanceMode { get; set; } = false;
+        public int MaxLoginAttempts { get; set; } = 5;
+        public int SessionTimeout { get; set; } = 30;
+        public bool EnableTwoFactor { get; set; } = true;
+        public bool EnableAuditLogs { get; set; } = true;
+        public string NotificationEmail { get; set; } = string.Empty;
+        public bool EmailOnNewTickets { get; set; } = true;
+        public bool EmailOnPaymentReceived { get; set; } = true;
+        public bool EmailOnSystemErrors { get; set; } = true;
+        public bool EmailOnSecurityAlerts { get; set; } = true;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    }
+
+    public class LoginAttempt
+    {
+        [Key]
+        public int LoginAttemptID { get; set; }
+        public string UserID { get; set; } = string.Empty;
+        public int FailedAttempts { get; set; } = 0;
+        public DateTime? LockedUntil { get; set; }
+        public string? LockReason { get; set; } // "30_mins", "2_hours", "30_days"
+        public DateTime LastAttemptAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        [ForeignKey("UserID")]
+        public ApplicationUser User { get; set; } = null!;
+    }
 }
 ParseOptions.0.jsonì
 RE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Models\OnboardingModels.csßusing System.ComponentModel.DataAnnotations;
@@ -31654,15 +36921,29 @@ namespace TayoKonnektado_project.Models
         public ApplicationUser User { get; set; } = null!;
     }
 }
-ParseOptions.0.jsonò9
-BE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Program.csº8using Microsoft.AspNetCore.Authentication.JwtBearer;
+ParseOptions.0.jsonà
+RE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Models\SecuritySettings.csúnamespace TayoKonnektado_project.Models
+{
+    public class SecuritySettings
+    {
+        public List<string> BlockedIPs { get; set; } = new();
+        public List<string> BlockedUserAgents { get; set; } = new();
+        public int MaxFailedAttemptsPerIp { get; set; } = 10;
+        public int MaxFailedAttemptsPerDevice { get; set; } = 10;
+        public int BlockMinutes { get; set; } = 15;
+    }
+}
+ParseOptions.0.jsonéE
+BE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Program.cs≤Dusing Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Threading.RateLimiting;
 using TayoKonnektado_project.Data;
 using TayoKonnektado_project.Models;
 using TayoKonnektado_project.Services;
+using TayoKonnektado_project.Services.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31714,17 +36995,27 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 //Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
-    //Relax password requirements for easier testing
-    options.Password.RequireDigit = false;
-    options.Password.RequireLowercase = false;
-    options.Password.RequireUppercase = false;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequiredLength = 6;
+    // Strong password policy
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequiredLength = 12;
+    options.Password.RequiredUniqueChars = 4;
+
+    // Lockout policy for brute-force protection
+    options.Lockout.AllowedForNewUsers = true;
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
 })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
 //JWT Authentication
+var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
+if (string.IsNullOrWhiteSpace(jwtKey))
+    throw new InvalidOperationException("JWT secret key is not configured. Set JWT_KEY environment variable.");
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -31740,7 +37031,7 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
     };
 })
 .AddGoogle(options =>
@@ -31761,6 +37052,22 @@ builder.Services.AddCors(options =>
         });
 });
 
+// Rate limiting for auth endpoints
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddPolicy("auth", httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 20,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 5
+            }));
+});
+
 //Register Services
 builder.Services.AddScoped<TayoKonnektado_project.Services.PayMongoService>();
 builder.Services.AddScoped<TayoKonnektado_project.Services.TokenService>();
@@ -31773,9 +37080,13 @@ builder.Services.AddScoped<TayoKonnektado_project.Services.Admin.StaffManagement
 builder.Services.AddScoped<TayoKonnektado_project.Services.Admin.DashboardService>();
 builder.Services.AddScoped<TayoKonnektado_project.Services.Admin.PlanManagementService>();
 builder.Services.AddScoped<TayoKonnektado_project.Services.Admin.FAQManagementService>();
+builder.Services.AddScoped<TayoKonnektado_project.Services.LoginAttemptService>();
 builder.Services.AddHostedService<TayoKonnektado_project.Services.SubscriptionEndDateService>();
 builder.Services.AddHostedService<TayoKonnektado_project.Services.PrepaidUsageService>();
 builder.Services.AddHttpClient();
+builder.Services.Configure<SecuritySettings>(builder.Configuration.GetSection("Security"));
+builder.Services.AddSingleton<IpDeviceReputationService>();
+builder.Services.AddHttpClient<PasswordBreachService>();
 
 var app = builder.Build();
 
@@ -31798,6 +37109,8 @@ else
 }
 
 app.UseAuthentication();
+app.UseRateLimiter();
+app.UseMiddleware<ActivityLoggingMiddleware>();
 app.UseAuthorization();
 
 app.MapControllers();
@@ -31839,6 +37152,146 @@ public class UtcDateTimeConverter : System.Text.Json.Serialization.JsonConverter
     public override void Write(System.Text.Json.Utf8JsonWriter writer, DateTime value, System.Text.Json.JsonSerializerOptions options)
     {
         writer.WriteStringValue(DateTime.SpecifyKind(value, DateTimeKind.Utc));
+    }
+}
+ParseOptions.0.jsonÑ/
+]E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Services\ActivityLoggingMiddleware.csç.using System.Globalization;
+using System.Security.Claims;
+using TayoKonnektado_project.Data;
+using TayoKonnektado_project.Models;
+
+namespace TayoKonnektado_project.Services
+{
+    public class ActivityLoggingMiddleware
+    {
+        private readonly RequestDelegate _next;
+
+        public ActivityLoggingMiddleware(RequestDelegate next)
+        {
+            _next = next;
+        }
+
+        public async Task InvokeAsync(HttpContext context, ApplicationDbContext dbContext)
+        {
+            var shouldLog = ShouldLogRequest(context.Request);
+
+            await _next(context);
+
+            if (!shouldLog)
+                return;
+
+            if (context.Response.StatusCode < StatusCodes.Status200OK || context.Response.StatusCode >= StatusCodes.Status400BadRequest)
+                return;
+
+            var userId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(userId))
+                return;
+
+            try
+            {
+                var type = GetActivityType(context.Request);
+                var action = BuildAction(context.Request, type);
+
+                dbContext.ActivityLogs.Add(new ActivityLog
+                {
+                    UserID = userId,
+                    Action = action,
+                    Type = type,
+                    IPAddress = context.Connection.RemoteIpAddress?.ToString(),
+                    Timestamp = DateTime.UtcNow
+                });
+
+                await dbContext.SaveChangesAsync();
+            }
+            catch
+            {
+                // Do not block API responses because of activity logging failures.
+            }
+        }
+
+        private static bool ShouldLogRequest(HttpRequest request)
+        {
+            if (!request.Path.StartsWithSegments("/api", StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            var path = request.Path.Value?.ToLowerInvariant() ?? string.Empty;
+
+            // Prevent recursive/noisy logs.
+            if (path.StartsWith("/api/admin/activity-logs")
+                || path.StartsWith("/api/activity/log")
+                || path.StartsWith("/api/admin/notifications")
+                || path.StartsWith("/api/admin/dashboard/stats")
+                || path.StartsWith("/api/auth/onboarding-status")
+                || path.StartsWith("/api/customer/notifications")
+                || path.StartsWith("/api/customer/profile"))
+                return false;
+
+            return request.Method is "GET" or "POST" or "PUT" or "PATCH" or "DELETE";
+        }
+
+        private static string GetActivityType(HttpRequest request)
+        {
+            var path = request.Path.Value?.ToLowerInvariant() ?? string.Empty;
+
+            if (path.Contains("/auth/login") || path.Contains("/auth/google-login") || path.Contains("/auth/verify-2fa-login"))
+                return "Login";
+
+            return request.Method switch
+            {
+                "GET" => "View",
+                "POST" => "Create",
+                "PUT" or "PATCH" => "Update",
+                "DELETE" => "Delete",
+                _ => "View"
+            };
+        }
+
+        private static string BuildAction(HttpRequest request, string type)
+        {
+            var path = request.Path.Value?.ToLowerInvariant() ?? string.Empty;
+
+            if (path.Contains("/auth/login")) return "Logged in";
+            if (path.Contains("/auth/register")) return "Registered account";
+            if (path.Contains("/auth/google-login")) return "Logged in with Google";
+            if (path.Contains("/auth/verify-email")) return "Verified email address";
+            if (path.Contains("/auth/verify-2fa-login")) return "Completed two-factor login";
+
+            if (path.Contains("/customer/tickets") && type == "Create") return "Created support ticket";
+            if (path.Contains("/customer/tickets") && type == "Update") return "Updated support ticket";
+            if (path.Contains("/customer/tickets") && type == "Delete") return "Deleted support ticket";
+
+            if (path.Contains("/admin/tickets") && type == "Update") return "Updated support ticket status";
+            if (path.Contains("/admin/payments") && path.Contains("approve")) return "Approved payment";
+            if (path.Contains("/admin/payments") && path.Contains("reject")) return "Rejected payment";
+            if (path.Contains("/admin/staff") && type == "Create") return "Created staff account";
+            if (path.Contains("/admin/staff") && type == "Update") return "Updated staff account";
+            if (path.Contains("/admin/staff") && type == "Delete") return "Deleted staff account";
+            if (path.Contains("/admin/customers") && type == "Update") return "Updated customer account";
+            if (path.Contains("/admin/customers") && type == "Delete") return "Deleted customer account";
+
+            var segments = request.Path.Value?
+                .Split('/', StringSplitOptions.RemoveEmptyEntries)
+                .Skip(1) // Skip "api"
+                .ToArray() ?? Array.Empty<string>();
+
+            if (segments.Length == 0)
+                return type == "Create" ? "Created data" : type == "Update" ? "Updated data" : "Deleted data";
+
+            var resourceParts = segments
+                .Take(Math.Min(2, segments.Length))
+                .Select(s => s.Replace('-', ' '))
+                .Select(s => CultureInfo.InvariantCulture.TextInfo.ToTitleCase(s));
+
+            var resource = string.Join(" ", resourceParts);
+
+            return type switch
+            {
+                "Create" => $"Created {resource}",
+                "Update" => $"Updated {resource}",
+                "Delete" => $"Deleted {resource}",
+                _ => $"Viewed {resource}"
+            };
+        }
     }
 }
 ParseOptions.0.json˛
@@ -32068,8 +37521,8 @@ namespace TayoKonnektado_project.Services.Admin
         }
     }
 }
-ParseOptions.0.json‡%
-ZE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Services\Admin\DashboardService.csÏ$using Microsoft.AspNetCore.Identity;
+ParseOptions.0.json∫H
+ZE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Services\Admin\DashboardService.cs∆Gusing Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TayoKonnektado_project.Data;
 using TayoKonnektado_project.Models;
@@ -32179,22 +37632,126 @@ namespace TayoKonnektado_project.Services.Admin
                 .ToListAsync();
         }
 
-        public async Task<object> GetActivityLogsAsync()
+        public async Task<object> GetActivityLogsAsync(DateTime? since = null)
         {
-            return await _context.ActivityLogs
-                .Include(l => l.User)
-                .OrderByDescending(l => l.Timestamp)
-                .Take(100)
-                .Select(l => new
+            var roleByUser = await _context.UserRoles
+                .Join(
+                    _context.Roles,
+                    ur => ur.RoleId,
+                    r => r.Id,
+                    (ur, r) => new { ur.UserId, RoleName = r.Name ?? string.Empty })
+                .GroupBy(x => x.UserId)
+                .Select(g => new
                 {
-                    l.LogID,
-                    User = l.User.FirstName + " " + l.User.LastName,
-                    l.Action,
-                    l.Type,
-                    l.IPAddress,
-                    l.Timestamp
+                    UserId = g.Key,
+                    Role = g
+                        .OrderBy(x => (x.RoleName ?? string.Empty).ToLower() == "superadmin" ? 0 : (x.RoleName ?? string.Empty).ToLower() == "admin" ? 1 : (x.RoleName ?? string.Empty).ToLower() == "staff" ? 2 : 3)
+                        .Select(x => x.RoleName)
+                        .FirstOrDefault()
                 })
+                .ToDictionaryAsync(x => x.UserId, x => x.Role ?? string.Empty);
+
+            var logsQuery = _context.ActivityLogs
+                .AsNoTracking()
+                .Include(l => l.User)
+                .AsQueryable();
+
+            if (since.HasValue)
+            {
+                var sinceUtc = DateTime.SpecifyKind(since.Value, DateTimeKind.Utc);
+                logsQuery = logsQuery.Where(l => l.Timestamp > sinceUtc);
+            }
+
+            var logs = await logsQuery
+                .OrderByDescending(l => l.Timestamp)
+                .Take(1000)
                 .ToListAsync();
+
+            var loginHistoryQuery = _context.LoginHistory
+                .AsNoTracking()
+                .Include(h => h.User)
+                .AsQueryable();
+
+            if (since.HasValue)
+            {
+                var sinceUtc = DateTime.SpecifyKind(since.Value, DateTimeKind.Utc);
+                loginHistoryQuery = loginHistoryQuery.Where(h => h.LoginTime > sinceUtc);
+            }
+
+            var loginHistory = await loginHistoryQuery
+                .OrderByDescending(h => h.LoginTime)
+                .Take(500)
+                .ToListAsync();
+
+            var activityEntries = logs.Select(l => new ActivityLogView
+            {
+                LogID = l.LogID,
+                UserID = l.UserID,
+                UserEmail = l.User?.Email,
+                User = l.User == null
+                    ? "Unknown"
+                    : !string.IsNullOrWhiteSpace((l.User.FirstName + " " + l.User.LastName).Trim())
+                        ? (l.User.FirstName + " " + l.User.LastName).Trim()
+                        : (l.User.Email ?? "Unknown"),
+                UserRole = roleByUser.TryGetValue(l.UserID, out var resolvedRole)
+                    ? resolvedRole
+                    : (l.User != null && !string.IsNullOrWhiteSpace(l.User.Role) ? l.User.Role : "Customer"),
+                Action = l.Action,
+                Type = l.Type,
+                IPAddress = l.IPAddress,
+                Timestamp = l.Timestamp
+            });
+
+            var loginEntries = loginHistory.Select(h => new ActivityLogView
+            {
+                LogID = -h.LoginHistoryID,
+                UserID = h.UserID,
+                UserEmail = h.User?.Email,
+                User = h.User == null
+                    ? "Unknown"
+                    : !string.IsNullOrWhiteSpace((h.User.FirstName + " " + h.User.LastName).Trim())
+                        ? (h.User.FirstName + " " + h.User.LastName).Trim()
+                        : (h.User.Email ?? "Unknown"),
+                UserRole = roleByUser.TryGetValue(h.UserID, out var resolvedRole)
+                    ? resolvedRole
+                    : (h.User != null && !string.IsNullOrWhiteSpace(h.User.Role) ? h.User.Role : "Customer"),
+                Action = "Logged in",
+                Type = "Login",
+                IPAddress = h.IPAddress,
+                Timestamp = h.LoginTime
+            });
+
+            return activityEntries
+                .Concat(loginEntries)
+                .Where(x => !string.Equals(x.UserRole, "SuperAdmin", StringComparison.OrdinalIgnoreCase))
+                .OrderByDescending(x => x.Timestamp)
+                .Take(1000)
+                .Select(x => new
+                {
+                    x.LogID,
+                    x.UserID,
+                    x.UserEmail,
+                    x.User,
+                    x.UserRole,
+                    x.Action,
+                    x.Type,
+                    x.IPAddress,
+                    x.Timestamp
+                })
+                .ToList();
+        }
+
+        private sealed class ActivityLogView
+        {
+            public int LogID { get; set; }
+            public string UserID { get; set; } = string.Empty;
+            public string? UserEmail { get; set; }
+            public string User { get; set; } = "Unknown";
+            public string UserRole { get; set; } = "Customer";
+            public string Action { get; set; } = string.Empty;
+            public string Type { get; set; } = "View";
+            public string? IPAddress { get; set; }
+            public DateTime Timestamp { get; set; }
         }
     }
 }
@@ -33161,6 +38718,103 @@ namespace TayoKonnektado_project.Services
         }
     }
 }
+ParseOptions.0.jsonˆ
+WE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Services\LoginAttemptService.csÖusing Microsoft.EntityFrameworkCore;
+using TayoKonnektado_project.Data;
+using TayoKonnektado_project.Models;
+
+namespace TayoKonnektado_project.Services
+{
+    public class LoginAttemptService
+    {
+        private readonly ApplicationDbContext _context;
+
+        public LoginAttemptService(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<(bool isLocked, string? message, int? remainingMinutes)> CheckLoginAttemptAsync(string userId)
+        {
+            var attempt = await _context.LoginAttempts.FirstOrDefaultAsync(la => la.UserID == userId);
+            
+            if (attempt == null)
+                return (false, null, null);
+
+            if (attempt.LockedUntil.HasValue && attempt.LockedUntil > DateTime.UtcNow)
+            {
+                var remainingMinutes = (int)Math.Ceiling((attempt.LockedUntil.Value - DateTime.UtcNow).TotalMinutes);
+                return (true, $"Account locked. Try again in {remainingMinutes} minutes.", remainingMinutes);
+            }
+
+            if (attempt.LockedUntil.HasValue && attempt.LockedUntil <= DateTime.UtcNow)
+            {
+                attempt.FailedAttempts = 0;
+                attempt.LockedUntil = null;
+                attempt.LockReason = null;
+                await _context.SaveChangesAsync();
+            }
+
+            return (false, null, null);
+        }
+
+        public async Task RecordFailedAttemptAsync(string userId)
+        {
+            var attempt = await _context.LoginAttempts.FirstOrDefaultAsync(la => la.UserID == userId);
+
+            if (attempt == null)
+            {
+                attempt = new LoginAttempt { UserID = userId, FailedAttempts = 1, LastAttemptAt = DateTime.UtcNow };
+                _context.LoginAttempts.Add(attempt);
+            }
+            else
+            {
+                attempt.FailedAttempts++;
+                attempt.LastAttemptAt = DateTime.UtcNow;
+            }
+
+            // Apply lockout based on failed attempts
+            if (attempt.FailedAttempts == 3)
+            {
+                attempt.LockedUntil = DateTime.UtcNow.AddMinutes(30);
+                attempt.LockReason = "30_mins";
+            }
+            else if (attempt.FailedAttempts >= 4 && attempt.FailedAttempts <= 7)
+            {
+                attempt.LockedUntil = DateTime.UtcNow.AddHours(2);
+                attempt.LockReason = "2_hours";
+            }
+            else if (attempt.FailedAttempts >= 8)
+            {
+                attempt.LockedUntil = DateTime.UtcNow.AddDays(30);
+                attempt.LockReason = "30_days";
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task ResetAttemptsAsync(string userId)
+        {
+            var attempt = await _context.LoginAttempts.FirstOrDefaultAsync(la => la.UserID == userId);
+            if (attempt != null)
+            {
+                attempt.FailedAttempts = 0;
+                attempt.LockedUntil = null;
+                attempt.LockReason = null;
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<List<LoginAttempt>> GetSuspendedUsersAsync()
+        {
+            return await _context.LoginAttempts
+                .Where(la => la.LockedUntil.HasValue && la.LockedUntil > DateTime.UtcNow)
+                .Include(la => la.User)
+                .OrderByDescending(la => la.LockedUntil)
+                .ToListAsync();
+        }
+    }
+}
 ParseOptions.0.jsonÃt
 SE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Services\PayMongoService.csﬂsusing System.Text;
 using System.Text.Json;
@@ -33663,6 +39317,173 @@ namespace TayoKonnektado_project.Services
         }
     }
 }
+ParseOptions.0.jsonÂ 
+fE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Services\Security\IpDeviceReputationService.csÂusing System.Collections.Concurrent;
+using Microsoft.Extensions.Options;
+using TayoKonnektado_project.Models;
+
+namespace TayoKonnektado_project.Services.Security
+{
+    public class IpDeviceReputationService
+    {
+        private readonly SecuritySettings _settings;
+        private readonly ConcurrentDictionary<string, FailureWindow> _ipFailures = new();
+        private readonly ConcurrentDictionary<string, FailureWindow> _deviceFailures = new();
+
+        public IpDeviceReputationService(IOptions<SecuritySettings> options)
+        {
+            _settings = options.Value;
+        }
+
+        public bool IsBlocked(string? ip, string? userAgent, out string reason)
+        {
+            reason = string.Empty;
+
+            if (!string.IsNullOrWhiteSpace(ip) && _settings.BlockedIPs.Any(b => string.Equals(b, ip, StringComparison.OrdinalIgnoreCase)))
+            {
+                reason = "IP blocked";
+                return true;
+            }
+
+            if (!string.IsNullOrWhiteSpace(userAgent) && _settings.BlockedUserAgents.Any(b => userAgent.Contains(b, StringComparison.OrdinalIgnoreCase)))
+            {
+                reason = "Device blocked";
+                return true;
+            }
+
+            if (!string.IsNullOrWhiteSpace(ip) && _ipFailures.TryGetValue(ip, out var ipWindow) && ipWindow.BlockedUntilUtc > DateTime.UtcNow)
+            {
+                reason = "Too many failed attempts";
+                return true;
+            }
+
+            var deviceKey = BuildDeviceKey(ip, userAgent);
+            if (!string.IsNullOrWhiteSpace(deviceKey) && _deviceFailures.TryGetValue(deviceKey, out var deviceWindow) && deviceWindow.BlockedUntilUtc > DateTime.UtcNow)
+            {
+                reason = "Too many failed attempts";
+                return true;
+            }
+
+            return false;
+        }
+
+        public void RegisterFailure(string? ip, string? userAgent)
+        {
+            if (!string.IsNullOrWhiteSpace(ip))
+            {
+                var window = _ipFailures.GetOrAdd(ip, _ => new FailureWindow());
+                window.RegisterFailure(_settings.MaxFailedAttemptsPerIp, TimeSpan.FromMinutes(_settings.BlockMinutes));
+            }
+
+            var deviceKey = BuildDeviceKey(ip, userAgent);
+            if (!string.IsNullOrWhiteSpace(deviceKey))
+            {
+                var window = _deviceFailures.GetOrAdd(deviceKey, _ => new FailureWindow());
+                window.RegisterFailure(_settings.MaxFailedAttemptsPerDevice, TimeSpan.FromMinutes(_settings.BlockMinutes));
+            }
+        }
+
+        public void RegisterSuccess(string? ip, string? userAgent)
+        {
+            if (!string.IsNullOrWhiteSpace(ip))
+                _ipFailures.TryRemove(ip, out _);
+
+            var deviceKey = BuildDeviceKey(ip, userAgent);
+            if (!string.IsNullOrWhiteSpace(deviceKey))
+                _deviceFailures.TryRemove(deviceKey, out _);
+        }
+
+        private static string BuildDeviceKey(string? ip, string? userAgent)
+        {
+            if (string.IsNullOrWhiteSpace(ip) || string.IsNullOrWhiteSpace(userAgent))
+                return string.Empty;
+
+            return $"{ip}:{userAgent}".ToLowerInvariant();
+        }
+
+        private sealed class FailureWindow
+        {
+            private int _count;
+            private DateTime _windowStartUtc = DateTime.UtcNow;
+            public DateTime BlockedUntilUtc { get; private set; } = DateTime.MinValue;
+
+            public void RegisterFailure(int maxAttempts, TimeSpan blockDuration)
+            {
+                var now = DateTime.UtcNow;
+
+                if (now - _windowStartUtc > TimeSpan.FromMinutes(10))
+                {
+                    _windowStartUtc = now;
+                    _count = 0;
+                }
+
+                _count++;
+
+                if (_count >= maxAttempts)
+                {
+                    BlockedUntilUtc = now.Add(blockDuration);
+                }
+            }
+        }
+    }
+}
+ParseOptions.0.json∑
+bE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Services\Security\PasswordBreachService.csªusing System.Net.Http.Headers;
+using System.Security.Cryptography;
+using System.Text;
+
+namespace TayoKonnektado_project.Services.Security
+{
+    public class PasswordBreachService
+    {
+        private readonly HttpClient _httpClient;
+
+        public PasswordBreachService(HttpClient httpClient)
+        {
+            _httpClient = httpClient;
+        }
+
+        public async Task<bool> IsBreachedAsync(string password, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrWhiteSpace(password))
+                return false;
+
+            var hash = ComputeSha1(password);
+            var prefix = hash[..5];
+            var suffix = hash[5..];
+
+            var request = new HttpRequestMessage(HttpMethod.Get, $"https://api.pwnedpasswords.com/range/{prefix}");
+            request.Headers.UserAgent.Add(new ProductInfoHeaderValue("TayoKonnektado", "1.0"));
+
+            var response = await _httpClient.SendAsync(request, cancellationToken);
+            if (!response.IsSuccessStatusCode)
+                return false;
+
+            var body = await response.Content.ReadAsStringAsync(cancellationToken);
+            var lines = body.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var line in lines)
+            {
+                var parts = line.Trim().Split(':');
+                if (parts.Length < 2) continue;
+                if (string.Equals(parts[0], suffix, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+
+            return false;
+        }
+
+        private static string ComputeSha1(string input)
+        {
+            using var sha1 = SHA1.Create();
+            var bytes = sha1.ComputeHash(Encoding.UTF8.GetBytes(input));
+            var sb = new StringBuilder(bytes.Length * 2);
+            foreach (var b in bytes)
+                sb.Append(b.ToString("X2"));
+            return sb.ToString();
+        }
+    }
+}
 ParseOptions.0.json∑
 ^E:\projects\sharp_tayokonnektado\TayoKonnektado-project\Services\SubscriptionEndDateService.csøusing Microsoft.EntityFrameworkCore;
 using TayoKonnektado_project.Data;
@@ -33716,26 +39537,34 @@ namespace TayoKonnektado_project.Services
         }
     }
 }
-ParseOptions.0.json‚
-PE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Services\TokenService.cs¯using Microsoft.IdentityModel.Tokens;
+ParseOptions.0.jsonÒ
+PE:\projects\sharp_tayokonnektado\TayoKonnektado-project\Services\TokenService.csáusing Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using TayoKonnektado_project.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace TayoKonnektado_project.Services
 {
     public class TokenService
     {
         private readonly IConfiguration _configuration;
+        private readonly ApplicationDbContext _context;
 
-        public TokenService(IConfiguration configuration)
+        public TokenService(IConfiguration configuration, ApplicationDbContext context)
         {
             _configuration = configuration;
+            _context = context;
         }
 
-        public string GenerateToken(string email, string userId, string? role = null)
+        public async Task<string> GenerateTokenAsync(string email, string userId, string? role = null)
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
+            var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
+            if (string.IsNullOrWhiteSpace(jwtKey))
+                throw new InvalidOperationException("JWT secret key is not configured. Set JWT_KEY environment variable.");
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claimsList = new List<Claim>
@@ -33752,15 +39581,23 @@ namespace TayoKonnektado_project.Services
 
             var claims = claimsList.ToArray();
 
+            var settings = await _context.SystemSettings.FirstOrDefaultAsync();
+            var sessionTimeoutMinutes = settings?.SessionTimeout ?? 30;
+
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(24),
+                expires: DateTime.UtcNow.AddMinutes(sessionTimeoutMinutes),
                 signingCredentials: credentials
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public string GenerateToken(string email, string userId, string? role = null)
+        {
+            return GenerateTokenAsync(email, userId, role).Result;
         }
     }
 }
@@ -33803,7 +39640,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TayoKonnektado-project")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3f0e8f4ca2601ee846d676cc208008f4daac6619")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5f909935172de315638ac6fc5e20b443f3217a22")]
 [assembly: System.Reflection.AssemblyProductAttribute("TayoKonnektado-project")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TayoKonnektado-project")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
